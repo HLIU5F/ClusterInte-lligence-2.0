@@ -1,0 +1,27 @@
+# Cluster-Intelligence Enricher 配置
+#
+# 启用方式：
+#   enrichers: all              → 注册表里 enabled=True 的全开（默认）
+#   enrichers: [ip_geo, ...]    → 只开列表里的
+#   enrichers:                  → dict 形式，可给每个传参 + 单独关
+#
+# 当前是纯内网场景，ip_geo 关闭；以后接公网数据时把 ip_geo.enabled 改回 true 即可。
+
+enrichers:
+  subnet_cidr:
+    enabled: true
+  service_type:
+    enabled: true
+    params:
+      min_confidence: 0.15
+  port_service:
+    enabled: true
+    params:
+      include_unknown: true
+  anomaly_score:
+    enabled: true
+  ip_geo:
+    enabled: false
+
+fail_fast: false    # 一个 enricher 整体炸了是否停 pipeline
+concurrency: 4      # 预留；当前同步实现没用
