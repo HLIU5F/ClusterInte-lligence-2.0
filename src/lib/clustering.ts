@@ -1,7 +1,8 @@
-﻿// src/lib/clustering.ts
+// src/lib/clustering.ts
 // 多策略聚类：当图算法不适用时，基于节点属性进行安全域划分
 
 import type { TopologyNode, TopologyLink } from '@/lib/types';
+import { ROLE_LABELS } from '@/lib/types';
 
 export type ClusteringStrategy =
   | 'subnet24'      // /24 子网分组
@@ -10,6 +11,9 @@ export type ClusteringStrategy =
   | 'port_type'     // 端口类型分组（web/db/cache等）
   | 'ip_decade'     // IP 十位分组
   | 'service_type'  // 服务类型推断
+  | 'service_port'  // 端口服务域（方向感知：入向=服务签名，出向=消费签名，+子网细化）
+  | 'flow_anchor'   // 通信锚点域（方案2：源IP+目的IP+固定目的端口 三元组锚点，含调用方子网）
+  | 'policy_domain' // 策略域（服务类别聚合，忽略子网，面向安全策略配置）
   | 'zone_label'    // 按标签细分
   | 'security_v3';  // 三层安全域（核心基础设施域 + 物理域 + 业务社区 + 属性细分）
 
@@ -25,6 +29,12 @@ export interface ClusteringZone {
   node_id: string;
   zone_id: string;
   algorithm: string;
+  /** flow_anchor 附加元数据：节点方向角色（服务提供 / 客户端 / 监控终端） */
+  direction?: 'service' | 'client' | 'terminal';
+  /** flow_anchor：服务提供者被哪些调用方子网访问 */
+  callers?: string;
+  /** flow_anchor：客户端访问哪些对端子网 */
+  peers?: string;
 }
 
 export interface ClusteringResult {
@@ -47,6 +57,9 @@ export const CLUSTERING_LABELS: Record<ClusteringStrategy, string> = {
   port_type: '端口类型',
   ip_decade: 'IP 十位段',
   service_type: '服务类型',
+  service_port: '端口服务域',
+  flow_anchor: '通信锚点域（方案2）',
+  policy_domain: '策略域',
   zone_label: '按 zone_label 细分',
   security_v3: '三层安全域',
 
@@ -59,6 +72,9 @@ export const CLUSTERING_DESCRIPTIONS: Record<ClusteringStrategy, string> = {
   port_type: '按端口服务类型分组（Web / 数据库 / 缓存 / 消息队列等）',
   ip_decade: '按 IP 第三段十位数分组（如 10.0.10-19.x 为一组）',
   service_type: '按推断的服务角色分组（Web 服务 / 数据库 / 缓存等）',
+  service_port: '方向感知的端口服务域：入向端口（别人访问我）= 服务签名，出向端口（我访问别人）= 消费签名；剔除监控/采集端口 + 子网细化',
+  flow_anchor: '通信锚点域（方案2）：以 (源IP, 目的IP, 固定目的端口) 三元组为锚点，域 = 服务类别 × 服务子网 × 调用方子网；接入主机间流量后自动细分为"谁调用我的哪个服务"，可支撑动态 ACL',
+  policy_domain: '按服务类别聚合（忽略子网），得到约 12 个可配策略的域：Web / 管理 / 监控 / 中间件等',
   zone_label: '按 zone_label / zone_id 字符串分组（如 enrich、dmz 等），适合多域场景',
   security_v3: '先识别核心基础设施域，再按物理域 -> 业务通信社区 -> 属性细分的三层结构划分，并施加最小域规模约束',
 
@@ -278,6 +294,358 @@ function clusterByServiceType(nodes: TopologyNode[]): ClusteringResult {
 
   const uniqueZones = new Set(zones.map(z => z.zone_id));
   return { zones, zoneCount: uniqueZones.size, strategy: 'service_type', zoneLabels };
+}
+
+// ============ 端口服务域（方案1/方案2 的落地） ============
+
+/** 服务类别 → 中文标签（与 classifyPort 对应） */
+const SERVICE_CLASS_LABELS: Record<string, string> = {
+  web: 'Web 服务',
+  database: '数据库',
+  cache: '缓存',
+  messaging: '消息队列',
+  email: '邮件',
+  remote: '远程管理',
+  dns: 'DNS',
+  file_transfer: '文件传输',
+  auth: '认证服务',
+  logging: '日志采集',
+  monitoring: '监控',
+  system: '系统服务',
+  other: '其他',
+};
+
+/** 监控/采集端口：不参与业务服务签名，避免把业务主机全部吸进"监控域" */
+const MONITOR_PORTS = new Set([36000, 9100, 9101, 1514, 1515, 6514]);
+
+/** 已确认的采集 / 汇聚 / 安全设备（来自原始日志的 dvchost/dvc 字段） */
+const KNOWN_COLLECTOR_IPS = new Set(['10.26.0.26', '10.20.3.25', '10.100.113.134']);
+
+/**
+ * 识别采集/汇聚节点：已知采集 IP，或邻居数 ≥ max(50, 30% 总节点)。
+ * 这类节点只做采集/监控，不承载业务，应折叠出业务域而非参与服务签名。
+ */
+function isCollectorNode(node: TopologyNode, neighborCount: number, totalNodes: number): boolean {
+  if (KNOWN_COLLECTOR_IPS.has(node.id)) return true;
+  return neighborCount >= Math.max(50, Math.ceil(totalNodes * 0.3));
+}
+
+/**
+ * 端口服务域
+ *
+ * 方案 1（目的端口锚点）：每节点的"服务端口签名" = 非监控端口 → 服务类别集合，
+ *   分组键 = 服务类别签名 + /24 子网（同服务不同网段仍分开）。
+ * 方案 2（连接锚点）：节点参与的所有连接（源/目的侧）端口一并并入签名——
+ *   当前数据源侧均为采集节点，方案 2 退化为方案 1；未来接入主机间流量后，
+ *   可再按"调用方子网"进一步拆分（签名里已预留该信息）。
+ *
+ * 采集节点折叠：端口信号主要记录在采集节点↔主机的边上，因此**不物理删除**采集节点，
+ * 而是把它们折叠成独立的"采集节点"域——它们的边端口照常并入业务主机签名，
+ * 但采集节点本身不参与服务域分组（逻辑折叠，信号保留、干扰排除）。
+ *
+ * enrichLabels=true 时叠加"标签细分"维度（与三层安全域的 Enrich 叠加一致）。
+ */
+function clusterByServicePort(nodes: TopologyNode[], links: any[], enrichLabels = false): ClusteringResult {
+  // 方向感知（修正版）：入向端口（节点作为 dst，别人访问我）= 服务签名；
+  // 出向端口（节点作为 src，我访问别人）= 消费签名。
+  // 数据验证：本数据集主机间流=0，698 台有入向业务端口（真正的服务提供者），
+  // 2508 台只有出向业务端口（消费方，多为 web 客户端）——旧版把消费方误标为服务提供方。
+  // 因此域分三类：服务提供域 svc_* / 客户端域 cli_* / 纯监控终端 svc_none。
+  const inPorts = new Map<string, Set<number>>();
+  const outPorts = new Map<string, Set<number>>();
+  for (const node of nodes) { inPorts.set(node.id, new Set()); outPorts.set(node.id, new Set()); }
+
+  const neighborCounts = new Map<string, number>();
+  for (const node of nodes) neighborCounts.set(node.id, 0);
+
+  for (const link of links) {
+    const s = typeof link.source === 'object' ? (link.source as any).id : link.source;
+    const t = typeof link.target === 'object' ? (link.target as any).id : link.target;
+    const ps: unknown[] = (link as any).ports || [];
+    for (const p of ps) {
+      const port = Number(p);
+      if (Number.isFinite(port)) {
+        if (inPorts.has(t)) inPorts.get(t)!.add(port);   // 入向：t 提供服务端口 p
+        if (outPorts.has(s)) outPorts.get(s)!.add(port); // 出向：s 消费端口 p
+      }
+    }
+    if (neighborCounts.has(s)) neighborCounts.set(s, neighborCounts.get(s)! + 1);
+    if (neighborCounts.has(t)) neighborCounts.set(t, neighborCounts.get(t)! + 1);
+  }
+
+  const zones: ClusteringZone[] = [];
+  const zoneLabels: Record<string, string> = {};
+  const zoneOrder: string[] = [];
+
+  for (const node of nodes) {
+    // 采集节点折叠：归入独立"采集节点"域，不参与业务服务签名
+    if (isCollectorNode(node, neighborCounts.get(node.id) || 0, nodes.length)) {
+      zones.push({ node_id: node.id, zone_id: 'collector', algorithm: 'service_port' });
+      if (!zoneLabels['collector']) zoneLabels['collector'] = '采集节点（监控/汇聚）';
+      if (!zoneOrder.includes('collector')) zoneOrder.push('collector');
+      continue;
+    }
+
+    const svcPorts = [...(inPorts.get(node.id) || new Set<number>())].filter(p => !MONITOR_PORTS.has(p));
+    const conPorts = [...(outPorts.get(node.id) || new Set<number>())].filter(p => !MONITOR_PORTS.has(p));
+    const svcClasses = [...new Set(svcPorts.map(p => classifyPort(p)))].filter(c => c !== 'other').sort();
+    const conClasses = [...new Set(conPorts.map(p => classifyPort(p)))].filter(c => c !== 'other').sort();
+    const svcSig = svcClasses.join('+');
+    const conSig = conClasses.join('+');
+    const subnet = getSubnet24(node.id);
+    const enriched = enrichLabels ? deriveZoneLabel(node) : '';
+
+    let zoneId: string;
+    let label: string;
+    if (svcSig) {
+      // 服务提供者：入向签名为主分组，出向消费签名并入（如 "web 服务，消费 cache"）
+      zoneId = `svc_${svcSig}|${subnet}${conSig ? '|con:' + conSig : ''}${enriched ? '|' + enriched : ''}`;
+      label = `${svcClasses.map(c => SERVICE_CLASS_LABELS[c] || c).join(' + ')} · ${subnet}（服务提供）`
+        + (conSig ? ` · 消费 ${conClasses.map(c => SERVICE_CLASS_LABELS[c] || c).join('+')}` : '')
+        + (enriched ? ` · ${enriched}` : '');
+    } else if (conSig) {
+      // 客户端：只有出向消费签名（当前数据下 2500+ 台，多为访问 443 的终端）
+      zoneId = `cli_${conSig}|${subnet}${enriched ? '|' + enriched : ''}`;
+      label = `${conClasses.map(c => SERVICE_CLASS_LABELS[c] || c).join(' + ')} 客户端 · ${subnet}（消费 ${conSig}）`
+        + (enriched ? ` · ${enriched}` : '');
+    } else {
+      // 纯监控终端：无业务端口信号
+      zoneId = `svc_none|${subnet}${enriched ? '|' + enriched : ''}`;
+      label = `监控终端 · ${subnet}${enriched ? ` · ${enriched}` : ''}`;
+    }
+    zones.push({ node_id: node.id, zone_id: zoneId, algorithm: 'service_port' });
+    if (!zoneLabels[zoneId]) zoneLabels[zoneId] = label;
+    if (!zoneOrder.includes(zoneId)) zoneOrder.push(zoneId);
+  }
+
+  const zoneSizes = new Map<string, number>();
+  for (const z of zones) zoneSizes.set(z.zone_id, (zoneSizes.get(z.zone_id) || 0) + 1);
+  const sizes = [...zoneSizes.values()].sort((a, b) => b - a);
+
+  return {
+    zones,
+    zoneCount: zoneOrder.length,
+    strategy: 'service_port',
+    zoneLabels,
+    metrics: {
+      modularity: 0,
+      intraEdgePct: 0,
+      avgSize: sizes.length ? Number((nodes.length / sizes.length).toFixed(2)) : 0,
+      singletons: sizes.filter(s => s === 1).length,
+    },
+  };
+}
+
+// ============ 通信锚点域（方案2：源IP + 目的IP + 固定目的端口） ============
+
+/**
+ * 通信锚点域（方案2）：以 (源IP, 目的IP, 固定目的端口) 三元组为锚点。
+ *
+ * 每条有向边 (src → dst) 的每个目的端口 p 构成一个锚点，按方向分两类：
+ *   - 服务锚点（dst 侧）：节点被 src 以端口 p 调用 → 记录调用方子网
+ *   - 消费锚点（src 侧）：节点以端口 p 访问 dst → 记录对端子网
+ * 节点归属：
+ *   - 有服务锚点的节点 → 服务提供域：服务类别 × 服务子网 × 调用方子网
+ *   - 无服务锚点但有消费锚点 → 客户端域：消费类别 × 源子网 × 对端子网
+ *   - 都没有 → 监控终端域
+ * 当前主机间流=0（调用方几乎都是采集器），服务/消费域按子网聚合；
+ * 接入主机间流量后自动细分出"谁调用我的哪个服务"，可支撑动态 ACL 生成。
+ * 注意：方案1（额外要求固定源端口）因原始数据无源端口列暂不可用，
+ * 本实现保留 src 维度（源IP 已包含在锚点里），未来数据含 sport 时可在锚点中追加源端口。
+ */
+function clusterByFlowAnchor(nodes: TopologyNode[], links: any[], enrichLabels = false): ClusteringResult {
+  const svcAnchors = new Map<string, Set<string>>(); // 节点 → 服务锚点 key "dst|port"
+  const conAnchors = new Map<string, Set<string>>(); // 节点 → 消费锚点 key "src|port"
+  const anchorCallers = new Map<string, Set<string>>(); // 服务锚点 → 调用方子网
+  const anchorPeers = new Map<string, Set<string>>();   // 消费锚点 → 对端子网
+  for (const node of nodes) { svcAnchors.set(node.id, new Set()); conAnchors.set(node.id, new Set()); }
+
+  const neighborCounts = new Map<string, number>();
+  for (const node of nodes) neighborCounts.set(node.id, 0);
+
+  for (const link of links) {
+    const s = typeof link.source === 'object' ? (link.source as any).id : link.source;
+    const t = typeof link.target === 'object' ? (link.target as any).id : link.target;
+    const ps: unknown[] = (link as any).ports || [];
+    for (const p of ps) {
+      const port = Number(p);
+      if (!Number.isFinite(port)) continue;
+      if (MONITOR_PORTS.has(port)) continue; // 监控/采集端口不构成业务锚点
+      const sk = `${t}|${port}`;
+      if (!anchorCallers.has(sk)) anchorCallers.set(sk, new Set());
+      anchorCallers.get(sk)!.add(getSubnet24(s));
+      svcAnchors.get(t)?.add(sk);
+      const ck = `${s}|${port}`;
+      if (!anchorPeers.has(ck)) anchorPeers.set(ck, new Set());
+      anchorPeers.get(ck)!.add(getSubnet24(t));
+      conAnchors.get(s)?.add(ck);
+    }
+    if (neighborCounts.has(s)) neighborCounts.set(s, neighborCounts.get(s)! + 1);
+    if (neighborCounts.has(t)) neighborCounts.set(t, neighborCounts.get(t)! + 1);
+  }
+
+  const zones: ClusteringZone[] = [];
+  const zoneLabels: Record<string, string> = {};
+  const zoneOrder: string[] = [];
+
+  for (const node of nodes) {
+    if (isCollectorNode(node, neighborCounts.get(node.id) || 0, nodes.length)) {
+      zones.push({ node_id: node.id, zone_id: 'flow_collector', algorithm: 'flow_anchor' });
+      if (!zoneLabels['flow_collector']) zoneLabels['flow_collector'] = '采集节点（监控/汇聚）';
+      if (!zoneOrder.includes('flow_collector')) zoneOrder.push('flow_collector');
+      continue;
+    }
+    // 服务锚点 → 服务类别 + 调用方子网
+    const svcPorts = new Set<number>();
+    const callers = new Set<string>();
+    for (const key of svcAnchors.get(node.id) || []) {
+      const idx = key.lastIndexOf('|');
+      svcPorts.add(Number(key.slice(idx + 1)));
+      for (const cs of anchorCallers.get(key) || []) callers.add(cs);
+    }
+    // 消费锚点 → 消费类别 + 对端子网
+    const conPorts = new Set<number>();
+    const peers = new Set<string>();
+    for (const key of conAnchors.get(node.id) || []) {
+      const idx = key.lastIndexOf('|');
+      conPorts.add(Number(key.slice(idx + 1)));
+      for (const cs of anchorPeers.get(key) || []) peers.add(cs);
+    }
+    const svcClasses = [...new Set([...svcPorts].map(p => classifyPort(p)))].filter(c => c !== 'other').sort();
+    const conClasses = [...new Set([...conPorts].map(p => classifyPort(p)))].filter(c => c !== 'other').sort();
+    const svcSig = svcClasses.join('+');
+    const conSig = conClasses.join('+');
+    const subnet = getSubnet24(node.id);
+
+    let zoneId: string;
+    let label: string;
+    let direction: 'service' | 'client' | 'terminal';
+    let callersStr = '';
+    let peersStr = '';
+    // enrichLabels：并入节点角色标签（role_guess，服务端已算好）——温和细分，域内同质；
+    // 刻意不用 deriveZoneLabel（会把具体端口集合塞进域键，域数爆炸且与导出列重复）。
+    const roleTag = enrichLabels && node.role_guess && node.role_guess !== 'unknown'
+      ? `|role:${node.role_guess}` : '';
+    const roleLabel = roleTag ? ` · ${ROLE_LABELS[node.role_guess] || node.role_guess}` : '';
+    if (svcSig) {
+      direction = 'service';
+      const callerKey = [...callers].sort().join(',');
+      callersStr = callerKey;
+      zoneId = `flow_svc_${svcSig}|${subnet}${callerKey ? '|callers:' + callerKey : ''}${roleTag}`;
+      label = `${svcClasses.map(c => SERVICE_CLASS_LABELS[c] || c).join(' + ')} · ${subnet}（服务提供）`
+        + (callerKey ? ` · 被 ${callerKey} 调用` : '') + roleLabel;
+    } else if (conSig) {
+      direction = 'client';
+      const peerKey = [...peers].sort().join(',');
+      peersStr = peerKey;
+      zoneId = `flow_cli_${conSig}|${subnet}${peerKey ? '|peers:' + peerKey : ''}${roleTag}`;
+      label = `${conClasses.map(c => SERVICE_CLASS_LABELS[c] || c).join(' + ')} 客户端 · ${subnet}`
+        + (peerKey ? ` · 访问 ${peerKey}` : '') + roleLabel;
+    } else {
+      direction = 'terminal';
+      zoneId = `flow_cli_none|${subnet}`;
+      label = `监控终端 · ${subnet}`;
+    }
+    zones.push({
+      node_id: node.id, zone_id: zoneId, algorithm: 'flow_anchor',
+      direction, callers: callersStr || undefined, peers: peersStr || undefined,
+    });
+    if (!zoneLabels[zoneId]) zoneLabels[zoneId] = label;
+    if (!zoneOrder.includes(zoneId)) zoneOrder.push(zoneId);
+  }
+
+  const zoneSizes = new Map<string, number>();
+  for (const z of zones) zoneSizes.set(z.zone_id, (zoneSizes.get(z.zone_id) || 0) + 1);
+  const sizes = [...zoneSizes.values()].sort((a, b) => b - a);
+
+  return {
+    zones,
+    zoneCount: zoneOrder.length,
+    strategy: 'flow_anchor',
+    zoneLabels,
+    metrics: {
+      modularity: 0,
+      intraEdgePct: 0,
+      avgSize: sizes.length ? Number((nodes.length / sizes.length).toFixed(2)) : 0,
+      singletons: sizes.filter(s => s === 1).length,
+    },
+  };
+}
+
+// ============ 策略域（服务类别聚合，面向安全策略配置） ============
+
+/**
+ * 策略域：按"服务类别签名"分组（忽略子网），采集节点折叠。
+ *
+ * 用途：端口服务域（~280 个）适合可视化，但安全策略无法面向几百个域配置。
+ * 策略域把同服务类别的主机聚合成 ~12 个策略域（Web / 管理 / 监控 / 中间件…），
+ * 每个策略域一套规则（如 Web 域放行 443、管理域限制来源、监控域仅内部）：
+ *   策略域(规则集) ← 服务域(服务类别 × 子网)  ←  资产(节点)
+ */
+function clusterByPolicyDomain(nodes: TopologyNode[], links: any[]): ClusteringResult {
+  const nodePorts = new Map<string, Set<number>>();
+  for (const node of nodes) nodePorts.set(node.id, new Set((node.ports || []).map(Number)));
+  const neighborCounts = new Map<string, number>();
+  for (const node of nodes) neighborCounts.set(node.id, 0);
+
+  for (const link of links) {
+    const s = typeof link.source === 'object' ? (link.source as any).id : link.source;
+    const t = typeof link.target === 'object' ? (link.target as any).id : link.target;
+    const ps: unknown[] = (link as any).ports || [];
+    for (const p of ps) {
+      const port = Number(p);
+      if (Number.isFinite(port)) {
+        if (nodePorts.has(s)) nodePorts.get(s)!.add(port);
+        if (nodePorts.has(t)) nodePorts.get(t)!.add(port);
+      }
+    }
+    if (neighborCounts.has(s)) neighborCounts.set(s, neighborCounts.get(s)! + 1);
+    if (neighborCounts.has(t)) neighborCounts.set(t, neighborCounts.get(t)! + 1);
+  }
+
+  const zones: ClusteringZone[] = [];
+  const zoneLabels: Record<string, string> = {};
+  const zoneOrder: string[] = [];
+
+  for (const node of nodes) {
+    if (isCollectorNode(node, neighborCounts.get(node.id) || 0, nodes.length)) {
+      zones.push({ node_id: node.id, zone_id: 'policy_collector', algorithm: 'policy_domain' });
+      if (!zoneLabels['policy_collector']) zoneLabels['policy_collector'] = '采集节点（监控/汇聚）';
+      if (!zoneOrder.includes('policy_collector')) zoneOrder.push('policy_collector');
+      continue;
+    }
+    const all = [...(nodePorts.get(node.id) || new Set<number>())];
+    const business = all.filter(p => !MONITOR_PORTS.has(p));
+    const classes = [...new Set(business.map(p => classifyPort(p)))]
+      .filter(c => c !== 'other')
+      .sort();
+    const sig = classes.length > 0 ? classes.join('+') : 'none';
+    const zoneId = `policy_${sig}`;
+    zones.push({ node_id: node.id, zone_id: zoneId, algorithm: 'policy_domain' });
+    if (!zoneLabels[zoneId]) {
+      zoneLabels[zoneId] = sig === 'none'
+        ? '监控资产（无业务端口）'
+        : classes.map(c => SERVICE_CLASS_LABELS[c] || c).join(' + ');
+    }
+    if (!zoneOrder.includes(zoneId)) zoneOrder.push(zoneId);
+  }
+
+  const zoneSizes = new Map<string, number>();
+  for (const z of zones) zoneSizes.set(z.zone_id, (zoneSizes.get(z.zone_id) || 0) + 1);
+  const sizes = [...zoneSizes.values()].sort((a, b) => b - a);
+
+  return {
+    zones,
+    zoneCount: zoneOrder.length,
+    strategy: 'policy_domain',
+    zoneLabels,
+    metrics: {
+      modularity: 0,
+      intraEdgePct: 0,
+      avgSize: sizes.length ? Number((nodes.length / sizes.length).toFixed(2)) : 0,
+      singletons: sizes.filter(s => s === 1).length,
+    },
+  };
 }
 
 // ============ 主入口 ============
@@ -759,6 +1127,12 @@ export function computeClustering(
       return clusterByIpDecade(nodes);
     case 'service_type':
       return clusterByServiceType(nodes);
+    case 'service_port':
+      return clusterByServicePort(nodes, links, enrichLabels);
+    case 'flow_anchor':
+      return clusterByFlowAnchor(nodes, links, enrichLabels);
+    case 'policy_domain':
+      return clusterByPolicyDomain(nodes, links);
     case 'zone_label':
       return clusterByZoneLabel(nodes);
     case 'security_v3':

@@ -4,7 +4,7 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import * as d3 from 'd3';
 import { Plus, Minus, RotateCcw } from 'lucide-react';
 import type { TopologyNode, TopologyLink, TopologyData, GraphLayoutPreset, GraphPhysics } from '@/lib/types';
-import { COMMUNITY_COLORS, getAnomalyLevel } from '@/lib/types';
+import { communityColor, getAnomalyLevel } from '@/lib/types';
 
 interface TopologyGraphProps {
   data: TopologyData;
@@ -47,7 +47,19 @@ export function TopologyGraph({
   const simulationRef = useRef<d3.Simulation<SimNode, SimLink> | null>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
+  const zoomKRef = useRef(1); // 当前缩放级别（语义缩放用）
+  const minimapRef = useRef<SVGSVGElement>(null);
+  // minimap 几何状态：图 bbox、映射比例、偏移
+  const minimapStateRef = useRef<{
+    s: number;
+    offsetX: number;
+    offsetY: number;
+    bounds: { x: number; y: number; w: number; h: number };
+  } | null>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+  // dimensions 的 ref 镜像（供挂载期 minimap 事件回调读取最新尺寸）
+  const dimensionsRef = useRef(dimensions);
+  dimensionsRef.current = dimensions;
 
   // Handle resize
   useEffect(() => {
@@ -150,14 +162,44 @@ export function TopologyGraph({
       bytes: l.bytes,
     })).filter(l => l.source && l.target);
 
+    // 语义缩放：节点标签可见性（远视图隐藏，放大后显示；大图阈值更高）
+    const labelOpacity = (d: SimNode, k: number) => {
+      if (!showLabels) return 0;
+      if (d.isFocusedDomain === false) return 0;
+      if (k < (nodes.length > 1000 ? 1.2 : 0.5)) return 0;
+      return nodes.length > 1000 ? 0.9 : 0.85;
+    };
+
     // Create containers
     const g = svg.append('g').attr('class', 'topology-container');
+
+    // minimap viewport 跟随主视图缩放/平移
+    const updateMinimapViewport = () => {
+      const st = minimapStateRef.current;
+      const mm = minimapRef.current;
+      if (!st || !mm || !svgRef.current) return;
+      const t = d3.zoomTransform(svgRef.current);
+      const k = t.k || 1;
+      const vx = -t.x / k, vy = -t.y / k;
+      const vw = dimensions.width / k, vh = dimensions.height / k;
+      const s = st.s;
+      d3.select(mm).select('rect.minimap-viewport')
+        .attr('x', Math.max(0, (vx - st.bounds.x) * s + st.offsetX))
+        .attr('y', Math.max(0, (vy - st.bounds.y) * s + st.offsetY))
+        .attr('width', Math.max(4, Math.min(st.bounds.w * s, vw * s)))
+        .attr('height', Math.max(4, Math.min(st.bounds.h * s, vh * s)));
+    };
 
     // Zoom behavior
     const zoom = d3.zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.1, 8])
       .on('zoom', (event) => {
         g.attr('transform', event.transform);
+        const k = event.transform.k;
+        zoomKRef.current = k;
+        // 语义缩放：放大到一定程度才显示节点标签，避免远视图噪点
+        g.selectAll('text.node-label').attr('opacity', (d: unknown) => labelOpacity(d as SimNode, k));
+        updateMinimapViewport();
       });
     
     zoomRef.current = zoom;
@@ -248,6 +290,12 @@ export function TopologyGraph({
     // Degree scale for node size - adaptive for large graphs
     const degreeExtent = d3.extent(nodes, d => d.degree) as [number, number];
     const isLargeGraph = nodes.length > 1000;
+    // 星型中心节点（度数最大）用最鲜艳的主青色突出
+    const HUB_COLOR = '#00e5c7';
+    const hubNodeId = nodes.reduce<SimNode | null>(
+      (best, n) => (best == null || (n.degree ?? 0) > (best.degree ?? 0) ? n : best),
+      null
+    )?.id;
     const nodeSizeScale = d3.scaleLinear()
       .domain(degreeExtent[0] === degreeExtent[1] ? [0, degreeExtent[1]] : degreeExtent)
       .range(isLargeGraph ? [2, 8] : [4, 16]);
@@ -260,7 +308,7 @@ export function TopologyGraph({
     const linkElements = linkGroup.selectAll('line')
       .data(links)
       .join('line')
-      .attr('stroke', d => (d as any).isCrossDomain ? 'rgba(0,229,199,0.15)' : 'rgba(90,102,128,0.25)')
+      .attr('stroke', d => (d as any).isCrossDomain ? 'rgba(240,160,48,0.55)' : 'rgba(90,102,128,0.25)')
       .attr('stroke-width', d => edgeWidthScale(d.weight))
       .attr('stroke-opacity', d => (d as any).isCrossDomain ? 0.5 : edgeOpacity)
       .attr('stroke-dasharray', d => (d as any).isCrossDomain ? '4,4' : 'none')
@@ -407,18 +455,18 @@ export function TopologyGraph({
     nodeElements.filter(d => !d.is_anomaly || d.is_whitelisted === true).append('circle')
       .attr('class', 'node-glow-circle')
       .attr('r', d => nodeSizeScale(d.degree) + (isLargeGraph ? 2 : 4))
-      .attr('fill', d => COMMUNITY_COLORS[d.community % COMMUNITY_COLORS.length])
+      .attr('fill', d => (d.id === hubNodeId ? HUB_COLOR : communityColor(d.community)))
       .attr('opacity', d => {
         if (d.isFocusedDomain === false) return 0.05;
-        return isLargeGraph ? 0.1 : 0.15;
+        return d.id === hubNodeId ? 0.3 : (isLargeGraph ? 0.1 : 0.15);
       })
       .attr('filter', 'blur(3px)');
 
-    // Node circle
+    // Node circle — 按域着色（金黄角色板保证颜色分明），星型中心节点用最鲜艳的主青色
     nodeElements.append('circle')
       .attr('class', 'node-circle')
       .attr('r', d => nodeSizeScale(d.degree))
-      .attr('fill', d => COMMUNITY_COLORS[d.community % COMMUNITY_COLORS.length])
+      .attr('fill', d => (d.id === hubNodeId ? HUB_COLOR : communityColor(d.community)))
       .style('stroke', d => {
         if (d.is_anomaly && !d.is_whitelisted) return '#ff4d6a';
         if (d.isFocusedDomain === false) return 'rgba(0,0,0,0.3)';
@@ -442,20 +490,17 @@ export function TopologyGraph({
       .attr('stroke-dasharray', '3,3')
       .attr('opacity', 0.85);
 
-    // Node labels - adaptive for large graphs
+    // Node labels - adaptive for large graphs (语义缩放：初始按当前缩放级别显示)
     const labelElements = nodeGroup.selectAll('text.node-label')
       .data(nodes)
       .join('text')
       .attr('class', 'node-label')
       .attr('text-anchor', 'middle')
-      .attr('dy', d => nodeSizeScale(d.degree) + 12)
+      .attr('dy', d => nodeSizeScale(d.degree) + 14)
       .attr('fill', d => d.isFocusedDomain === false ? 'oklch(0.5 0.01 250 / 0.3)' : 'oklch(0.7 0.01 250)')
-      .attr('font-size', isLargeGraph ? '8px' : '9px')
+      .attr('font-size', isLargeGraph ? '10px' : '11px')
       .attr('font-family', "'JetBrains Mono', monospace")
-      .attr('opacity', d => {
-        if (d.isFocusedDomain === false) return 0;
-        return showLabels && !isLargeGraph ? 0.8 : 0;
-      })
+      .attr('opacity', d => labelOpacity(d, zoomKRef.current))
       .text(d => d.id);
 
     // Tooltip
@@ -465,7 +510,10 @@ export function TopologyGraph({
       .on('mouseover', (event, d) => {
         const roleMap: Record<string, string> = {
           web_server: 'Web 服务', database: '数据库', cache: '缓存服务',
-          message_queue: '消息队列', monitoring: '监控采集',
+          message_queue: '消息队列', monitoring: '监控采集', dns_server: 'DNS 服务',
+          bastion_host: '跳板机/管理服务器', admin_server: '管理服务器',
+          ldap_server: 'LDAP 服务', rpc_service: 'RPC/NFS 服务', mail_server: '邮件服务',
+          file_server: '文件服务', data_platform: '数据平台/日志基础设施',
         };
         tooltip
           .style('opacity', '1')
@@ -478,8 +526,9 @@ export function TopologyGraph({
             <div style="display: grid; grid-template-columns: auto auto; gap: 3px 14px; font-size: 11px; line-height: 1.5;">
               <span style="color: #5a6680;">角色</span>
               <span style="color: #e0e6f0;">${roleMap[d.role_guess] || d.role_guess}</span>
+              ${d.is_critical ? '<span style="color: #5a6680;">重要资产</span><span style="color: #fbbf24; font-weight: 600;">● 关键服务</span>' : ''}
               <span style="color: #5a6680;">安全域</span>
-              <span style="color: #e0e6f0;">Community ${d.community}</span>
+              <span style="color: #e0e6f0;">域 ${d.community}</span>
               <span style="color: #5a6680;">连接数</span>
               <span style="color: #e0e6f0;">${d.degree} (入:${d.in_degree} 出:${d.out_degree})</span>
               <span style="color: #5a6680;">发送</span>
@@ -489,7 +538,7 @@ export function TopologyGraph({
               <span style="color: #5a6680;">异常分</span>
               <span style="color: ${d.is_anomaly && !d.is_whitelisted ? '#ff4d6a' : '#22d67a'}; font-weight: 600;">${d.anomaly_score.toFixed(3)} ${d.anomaly_level}</span>
             </div>
-            ${d.is_whitelisted ? `<div style="color: #f0a030; margin-top: 6px; font-size: 11px;">⚠ 白名单节点：${d.whitelist_reason || '已加入白名单'}</div>` : ''}
+            ${d.is_whitelisted ? `<div style="color: #f0a030; margin-top: 6px; font-size: 11px;">白名单节点：${d.whitelist_reason || '已加入白名单'}</div>` : ''}
           `);
 
         // Highlight node
@@ -598,10 +647,50 @@ export function TopologyGraph({
         .attr('y', d => d.y!);
     });
 
+    // ── minimap 缩略图（布局稳定后按节点位置绘制一次，之后只更新 viewport 矩形）──
+    const initMinimap = () => {
+      const mm = minimapRef.current;
+      if (!mm) return;
+      const bbox = (g.node() as SVGGElement)?.getBBox();
+      if (!bbox || bbox.width === 0 || bbox.height === 0) return;
+      const MW = 180, MH = 120;
+      const s = Math.min(MW / bbox.width, MH / bbox.height) * 0.98;
+      const offsetX = (MW - bbox.width * s) / 2;
+      const offsetY = (MH - bbox.height * s) / 2;
+      minimapStateRef.current = { s, offsetX, offsetY, bounds: { x: bbox.x, y: bbox.y, w: bbox.width, h: bbox.height } };
+      const svgMM = d3.select(mm);
+      svgMM.selectAll('*').remove();
+      svgMM.append('rect')
+        .attr('width', MW).attr('height', MH).attr('rx', 6)
+        .attr('fill', 'rgba(10,15,26,0.92)')
+        .attr('stroke', 'rgba(120,140,180,0.25)');
+      svgMM.append('g')
+        .selectAll('circle')
+        // 大图时抽样画点（每 4 个取 1），避免一次性渲染数千个 circle 造成卡顿
+        .data(nodes.length > 1500 ? nodes.filter((_, i) => i % 4 === 0) : nodes)
+        .join('circle')
+        .attr('cx', n => offsetX + (n.x! - bbox.x) * s)
+        .attr('cy', n => offsetY + (n.y! - bbox.y) * s)
+        .attr('r', n => (n.id === hubNodeId ? 2 : (nodes.length > 500 ? 0.8 : 1.1)))
+        .attr('fill', n => (n.id === hubNodeId ? HUB_COLOR : communityColor(n.community)))
+        .attr('opacity', 0.75);
+      svgMM.append('rect')
+        .attr('class', 'minimap-viewport')
+        .attr('fill', 'rgba(0,229,199,0.08)')
+        .attr('stroke', 'rgba(0,229,199,0.85)')
+        .attr('stroke-width', 1)
+        .attr('rx', 2);
+      updateMinimapViewport();
+    };
+
     simulationRef.current = simulation;
 
-    // Initial zoom to fit
+    // Initial zoom to fit (仅在首次布局后执行一次，避免拖拽后视图被重置)
+    let didFit = false;
     simulation.on('end', () => {
+      initMinimap();
+      if (didFit) return;
+      didFit = true;
       const bounds = (g.node() as SVGGElement)?.getBBox();
       if (bounds) {
         const dx = bounds.width;
@@ -721,6 +810,47 @@ export function TopologyGraph({
       .attr('opacity', showLabels ? 0.8 : 0);
   }, [showLabels]);
 
+  // minimap 点击 / 拖拽平移（挂载期绑定一次，几何状态走 ref）
+  useEffect(() => {
+    const mm = minimapRef.current;
+    if (!mm) return;
+    const panTo = (gx: number, gy: number) => {
+      if (!svgRef.current || !zoomRef.current) return;
+      const k = zoomKRef.current;
+      const d = dimensionsRef.current;
+      d3.select(svgRef.current).transition().duration(250).call(
+        zoomRef.current.transform,
+        d3.zoomIdentity.translate(d.width / 2 - k * gx, d.height / 2 - k * gy).scale(k)
+      );
+    };
+    const posToGraph = (e: PointerEvent): [number, number] | null => {
+      const st = minimapStateRef.current;
+      if (!st) return null;
+      const rect = mm.getBoundingClientRect();
+      const gx = st.bounds.x + (e.clientX - rect.left - st.offsetX) / st.s;
+      const gy = st.bounds.y + (e.clientY - rect.top - st.offsetY) / st.s;
+      return [gx, gy];
+    };
+    const onPointerDown = (e: PointerEvent) => {
+      e.preventDefault();
+      const p = posToGraph(e);
+      if (p) panTo(p[0], p[1]);
+      mm.setPointerCapture(e.pointerId);
+      const onMove = (ev: PointerEvent) => {
+        const q = posToGraph(ev);
+        if (q) panTo(q[0], q[1]);
+      };
+      const onUp = () => {
+        mm.removeEventListener('pointermove', onMove);
+        mm.removeEventListener('pointerup', onUp);
+      };
+      mm.addEventListener('pointermove', onMove);
+      mm.addEventListener('pointerup', onUp);
+    };
+    mm.addEventListener('pointerdown', onPointerDown);
+    return () => mm.removeEventListener('pointerdown', onPointerDown);
+  }, []);
+
   return (
     <div ref={containerRef} className="relative w-full h-full topology-bg">
       <svg
@@ -731,6 +861,11 @@ export function TopologyGraph({
       />
       <div ref={tooltipRef} className="topology-tooltip" style={{ opacity: 0 }} />
 
+      {/* 缩略图 minimap：显示全图 + 当前视口，点击/拖拽平移 */}
+      <div className="absolute bottom-[132px] right-4 z-20 hidden lg:block rounded-lg overflow-hidden border border-border/60 shadow-lg shadow-black/30">
+        <svg ref={minimapRef} width={180} height={120} className="minimap block" />
+      </div>
+
       {/* 缩放控件 */}
       <div className="absolute bottom-4 right-4 flex flex-col overflow-hidden rounded-lg backdrop-blur-xl bg-[var(--toolbar-bg)] border border-border/60 shadow-lg shadow-black/10">
         <button
@@ -740,7 +875,7 @@ export function TopologyGraph({
             const svg = d3.select(svgRef.current);
             svg.transition().duration(300).call(zoomRef.current.scaleBy, 1.3);
           }}
-          className="w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-[color,background-color,box-shadow] duration-200 hover:shadow-[0_0_12px_color-mix(in_srgb,var(--primary)_30%,transparent)]"
+          className="w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors duration-200"
           title="放大"
         >
           <Plus className="w-4 h-4" />
@@ -753,7 +888,7 @@ export function TopologyGraph({
             const svg = d3.select(svgRef.current);
             svg.transition().duration(300).call(zoomRef.current.scaleBy, 0.7);
           }}
-          className="w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-[color,background-color,box-shadow] duration-200 hover:shadow-[0_0_12px_color-mix(in_srgb,var(--primary)_30%,transparent)]"
+          className="w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors duration-200"
           title="缩小"
         >
           <Minus className="w-4 h-4" />
@@ -769,7 +904,7 @@ export function TopologyGraph({
               d3.zoomIdentity.translate(dimensions.width / 2, dimensions.height / 2).scale(0.8)
             );
           }}
-          className="w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-[color,background-color,box-shadow] duration-200 hover:shadow-[0_0_12px_color-mix(in_srgb,var(--primary)_30%,transparent)]"
+          className="w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors duration-200"
           title="重置视图"
         >
           <RotateCcw className="w-4 h-4" />

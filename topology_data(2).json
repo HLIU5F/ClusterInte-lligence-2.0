@@ -1,0 +1,6076 @@
+{
+  "metadata": {
+    "generated_at": "2026-07-31T17:06:39.392955",
+    "source": "csv_preprocess_multi_strategy_cluster",
+    "total_nodes": 212,
+    "total_links": 211,
+    "communities": 48,
+    "strategies": [
+      "subnet_24",
+      "port_count",
+      "protocol",
+      "port_type",
+      "ip_tens",
+      "service_type"
+    ],
+    "nodes_removed": [
+      "10.26.0.26",
+      "10.20.3.25"
+    ],
+    "hub_nodes": [
+      "10.100.113.134"
+    ],
+    "hub_count": 1
+  },
+  "nodes": [
+    {
+      "id": "10.100.2.150",
+      "name": "10.100.2.150",
+      "community": 0,
+      "community_name": "10.100.2 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.2 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.150",
+      "description": "IP:10.100.2.150 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.33.133",
+      "name": "10.100.33.133",
+      "community": 1,
+      "community_name": "10.100.33 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.33 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.33.133",
+      "description": "IP:10.100.33.133 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.135",
+      "name": "10.100.4.135",
+      "community": 2,
+      "community_name": "10.100.4 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.4 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.135",
+      "description": "IP:10.100.4.135 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.39",
+      "name": "10.100.3.39",
+      "community": 3,
+      "community_name": "10.100.3 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.39",
+      "description": "IP:10.100.3.39 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.114.6",
+      "name": "10.100.114.6",
+      "community": 4,
+      "community_name": "10.100.114 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.114 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.114.6",
+      "description": "IP:10.100.114.6 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.10",
+      "name": "10.100.4.10",
+      "community": 5,
+      "community_name": "10.100.4 TCP P36000 (5节点)",
+      "community_description": "网段:10.100.4 | 节点:5 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.10",
+      "description": "IP:10.100.4.10 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.5.6",
+      "name": "10.100.5.6",
+      "community": 6,
+      "community_name": "10.100.5 TCP P36000 (4节点)",
+      "community_description": "网段:10.100.5 | 节点:4 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.5.6",
+      "description": "IP:10.100.5.6 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.113.134",
+      "name": "10.100.113.134",
+      "community": 7,
+      "community_name": "10.100.113 Mixed P53 (1节点)",
+      "community_description": "网段:10.100.113 | 节点:1 | 协议:tcp/udp | 端口:53-36000",
+      "degree": 211,
+      "in_degree": 220,
+      "out_degree": 0,
+      "port_count": 7,
+      "ports": [
+        53,
+        9092,
+        9200,
+        9201,
+        18060,
+        22003,
+        36000
+      ],
+      "protocols": [
+        "udp",
+        "tcp"
+      ],
+      "is_hub": true,
+      "hub_reason": "度数=211, 占比=99.5%",
+      "anomaly_score": 0.85,
+      "label": "10.100.113.134",
+      "description": "IP:10.100.113.134 | 端口:7个 | 协议:udp,tcp"
+    },
+    {
+      "id": "10.100.0.22",
+      "name": "10.100.0.22",
+      "community": 8,
+      "community_name": "10.100.0 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.0 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.22",
+      "description": "IP:10.100.0.22 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.138",
+      "name": "10.100.2.138",
+      "community": 9,
+      "community_name": "10.100.2 TCP P36000 (5节点)",
+      "community_description": "网段:10.100.2 | 节点:5 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.138",
+      "description": "IP:10.100.2.138 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.11",
+      "name": "10.100.3.11",
+      "community": 10,
+      "community_name": "10.100.3 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.3 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.11",
+      "description": "IP:10.100.3.11 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.169",
+      "name": "10.100.0.169",
+      "community": 11,
+      "community_name": "10.100.0 TCP P9200,9201,36000 (9节点)",
+      "community_description": "网段:10.100.0 | 节点:9 | 协议:tcp | 端口:9200-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.169",
+      "description": "IP:10.100.0.169 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.40",
+      "name": "10.100.1.40",
+      "community": 12,
+      "community_name": "10.100.1 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.1 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.40",
+      "description": "IP:10.100.1.40 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.157",
+      "name": "10.100.0.157",
+      "community": 13,
+      "community_name": "10.100.0 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.157",
+      "description": "IP:10.100.0.157 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.5.16",
+      "name": "10.100.5.16",
+      "community": 14,
+      "community_name": "10.100.5 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.5 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.5.16",
+      "description": "IP:10.100.5.16 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.172",
+      "name": "10.100.2.172",
+      "community": 15,
+      "community_name": "10.100.2 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.2 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.172",
+      "description": "IP:10.100.2.172 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.34.6",
+      "name": "10.100.34.6",
+      "community": 16,
+      "community_name": "10.100.34 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.34 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.34.6",
+      "description": "IP:10.100.34.6 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.113.139",
+      "name": "10.100.113.139",
+      "community": 17,
+      "community_name": "10.100.113 TCP P36000 (1节点)",
+      "community_description": "网段:10.100.113 | 节点:1 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.113.139",
+      "description": "IP:10.100.113.139 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.7",
+      "name": "10.100.3.7",
+      "community": 18,
+      "community_name": "10.100.3 TCP P36000 (4节点)",
+      "community_description": "网段:10.100.3 | 节点:4 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.7",
+      "description": "IP:10.100.3.7 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.37",
+      "name": "10.100.3.37",
+      "community": 3,
+      "community_name": "10.100.3 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.37",
+      "description": "IP:10.100.3.37 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.136",
+      "name": "10.100.4.136",
+      "community": 2,
+      "community_name": "10.100.4 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.4 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.136",
+      "description": "IP:10.100.4.136 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.147",
+      "name": "10.100.2.147",
+      "community": 19,
+      "community_name": "10.100.2 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.2 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.147",
+      "description": "IP:10.100.2.147 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.24",
+      "name": "10.100.3.24",
+      "community": 20,
+      "community_name": "10.100.3 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.24",
+      "description": "IP:10.100.3.24 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.144",
+      "name": "10.100.2.144",
+      "community": 19,
+      "community_name": "10.100.2 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.2 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.144",
+      "description": "IP:10.100.2.144 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.148",
+      "name": "10.100.2.148",
+      "community": 19,
+      "community_name": "10.100.2 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.2 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.148",
+      "description": "IP:10.100.2.148 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.8",
+      "name": "10.100.1.8",
+      "community": 21,
+      "community_name": "10.100.1 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.1 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.8",
+      "description": "IP:10.100.1.8 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.5.9",
+      "name": "10.100.5.9",
+      "community": 6,
+      "community_name": "10.100.5 TCP P36000 (4节点)",
+      "community_description": "网段:10.100.5 | 节点:4 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.5.9",
+      "description": "IP:10.100.5.9 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.43",
+      "name": "10.100.0.43",
+      "community": 22,
+      "community_name": "10.100.0 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.0 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.43",
+      "description": "IP:10.100.0.43 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.31",
+      "name": "10.100.0.31",
+      "community": 23,
+      "community_name": "10.100.0 TCP P36000 (5节点)",
+      "community_description": "网段:10.100.0 | 节点:5 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.31",
+      "description": "IP:10.100.0.31 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.161",
+      "name": "10.100.2.161",
+      "community": 24,
+      "community_name": "10.100.2 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.2 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.161",
+      "description": "IP:10.100.2.161 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.30",
+      "name": "10.100.3.30",
+      "community": 3,
+      "community_name": "10.100.3 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.30",
+      "description": "IP:10.100.3.30 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.16",
+      "name": "10.100.0.16",
+      "community": 25,
+      "community_name": "10.100.0 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.16",
+      "description": "IP:10.100.0.16 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.145",
+      "name": "10.100.0.145",
+      "community": 26,
+      "community_name": "10.100.0 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.0 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.145",
+      "description": "IP:10.100.0.145 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.26",
+      "name": "10.100.1.26",
+      "community": 27,
+      "community_name": "10.100.1 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.1 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.26",
+      "description": "IP:10.100.1.26 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.163",
+      "name": "10.100.0.163",
+      "community": 11,
+      "community_name": "10.100.0 TCP P9200,9201,36000 (9节点)",
+      "community_description": "网段:10.100.0 | 节点:9 | 协议:tcp | 端口:9200-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.163",
+      "description": "IP:10.100.0.163 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.43",
+      "name": "10.100.1.43",
+      "community": 12,
+      "community_name": "10.100.1 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.1 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.43",
+      "description": "IP:10.100.1.43 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.140",
+      "name": "10.100.2.140",
+      "community": 19,
+      "community_name": "10.100.2 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.2 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.140",
+      "description": "IP:10.100.2.140 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.164",
+      "name": "10.100.2.164",
+      "community": 24,
+      "community_name": "10.100.2 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.2 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.164",
+      "description": "IP:10.100.2.164 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.34",
+      "name": "10.100.3.34",
+      "community": 3,
+      "community_name": "10.100.3 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.34",
+      "description": "IP:10.100.3.34 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.170",
+      "name": "10.100.0.170",
+      "community": 28,
+      "community_name": "10.100.0 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.0 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.170",
+      "description": "IP:10.100.0.170 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.25",
+      "name": "10.100.0.25",
+      "community": 8,
+      "community_name": "10.100.0 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.0 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.25",
+      "description": "IP:10.100.0.25 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.157",
+      "name": "10.100.2.157",
+      "community": 0,
+      "community_name": "10.100.2 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.2 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.157",
+      "description": "IP:10.100.2.157 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.26",
+      "name": "10.100.3.26",
+      "community": 20,
+      "community_name": "10.100.3 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.26",
+      "description": "IP:10.100.3.26 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.158",
+      "name": "10.100.0.158",
+      "community": 13,
+      "community_name": "10.100.0 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.158",
+      "description": "IP:10.100.0.158 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.10",
+      "name": "10.100.1.10",
+      "community": 29,
+      "community_name": "10.100.1 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.1 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.10",
+      "description": "IP:10.100.1.10 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.114.5",
+      "name": "10.100.114.5",
+      "community": 4,
+      "community_name": "10.100.114 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.114 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.114.5",
+      "description": "IP:10.100.114.5 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.165",
+      "name": "10.100.2.165",
+      "community": 24,
+      "community_name": "10.100.2 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.2 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.165",
+      "description": "IP:10.100.2.165 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.135",
+      "name": "10.100.0.135",
+      "community": 30,
+      "community_name": "10.100.0 TCP P36000 (4节点)",
+      "community_description": "网段:10.100.0 | 节点:4 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.135",
+      "description": "IP:10.100.0.135 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.137",
+      "name": "10.100.2.137",
+      "community": 31,
+      "community_name": "10.100.2 TCP P9092,9200,9201 (1节点)",
+      "community_description": "网段:10.100.2 | 节点:1 | 协议:tcp | 端口:9092-9201",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 3,
+      "port_count": 3,
+      "ports": [
+        9092,
+        9200,
+        9201
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.137",
+      "description": "IP:10.100.2.137 | 端口:3个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.24",
+      "name": "10.100.0.24",
+      "community": 8,
+      "community_name": "10.100.0 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.0 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.24",
+      "description": "IP:10.100.0.24 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.27",
+      "name": "10.100.3.27",
+      "community": 20,
+      "community_name": "10.100.3 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.27",
+      "description": "IP:10.100.3.27 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.28",
+      "name": "10.100.0.28",
+      "community": 8,
+      "community_name": "10.100.0 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.0 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.28",
+      "description": "IP:10.100.0.28 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.22",
+      "name": "10.100.1.22",
+      "community": 27,
+      "community_name": "10.100.1 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.1 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.22",
+      "description": "IP:10.100.1.22 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.44",
+      "name": "10.100.3.44",
+      "community": 32,
+      "community_name": "10.100.3 TCP P36000 (4节点)",
+      "community_description": "网段:10.100.3 | 节点:4 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.44",
+      "description": "IP:10.100.3.44 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.41",
+      "name": "10.100.1.41",
+      "community": 12,
+      "community_name": "10.100.1 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.1 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.41",
+      "description": "IP:10.100.1.41 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.8",
+      "name": "10.100.4.8",
+      "community": 33,
+      "community_name": "10.100.4 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.4 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.8",
+      "description": "IP:10.100.4.8 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.32.36",
+      "name": "10.100.32.36",
+      "community": 34,
+      "community_name": "10.100.32 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.32 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.32.36",
+      "description": "IP:10.100.32.36 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.12",
+      "name": "10.100.0.12",
+      "community": 25,
+      "community_name": "10.100.0 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.12",
+      "description": "IP:10.100.0.12 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.113.5",
+      "name": "10.100.113.5",
+      "community": 35,
+      "community_name": "10.100.113 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.113 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.113.5",
+      "description": "IP:10.100.113.5 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.137",
+      "name": "10.100.4.137",
+      "community": 2,
+      "community_name": "10.100.4 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.4 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.137",
+      "description": "IP:10.100.4.137 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.25",
+      "name": "10.100.1.25",
+      "community": 27,
+      "community_name": "10.100.1 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.1 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.25",
+      "description": "IP:10.100.1.25 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.41",
+      "name": "10.100.0.41",
+      "community": 22,
+      "community_name": "10.100.0 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.0 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.41",
+      "description": "IP:10.100.0.41 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.5",
+      "name": "10.100.0.5",
+      "community": 36,
+      "community_name": "10.100.0 Mixed P53 (1节点)",
+      "community_description": "网段:10.100.0 | 节点:1 | 协议:tcp/udp | 端口:53-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 2,
+      "port_count": 2,
+      "ports": [
+        53,
+        36000
+      ],
+      "protocols": [
+        "udp",
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.5",
+      "description": "IP:10.100.0.5 | 端口:2个 | 协议:udp,tcp"
+    },
+    {
+      "id": "10.100.0.173",
+      "name": "10.100.0.173",
+      "community": 28,
+      "community_name": "10.100.0 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.0 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.173",
+      "description": "IP:10.100.0.173 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.134",
+      "name": "10.100.4.134",
+      "community": 2,
+      "community_name": "10.100.4 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.4 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.134",
+      "description": "IP:10.100.4.134 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.134",
+      "name": "10.100.2.134",
+      "community": 9,
+      "community_name": "10.100.2 TCP P36000 (5节点)",
+      "community_description": "网段:10.100.2 | 节点:5 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.134",
+      "description": "IP:10.100.2.134 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.24",
+      "name": "10.100.1.24",
+      "community": 27,
+      "community_name": "10.100.1 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.1 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.24",
+      "description": "IP:10.100.1.24 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.21",
+      "name": "10.100.1.21",
+      "community": 27,
+      "community_name": "10.100.1 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.1 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.21",
+      "description": "IP:10.100.1.21 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.144",
+      "name": "10.100.4.144",
+      "community": 37,
+      "community_name": "10.100.4 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.4 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.144",
+      "description": "IP:10.100.4.144 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.33.134",
+      "name": "10.100.33.134",
+      "community": 1,
+      "community_name": "10.100.33 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.33 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.33.134",
+      "description": "IP:10.100.33.134 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.32.5",
+      "name": "10.100.32.5",
+      "community": 38,
+      "community_name": "10.100.32 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.32 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.32.5",
+      "description": "IP:10.100.32.5 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.45",
+      "name": "10.100.3.45",
+      "community": 32,
+      "community_name": "10.100.3 TCP P36000 (4节点)",
+      "community_description": "网段:10.100.3 | 节点:4 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.45",
+      "description": "IP:10.100.3.45 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.155",
+      "name": "10.100.0.155",
+      "community": 13,
+      "community_name": "10.100.0 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.155",
+      "description": "IP:10.100.0.155 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.167",
+      "name": "10.100.2.167",
+      "community": 24,
+      "community_name": "10.100.2 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.2 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.167",
+      "description": "IP:10.100.2.167 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.30",
+      "name": "10.100.0.30",
+      "community": 23,
+      "community_name": "10.100.0 TCP P36000 (5节点)",
+      "community_description": "网段:10.100.0 | 节点:5 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.30",
+      "description": "IP:10.100.0.30 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.16",
+      "name": "10.100.3.16",
+      "community": 10,
+      "community_name": "10.100.3 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.3 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.16",
+      "description": "IP:10.100.3.16 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.43",
+      "name": "10.100.3.43",
+      "community": 32,
+      "community_name": "10.100.3 TCP P36000 (4节点)",
+      "community_description": "网段:10.100.3 | 节点:4 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.43",
+      "description": "IP:10.100.3.43 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.6",
+      "name": "10.100.4.6",
+      "community": 33,
+      "community_name": "10.100.4 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.4 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.6",
+      "description": "IP:10.100.4.6 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.32.179",
+      "name": "10.100.32.179",
+      "community": 39,
+      "community_name": "10.100.32 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.32 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.32.179",
+      "description": "IP:10.100.32.179 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.152",
+      "name": "10.100.2.152",
+      "community": 0,
+      "community_name": "10.100.2 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.2 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.152",
+      "description": "IP:10.100.2.152 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.168",
+      "name": "10.100.0.168",
+      "community": 11,
+      "community_name": "10.100.0 TCP P9200,9201,36000 (9节点)",
+      "community_description": "网段:10.100.0 | 节点:9 | 协议:tcp | 端口:9200-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.168",
+      "description": "IP:10.100.0.168 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.164",
+      "name": "10.100.0.164",
+      "community": 11,
+      "community_name": "10.100.0 TCP P9200,9201,36000 (9节点)",
+      "community_description": "网段:10.100.0 | 节点:9 | 协议:tcp | 端口:9200-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.164",
+      "description": "IP:10.100.0.164 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.34.134",
+      "name": "10.100.34.134",
+      "community": 40,
+      "community_name": "10.100.34 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.34 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.34.134",
+      "description": "IP:10.100.34.134 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.113.6",
+      "name": "10.100.113.6",
+      "community": 35,
+      "community_name": "10.100.113 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.113 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.113.6",
+      "description": "IP:10.100.113.6 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.12",
+      "name": "10.100.1.12",
+      "community": 29,
+      "community_name": "10.100.1 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.1 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.12",
+      "description": "IP:10.100.1.12 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.38",
+      "name": "10.100.1.38",
+      "community": 41,
+      "community_name": "10.100.1 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.1 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.38",
+      "description": "IP:10.100.1.38 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.36",
+      "name": "10.100.3.36",
+      "community": 3,
+      "community_name": "10.100.3 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.36",
+      "description": "IP:10.100.3.36 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.11",
+      "name": "10.100.1.11",
+      "community": 29,
+      "community_name": "10.100.1 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.1 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.11",
+      "description": "IP:10.100.1.11 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.13",
+      "name": "10.100.1.13",
+      "community": 29,
+      "community_name": "10.100.1 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.1 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.13",
+      "description": "IP:10.100.1.13 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.166",
+      "name": "10.100.2.166",
+      "community": 24,
+      "community_name": "10.100.2 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.2 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.166",
+      "description": "IP:10.100.2.166 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.143",
+      "name": "10.100.2.143",
+      "community": 19,
+      "community_name": "10.100.2 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.2 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.143",
+      "description": "IP:10.100.2.143 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.9",
+      "name": "10.100.3.9",
+      "community": 18,
+      "community_name": "10.100.3 TCP P36000 (4节点)",
+      "community_description": "网段:10.100.3 | 节点:4 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.9",
+      "description": "IP:10.100.3.9 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.31",
+      "name": "10.100.3.31",
+      "community": 3,
+      "community_name": "10.100.3 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.31",
+      "description": "IP:10.100.3.31 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.136",
+      "name": "10.100.2.136",
+      "community": 9,
+      "community_name": "10.100.2 TCP P36000 (5节点)",
+      "community_description": "网段:10.100.2 | 节点:5 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.136",
+      "description": "IP:10.100.2.136 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.9",
+      "name": "10.100.4.9",
+      "community": 33,
+      "community_name": "10.100.4 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.4 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.9",
+      "description": "IP:10.100.4.9 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.135",
+      "name": "10.100.2.135",
+      "community": 9,
+      "community_name": "10.100.2 TCP P36000 (5节点)",
+      "community_description": "网段:10.100.2 | 节点:5 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.135",
+      "description": "IP:10.100.2.135 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.44",
+      "name": "10.100.1.44",
+      "community": 12,
+      "community_name": "10.100.1 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.1 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.44",
+      "description": "IP:10.100.1.44 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.5.8",
+      "name": "10.100.5.8",
+      "community": 6,
+      "community_name": "10.100.5 TCP P36000 (4节点)",
+      "community_description": "网段:10.100.5 | 节点:4 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.5.8",
+      "description": "IP:10.100.5.8 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.5.12",
+      "name": "10.100.5.12",
+      "community": 14,
+      "community_name": "10.100.5 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.5 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.5.12",
+      "description": "IP:10.100.5.12 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.32",
+      "name": "10.100.0.32",
+      "community": 23,
+      "community_name": "10.100.0 TCP P36000 (5节点)",
+      "community_description": "网段:10.100.0 | 节点:5 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.32",
+      "description": "IP:10.100.0.32 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.7",
+      "name": "10.100.0.7",
+      "community": 42,
+      "community_name": "10.100.0 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.0 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.7",
+      "description": "IP:10.100.0.7 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.139",
+      "name": "10.100.0.139",
+      "community": 30,
+      "community_name": "10.100.0 TCP P36000 (4节点)",
+      "community_description": "网段:10.100.0 | 节点:4 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.139",
+      "description": "IP:10.100.0.139 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.152",
+      "name": "10.100.0.152",
+      "community": 13,
+      "community_name": "10.100.0 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.152",
+      "description": "IP:10.100.0.152 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.27",
+      "name": "10.100.1.27",
+      "community": 27,
+      "community_name": "10.100.1 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.1 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.27",
+      "description": "IP:10.100.1.27 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.29",
+      "name": "10.100.3.29",
+      "community": 20,
+      "community_name": "10.100.3 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.29",
+      "description": "IP:10.100.3.29 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.7",
+      "name": "10.100.1.7",
+      "community": 21,
+      "community_name": "10.100.1 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.1 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.7",
+      "description": "IP:10.100.1.7 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.34.133",
+      "name": "10.100.34.133",
+      "community": 40,
+      "community_name": "10.100.34 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.34 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.34.133",
+      "description": "IP:10.100.34.133 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.171",
+      "name": "10.100.0.171",
+      "community": 28,
+      "community_name": "10.100.0 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.0 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.171",
+      "description": "IP:10.100.0.171 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.17",
+      "name": "10.100.3.17",
+      "community": 10,
+      "community_name": "10.100.3 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.3 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.17",
+      "description": "IP:10.100.3.17 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.149",
+      "name": "10.100.0.149",
+      "community": 26,
+      "community_name": "10.100.0 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.0 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.149",
+      "description": "IP:10.100.0.149 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.29",
+      "name": "10.100.1.29",
+      "community": 27,
+      "community_name": "10.100.1 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.1 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.29",
+      "description": "IP:10.100.1.29 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.9",
+      "name": "10.100.0.9",
+      "community": 42,
+      "community_name": "10.100.0 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.0 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.9",
+      "description": "IP:10.100.0.9 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.32.34",
+      "name": "10.100.32.34",
+      "community": 34,
+      "community_name": "10.100.32 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.32 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.32.34",
+      "description": "IP:10.100.32.34 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.140",
+      "name": "10.100.0.140",
+      "community": 26,
+      "community_name": "10.100.0 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.0 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.140",
+      "description": "IP:10.100.0.140 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.154",
+      "name": "10.100.0.154",
+      "community": 13,
+      "community_name": "10.100.0 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.154",
+      "description": "IP:10.100.0.154 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.45",
+      "name": "10.100.1.45",
+      "community": 12,
+      "community_name": "10.100.1 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.1 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.45",
+      "description": "IP:10.100.1.45 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.150",
+      "name": "10.100.0.150",
+      "community": 13,
+      "community_name": "10.100.0 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.150",
+      "description": "IP:10.100.0.150 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.171",
+      "name": "10.100.2.171",
+      "community": 15,
+      "community_name": "10.100.2 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.2 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.171",
+      "description": "IP:10.100.2.171 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.5.10",
+      "name": "10.100.5.10",
+      "community": 14,
+      "community_name": "10.100.5 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.5 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.5.10",
+      "description": "IP:10.100.5.10 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.21",
+      "name": "10.100.3.21",
+      "community": 20,
+      "community_name": "10.100.3 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.21",
+      "description": "IP:10.100.3.21 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.156",
+      "name": "10.100.2.156",
+      "community": 0,
+      "community_name": "10.100.2 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.2 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.156",
+      "description": "IP:10.100.2.156 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.46",
+      "name": "10.100.0.46",
+      "community": 22,
+      "community_name": "10.100.0 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.0 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 2,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.46",
+      "description": "IP:10.100.0.46 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.32.160",
+      "name": "10.100.32.160",
+      "community": 43,
+      "community_name": "10.100.32 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.32 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.32.160",
+      "description": "IP:10.100.32.160 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.19",
+      "name": "10.100.1.19",
+      "community": 29,
+      "community_name": "10.100.1 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.1 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.19",
+      "description": "IP:10.100.1.19 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.32.133",
+      "name": "10.100.32.133",
+      "community": 44,
+      "community_name": "10.100.32 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.32 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.32.133",
+      "description": "IP:10.100.32.133 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.20",
+      "name": "10.100.3.20",
+      "community": 20,
+      "community_name": "10.100.3 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.20",
+      "description": "IP:10.100.3.20 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.137",
+      "name": "10.100.0.137",
+      "community": 30,
+      "community_name": "10.100.0 TCP P36000 (4节点)",
+      "community_description": "网段:10.100.0 | 节点:4 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.137",
+      "description": "IP:10.100.0.137 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.32.177",
+      "name": "10.100.32.177",
+      "community": 39,
+      "community_name": "10.100.32 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.32 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.32.177",
+      "description": "IP:10.100.32.177 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.134",
+      "name": "10.100.0.134",
+      "community": 30,
+      "community_name": "10.100.0 TCP P36000 (4节点)",
+      "community_description": "网段:10.100.0 | 节点:4 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.134",
+      "description": "IP:10.100.0.134 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.138",
+      "name": "10.100.4.138",
+      "community": 2,
+      "community_name": "10.100.4 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.4 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.138",
+      "description": "IP:10.100.4.138 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.23",
+      "name": "10.100.0.23",
+      "community": 8,
+      "community_name": "10.100.0 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.0 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.23",
+      "description": "IP:10.100.0.23 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.22",
+      "name": "10.100.3.22",
+      "community": 20,
+      "community_name": "10.100.3 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.22",
+      "description": "IP:10.100.3.22 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.15",
+      "name": "10.100.1.15",
+      "community": 29,
+      "community_name": "10.100.1 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.1 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.15",
+      "description": "IP:10.100.1.15 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.32.135",
+      "name": "10.100.32.135",
+      "community": 44,
+      "community_name": "10.100.32 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.32 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.32.135",
+      "description": "IP:10.100.32.135 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.21",
+      "name": "10.100.0.21",
+      "community": 8,
+      "community_name": "10.100.0 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.0 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.21",
+      "description": "IP:10.100.0.21 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.167",
+      "name": "10.100.0.167",
+      "community": 11,
+      "community_name": "10.100.0 TCP P9200,9201,36000 (9节点)",
+      "community_description": "网段:10.100.0 | 节点:9 | 协议:tcp | 端口:9200-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.167",
+      "description": "IP:10.100.0.167 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.32",
+      "name": "10.100.1.32",
+      "community": 41,
+      "community_name": "10.100.1 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.1 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.32",
+      "description": "IP:10.100.1.32 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.5.7",
+      "name": "10.100.5.7",
+      "community": 6,
+      "community_name": "10.100.5 TCP P36000 (4节点)",
+      "community_description": "网段:10.100.5 | 节点:4 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.5.7",
+      "description": "IP:10.100.5.7 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.27",
+      "name": "10.100.0.27",
+      "community": 8,
+      "community_name": "10.100.0 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.0 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.27",
+      "description": "IP:10.100.0.27 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.34.5",
+      "name": "10.100.34.5",
+      "community": 16,
+      "community_name": "10.100.34 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.34 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.34.5",
+      "description": "IP:10.100.34.5 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.42",
+      "name": "10.100.1.42",
+      "community": 12,
+      "community_name": "10.100.1 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.1 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.42",
+      "description": "IP:10.100.1.42 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.5.18",
+      "name": "10.100.5.18",
+      "community": 14,
+      "community_name": "10.100.5 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.5 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.5.18",
+      "description": "IP:10.100.5.18 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.13",
+      "name": "10.100.3.13",
+      "community": 10,
+      "community_name": "10.100.3 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.3 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.13",
+      "description": "IP:10.100.3.13 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.34",
+      "name": "10.100.1.34",
+      "community": 41,
+      "community_name": "10.100.1 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.1 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.34",
+      "description": "IP:10.100.1.34 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.158",
+      "name": "10.100.2.158",
+      "community": 0,
+      "community_name": "10.100.2 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.2 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.158",
+      "description": "IP:10.100.2.158 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.5",
+      "name": "10.100.1.5",
+      "community": 21,
+      "community_name": "10.100.1 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.1 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.5",
+      "description": "IP:10.100.1.5 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.159",
+      "name": "10.100.2.159",
+      "community": 0,
+      "community_name": "10.100.2 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.2 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.159",
+      "description": "IP:10.100.2.159 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.32",
+      "name": "10.100.3.32",
+      "community": 3,
+      "community_name": "10.100.3 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.32",
+      "description": "IP:10.100.3.32 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.42",
+      "name": "10.100.0.42",
+      "community": 22,
+      "community_name": "10.100.0 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.0 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.42",
+      "description": "IP:10.100.0.42 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.12",
+      "name": "10.100.3.12",
+      "community": 10,
+      "community_name": "10.100.3 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.3 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.12",
+      "description": "IP:10.100.3.12 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.159",
+      "name": "10.100.0.159",
+      "community": 13,
+      "community_name": "10.100.0 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.159",
+      "description": "IP:10.100.0.159 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.145",
+      "name": "10.100.2.145",
+      "community": 19,
+      "community_name": "10.100.2 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.2 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.145",
+      "description": "IP:10.100.2.145 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.32.7",
+      "name": "10.100.32.7",
+      "community": 38,
+      "community_name": "10.100.32 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.32 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.32.7",
+      "description": "IP:10.100.32.7 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.169",
+      "name": "10.100.2.169",
+      "community": 24,
+      "community_name": "10.100.2 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.2 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.169",
+      "description": "IP:10.100.2.169 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.10",
+      "name": "10.100.0.10",
+      "community": 25,
+      "community_name": "10.100.0 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.10",
+      "description": "IP:10.100.0.10 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.18",
+      "name": "10.100.1.18",
+      "community": 29,
+      "community_name": "10.100.1 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.1 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.18",
+      "description": "IP:10.100.1.18 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.153",
+      "name": "10.100.2.153",
+      "community": 0,
+      "community_name": "10.100.2 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.2 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.153",
+      "description": "IP:10.100.2.153 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.14",
+      "name": "10.100.3.14",
+      "community": 10,
+      "community_name": "10.100.3 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.3 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.14",
+      "description": "IP:10.100.3.14 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.165",
+      "name": "10.100.0.165",
+      "community": 11,
+      "community_name": "10.100.0 TCP P9200,9201,36000 (9节点)",
+      "community_description": "网段:10.100.0 | 节点:9 | 协议:tcp | 端口:9200-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.165",
+      "description": "IP:10.100.0.165 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.161",
+      "name": "10.100.0.161",
+      "community": 11,
+      "community_name": "10.100.0 TCP P9200,9201,36000 (9节点)",
+      "community_description": "网段:10.100.0 | 节点:9 | 协议:tcp | 端口:9200-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 2,
+      "port_count": 2,
+      "ports": [
+        9200,
+        9201
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.161",
+      "description": "IP:10.100.0.161 | 端口:2个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.151",
+      "name": "10.100.0.151",
+      "community": 13,
+      "community_name": "10.100.0 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.151",
+      "description": "IP:10.100.0.151 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.28",
+      "name": "10.100.1.28",
+      "community": 27,
+      "community_name": "10.100.1 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.1 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.28",
+      "description": "IP:10.100.1.28 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.40",
+      "name": "10.100.0.40",
+      "community": 22,
+      "community_name": "10.100.0 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.0 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.40",
+      "description": "IP:10.100.0.40 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.148",
+      "name": "10.100.0.148",
+      "community": 26,
+      "community_name": "10.100.0 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.0 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.148",
+      "description": "IP:10.100.0.148 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.15",
+      "name": "10.100.0.15",
+      "community": 25,
+      "community_name": "10.100.0 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.15",
+      "description": "IP:10.100.0.15 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.37",
+      "name": "10.100.1.37",
+      "community": 41,
+      "community_name": "10.100.1 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.1 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.37",
+      "description": "IP:10.100.1.37 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.139",
+      "name": "10.100.2.139",
+      "community": 9,
+      "community_name": "10.100.2 TCP P36000 (5节点)",
+      "community_description": "网段:10.100.2 | 节点:5 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.139",
+      "description": "IP:10.100.2.139 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.5",
+      "name": "10.100.3.5",
+      "community": 18,
+      "community_name": "10.100.3 TCP P36000 (4节点)",
+      "community_description": "网段:10.100.3 | 节点:4 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.5",
+      "description": "IP:10.100.3.5 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.155",
+      "name": "10.100.2.155",
+      "community": 0,
+      "community_name": "10.100.2 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.2 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.155",
+      "description": "IP:10.100.2.155 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.46",
+      "name": "10.100.1.46",
+      "community": 12,
+      "community_name": "10.100.1 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.1 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.46",
+      "description": "IP:10.100.1.46 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.149",
+      "name": "10.100.2.149",
+      "community": 19,
+      "community_name": "10.100.2 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.2 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.149",
+      "description": "IP:10.100.2.149 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.23",
+      "name": "10.100.1.23",
+      "community": 27,
+      "community_name": "10.100.1 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.1 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.23",
+      "description": "IP:10.100.1.23 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.8",
+      "name": "10.100.3.8",
+      "community": 18,
+      "community_name": "10.100.3 TCP P36000 (4节点)",
+      "community_description": "网段:10.100.3 | 节点:4 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.8",
+      "description": "IP:10.100.3.8 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.133",
+      "name": "10.100.4.133",
+      "community": 2,
+      "community_name": "10.100.4 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.4 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.133",
+      "description": "IP:10.100.4.133 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.139",
+      "name": "10.100.4.139",
+      "community": 2,
+      "community_name": "10.100.4 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.4 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.139",
+      "description": "IP:10.100.4.139 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.11",
+      "name": "10.100.4.11",
+      "community": 5,
+      "community_name": "10.100.4 TCP P36000 (5节点)",
+      "community_description": "网段:10.100.4 | 节点:5 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.11",
+      "description": "IP:10.100.4.11 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.11",
+      "name": "10.100.0.11",
+      "community": 25,
+      "community_name": "10.100.0 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.11",
+      "description": "IP:10.100.0.11 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.15",
+      "name": "10.100.3.15",
+      "community": 10,
+      "community_name": "10.100.3 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.3 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.15",
+      "description": "IP:10.100.3.15 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.14",
+      "name": "10.100.0.14",
+      "community": 25,
+      "community_name": "10.100.0 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.14",
+      "description": "IP:10.100.0.14 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.141",
+      "name": "10.100.4.141",
+      "community": 37,
+      "community_name": "10.100.4 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.4 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.141",
+      "description": "IP:10.100.4.141 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.38",
+      "name": "10.100.3.38",
+      "community": 3,
+      "community_name": "10.100.3 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.38",
+      "description": "IP:10.100.3.38 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.36.71",
+      "name": "10.100.36.71",
+      "community": 45,
+      "community_name": "10.100.36 TCP P22003 (1节点)",
+      "community_description": "网段:10.100.36 | 节点:1 | 协议:tcp | 端口:22003-22003",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        22003
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.36.71",
+      "description": "IP:10.100.36.71 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.49",
+      "name": "10.100.0.49",
+      "community": 22,
+      "community_name": "10.100.0 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.0 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.49",
+      "description": "IP:10.100.0.49 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.10",
+      "name": "10.100.3.10",
+      "community": 10,
+      "community_name": "10.100.3 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.3 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.10",
+      "description": "IP:10.100.3.10 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.42",
+      "name": "10.100.3.42",
+      "community": 32,
+      "community_name": "10.100.3 TCP P36000 (4节点)",
+      "community_description": "网段:10.100.3 | 节点:4 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.42",
+      "description": "IP:10.100.3.42 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.142",
+      "name": "10.100.4.142",
+      "community": 37,
+      "community_name": "10.100.4 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.4 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.142",
+      "description": "IP:10.100.4.142 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.32.162",
+      "name": "10.100.32.162",
+      "community": 43,
+      "community_name": "10.100.32 TCP P36000 (2节点)",
+      "community_description": "网段:10.100.32 | 节点:2 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.32.162",
+      "description": "IP:10.100.32.162 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.20",
+      "name": "10.100.1.20",
+      "community": 46,
+      "community_name": "10.100.1 TCP 4ports (1节点)",
+      "community_description": "网段:10.100.1 | 节点:1 | 协议:tcp | 端口:9092-18060",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 4,
+      "port_count": 4,
+      "ports": [
+        9092,
+        9200,
+        9201,
+        18060
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.20",
+      "description": "IP:10.100.1.20 | 端口:4个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.34",
+      "name": "10.100.0.34",
+      "community": 23,
+      "community_name": "10.100.0 TCP P36000 (5节点)",
+      "community_description": "网段:10.100.0 | 节点:5 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.34",
+      "description": "IP:10.100.0.34 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.133",
+      "name": "10.100.0.133",
+      "community": 47,
+      "community_name": "10.100.0 Mixed P53 (1节点)",
+      "community_description": "网段:10.100.0 | 节点:1 | 协议:tcp/udp | 端口:53-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 2,
+      "port_count": 2,
+      "ports": [
+        53,
+        36000
+      ],
+      "protocols": [
+        "udp",
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.133",
+      "description": "IP:10.100.0.133 | 端口:2个 | 协议:udp,tcp"
+    },
+    {
+      "id": "10.100.5.11",
+      "name": "10.100.5.11",
+      "community": 14,
+      "community_name": "10.100.5 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.5 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.5.11",
+      "description": "IP:10.100.5.11 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.166",
+      "name": "10.100.0.166",
+      "community": 11,
+      "community_name": "10.100.0 TCP P9200,9201,36000 (9节点)",
+      "community_description": "网段:10.100.0 | 节点:9 | 协议:tcp | 端口:9200-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.166",
+      "description": "IP:10.100.0.166 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.35",
+      "name": "10.100.1.35",
+      "community": 41,
+      "community_name": "10.100.1 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.1 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.35",
+      "description": "IP:10.100.1.35 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.31",
+      "name": "10.100.1.31",
+      "community": 41,
+      "community_name": "10.100.1 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.1 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.31",
+      "description": "IP:10.100.1.31 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.162",
+      "name": "10.100.0.162",
+      "community": 11,
+      "community_name": "10.100.0 TCP P9200,9201,36000 (9节点)",
+      "community_description": "网段:10.100.0 | 节点:9 | 协议:tcp | 端口:9200-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.162",
+      "description": "IP:10.100.0.162 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.18",
+      "name": "10.100.3.18",
+      "community": 10,
+      "community_name": "10.100.3 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.3 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.18",
+      "description": "IP:10.100.3.18 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.3.28",
+      "name": "10.100.3.28",
+      "community": 20,
+      "community_name": "10.100.3 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.3.28",
+      "description": "IP:10.100.3.28 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.13",
+      "name": "10.100.4.13",
+      "community": 5,
+      "community_name": "10.100.4 TCP P36000 (5节点)",
+      "community_description": "网段:10.100.4 | 节点:5 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.13",
+      "description": "IP:10.100.4.13 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.18",
+      "name": "10.100.0.18",
+      "community": 25,
+      "community_name": "10.100.0 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.18",
+      "description": "IP:10.100.0.18 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.16",
+      "name": "10.100.4.16",
+      "community": 5,
+      "community_name": "10.100.4 TCP P36000 (5节点)",
+      "community_description": "网段:10.100.4 | 节点:5 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.16",
+      "description": "IP:10.100.4.16 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.30",
+      "name": "10.100.1.30",
+      "community": 41,
+      "community_name": "10.100.1 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.1 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.30",
+      "description": "IP:10.100.1.30 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.5.14",
+      "name": "10.100.5.14",
+      "community": 14,
+      "community_name": "10.100.5 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.5 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.5.14",
+      "description": "IP:10.100.5.14 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.8",
+      "name": "10.100.0.8",
+      "community": 42,
+      "community_name": "10.100.0 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.0 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.8",
+      "description": "IP:10.100.0.8 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.143",
+      "name": "10.100.0.143",
+      "community": 26,
+      "community_name": "10.100.0 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.0 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.143",
+      "description": "IP:10.100.0.143 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.4.14",
+      "name": "10.100.4.14",
+      "community": 5,
+      "community_name": "10.100.4 TCP P36000 (5节点)",
+      "community_description": "网段:10.100.4 | 节点:5 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.4.14",
+      "description": "IP:10.100.4.14 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.44",
+      "name": "10.100.0.44",
+      "community": 22,
+      "community_name": "10.100.0 TCP P36000 (7节点)",
+      "community_description": "网段:10.100.0 | 节点:7 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.44",
+      "description": "IP:10.100.0.44 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.147",
+      "name": "10.100.0.147",
+      "community": 26,
+      "community_name": "10.100.0 TCP P36000 (6节点)",
+      "community_description": "网段:10.100.0 | 节点:6 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.147",
+      "description": "IP:10.100.0.147 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.154",
+      "name": "10.100.2.154",
+      "community": 0,
+      "community_name": "10.100.2 TCP P36000 (9节点)",
+      "community_description": "网段:10.100.2 | 节点:9 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.154",
+      "description": "IP:10.100.2.154 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.1.17",
+      "name": "10.100.1.17",
+      "community": 29,
+      "community_name": "10.100.1 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.1 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.1.17",
+      "description": "IP:10.100.1.17 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.2.170",
+      "name": "10.100.2.170",
+      "community": 15,
+      "community_name": "10.100.2 TCP P36000 (3节点)",
+      "community_description": "网段:10.100.2 | 节点:3 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.2.170",
+      "description": "IP:10.100.2.170 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.13",
+      "name": "10.100.0.13",
+      "community": 25,
+      "community_name": "10.100.0 TCP P36000 (8节点)",
+      "community_description": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.13",
+      "description": "IP:10.100.0.13 | 端口:1个 | 协议:tcp"
+    },
+    {
+      "id": "10.100.0.33",
+      "name": "10.100.0.33",
+      "community": 23,
+      "community_name": "10.100.0 TCP P36000 (5节点)",
+      "community_description": "网段:10.100.0 | 节点:5 | 协议:tcp | 端口:36000-36000",
+      "degree": 1,
+      "in_degree": 0,
+      "out_degree": 1,
+      "port_count": 1,
+      "ports": [
+        36000
+      ],
+      "protocols": [
+        "tcp"
+      ],
+      "is_hub": false,
+      "hub_reason": "",
+      "anomaly_score": 0.1,
+      "label": "10.100.0.33",
+      "description": "IP:10.100.0.33 | 端口:1个 | 协议:tcp"
+    }
+  ],
+  "links": [
+    {
+      "source": "10.100.0.49",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.13",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.11",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.138",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.5.12",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.9",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.40",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.170",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.43",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.171",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.169",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.169",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.163",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.38",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.164",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.32.160",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.32.36",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.28",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.32.5",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.113.5",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.14",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.23",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.31",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.158",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.29",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.145",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.8",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.135",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.7",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.26",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.15",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.5",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.16",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.141",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.5.14",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.144",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.5.18",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.14",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.142",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.5.16",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.21",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.13",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.137",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.150",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.7",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.25",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.24",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.5",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.24",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.15",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.135",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.25",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.11",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.8",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.134",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.139",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.150",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.11",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.24",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.16",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.32",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.14",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.16",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.32.162",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.34.6",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.32.135",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.34.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.33.133",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.32.177",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.32.7",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.34.133",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.113.6",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.114.5",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.114.6",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.33.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.32.34",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.34.5",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.32.133",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.32.179",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.18",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.8",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.17",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.151",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.143",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.5",
+      "target": "10.100.113.134",
+      "weight": 2,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.30",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.22",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.148",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.149",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.157",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.27",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.21",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.31",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.32",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.158",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.156",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.22",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.149",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.32",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.157",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.28",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.133",
+      "target": "10.100.113.134",
+      "weight": 2,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.148",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.31",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.138",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.139",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.140",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.15",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.11",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.12",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.12",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.33",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.140",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.159",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.10",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.155",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.145",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.136",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.18",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.154",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.20",
+      "target": "10.100.113.134",
+      "weight": 4,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.161",
+      "target": "10.100.113.134",
+      "weight": 2,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.137",
+      "weight": 3,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.21",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.28",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.10",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.10",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.9",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.155",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.154",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.27",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.26",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.17",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.152",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.143",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.27",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.7",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.153",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.152",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.19",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.12",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.20",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.18",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.9",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.144",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.159",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.34",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.23",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.37",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.34",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.162",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.37",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.164",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.34",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.165",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.38",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.36",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.165",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.35",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.39",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.46",
+      "target": "10.100.113.134",
+      "weight": 2,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.46",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.172",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.43",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.167",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.45",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.167",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.43",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.45",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.166",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.41",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.171",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.41",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.44",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.168",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.170",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.44",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.40",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.42",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.42",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.44",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.166",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.42",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.5.9",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.5.11",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.5.10",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.5.8",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.5.7",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.8",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.10",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.136",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.135",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.137",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.139",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.29",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.6",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.30",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.113.139",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.5.6",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.1.13",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.22",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.147",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.30",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.0.173",
+      "target": "10.100.113.134",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.4.133",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.161",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.3.13",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.2.147",
+      "weight": 1,
+      "ports": []
+    },
+    {
+      "source": "10.100.113.134",
+      "target": "10.100.36.71",
+      "weight": 1,
+      "ports": []
+    }
+  ],
+  "domainNames": {
+    "0": "10.100.2 TCP P36000 (9节点)",
+    "1": "10.100.33 TCP P36000 (2节点)",
+    "2": "10.100.4 TCP P36000 (7节点)",
+    "3": "10.100.3 TCP P36000 (8节点)",
+    "4": "10.100.114 TCP P36000 (2节点)",
+    "5": "10.100.4 TCP P36000 (5节点)",
+    "6": "10.100.5 TCP P36000 (4节点)",
+    "7": "10.100.113 Mixed P53 (1节点)",
+    "8": "10.100.0 TCP P36000 (7节点)",
+    "9": "10.100.2 TCP P36000 (5节点)",
+    "10": "10.100.3 TCP P36000 (9节点)",
+    "11": "10.100.0 TCP P9200,9201,36000 (9节点)",
+    "12": "10.100.1 TCP P36000 (7节点)",
+    "13": "10.100.0 TCP P36000 (8节点)",
+    "14": "10.100.5 TCP P36000 (6节点)",
+    "15": "10.100.2 TCP P36000 (3节点)",
+    "16": "10.100.34 TCP P36000 (2节点)",
+    "17": "10.100.113 TCP P36000 (1节点)",
+    "18": "10.100.3 TCP P36000 (4节点)",
+    "19": "10.100.2 TCP P36000 (7节点)",
+    "20": "10.100.3 TCP P36000 (8节点)",
+    "21": "10.100.1 TCP P36000 (3节点)",
+    "22": "10.100.0 TCP P36000 (7节点)",
+    "23": "10.100.0 TCP P36000 (5节点)",
+    "24": "10.100.2 TCP P36000 (6节点)",
+    "25": "10.100.0 TCP P36000 (8节点)",
+    "26": "10.100.0 TCP P36000 (6节点)",
+    "27": "10.100.1 TCP P36000 (9节点)",
+    "28": "10.100.0 TCP P36000 (3节点)",
+    "29": "10.100.1 TCP P36000 (8节点)",
+    "30": "10.100.0 TCP P36000 (4节点)",
+    "31": "10.100.2 TCP P9092,9200,9201 (1节点)",
+    "32": "10.100.3 TCP P36000 (4节点)",
+    "33": "10.100.4 TCP P36000 (3节点)",
+    "34": "10.100.32 TCP P36000 (2节点)",
+    "35": "10.100.113 TCP P36000 (2节点)",
+    "36": "10.100.0 Mixed P53 (1节点)",
+    "37": "10.100.4 TCP P36000 (3节点)",
+    "38": "10.100.32 TCP P36000 (2节点)",
+    "39": "10.100.32 TCP P36000 (2节点)",
+    "40": "10.100.34 TCP P36000 (2节点)",
+    "41": "10.100.1 TCP P36000 (7节点)",
+    "42": "10.100.0 TCP P36000 (3节点)",
+    "43": "10.100.32 TCP P36000 (2节点)",
+    "44": "10.100.32 TCP P36000 (2节点)",
+    "45": "10.100.36 TCP P22003 (1节点)",
+    "46": "10.100.1 TCP 4ports (1节点)",
+    "47": "10.100.0 Mixed P53 (1节点)"
+  },
+  "domainDescriptions": {
+    "0": "网段:10.100.2 | 节点:9 | 协议:tcp | 端口:36000-36000",
+    "1": "网段:10.100.33 | 节点:2 | 协议:tcp | 端口:36000-36000",
+    "2": "网段:10.100.4 | 节点:7 | 协议:tcp | 端口:36000-36000",
+    "3": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+    "4": "网段:10.100.114 | 节点:2 | 协议:tcp | 端口:36000-36000",
+    "5": "网段:10.100.4 | 节点:5 | 协议:tcp | 端口:36000-36000",
+    "6": "网段:10.100.5 | 节点:4 | 协议:tcp | 端口:36000-36000",
+    "7": "网段:10.100.113 | 节点:1 | 协议:tcp/udp | 端口:53-36000",
+    "8": "网段:10.100.0 | 节点:7 | 协议:tcp | 端口:36000-36000",
+    "9": "网段:10.100.2 | 节点:5 | 协议:tcp | 端口:36000-36000",
+    "10": "网段:10.100.3 | 节点:9 | 协议:tcp | 端口:36000-36000",
+    "11": "网段:10.100.0 | 节点:9 | 协议:tcp | 端口:9200-36000",
+    "12": "网段:10.100.1 | 节点:7 | 协议:tcp | 端口:36000-36000",
+    "13": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+    "14": "网段:10.100.5 | 节点:6 | 协议:tcp | 端口:36000-36000",
+    "15": "网段:10.100.2 | 节点:3 | 协议:tcp | 端口:36000-36000",
+    "16": "网段:10.100.34 | 节点:2 | 协议:tcp | 端口:36000-36000",
+    "17": "网段:10.100.113 | 节点:1 | 协议:tcp | 端口:36000-36000",
+    "18": "网段:10.100.3 | 节点:4 | 协议:tcp | 端口:36000-36000",
+    "19": "网段:10.100.2 | 节点:7 | 协议:tcp | 端口:36000-36000",
+    "20": "网段:10.100.3 | 节点:8 | 协议:tcp | 端口:36000-36000",
+    "21": "网段:10.100.1 | 节点:3 | 协议:tcp | 端口:36000-36000",
+    "22": "网段:10.100.0 | 节点:7 | 协议:tcp | 端口:36000-36000",
+    "23": "网段:10.100.0 | 节点:5 | 协议:tcp | 端口:36000-36000",
+    "24": "网段:10.100.2 | 节点:6 | 协议:tcp | 端口:36000-36000",
+    "25": "网段:10.100.0 | 节点:8 | 协议:tcp | 端口:36000-36000",
+    "26": "网段:10.100.0 | 节点:6 | 协议:tcp | 端口:36000-36000",
+    "27": "网段:10.100.1 | 节点:9 | 协议:tcp | 端口:36000-36000",
+    "28": "网段:10.100.0 | 节点:3 | 协议:tcp | 端口:36000-36000",
+    "29": "网段:10.100.1 | 节点:8 | 协议:tcp | 端口:36000-36000",
+    "30": "网段:10.100.0 | 节点:4 | 协议:tcp | 端口:36000-36000",
+    "31": "网段:10.100.2 | 节点:1 | 协议:tcp | 端口:9092-9201",
+    "32": "网段:10.100.3 | 节点:4 | 协议:tcp | 端口:36000-36000",
+    "33": "网段:10.100.4 | 节点:3 | 协议:tcp | 端口:36000-36000",
+    "34": "网段:10.100.32 | 节点:2 | 协议:tcp | 端口:36000-36000",
+    "35": "网段:10.100.113 | 节点:2 | 协议:tcp | 端口:36000-36000",
+    "36": "网段:10.100.0 | 节点:1 | 协议:tcp/udp | 端口:53-36000",
+    "37": "网段:10.100.4 | 节点:3 | 协议:tcp | 端口:36000-36000",
+    "38": "网段:10.100.32 | 节点:2 | 协议:tcp | 端口:36000-36000",
+    "39": "网段:10.100.32 | 节点:2 | 协议:tcp | 端口:36000-36000",
+    "40": "网段:10.100.34 | 节点:2 | 协议:tcp | 端口:36000-36000",
+    "41": "网段:10.100.1 | 节点:7 | 协议:tcp | 端口:36000-36000",
+    "42": "网段:10.100.0 | 节点:3 | 协议:tcp | 端口:36000-36000",
+    "43": "网段:10.100.32 | 节点:2 | 协议:tcp | 端口:36000-36000",
+    "44": "网段:10.100.32 | 节点:2 | 协议:tcp | 端口:36000-36000",
+    "45": "网段:10.100.36 | 节点:1 | 协议:tcp | 端口:22003-22003",
+    "46": "网段:10.100.1 | 节点:1 | 协议:tcp | 端口:9092-18060",
+    "47": "网段:10.100.0 | 节点:1 | 协议:tcp/udp | 端口:53-36000"
+  }
+}
