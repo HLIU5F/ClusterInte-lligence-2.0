@@ -1,4 +1,4 @@
-﻿// src/lib/topology-api.ts
+// src/lib/topology-api.ts
 //
 // Cluster-Intelligence 拓扑数据接口
 //
@@ -27,6 +27,7 @@ export interface Neo4jTopologyResponse {
     is_anomaly: boolean;
     anomaly_level: 'Critical' | 'High' | 'Medium' | 'Low' | 'None';
     is_hub: boolean;
+    is_critical?: boolean;
     service_type: string | null;
     geo_country: string | null;
     role_guess: string;
@@ -36,6 +37,9 @@ export interface Neo4jTopologyResponse {
     owner?: string | null;
     environment?: string | null;
     cmdb_tags?: string[];
+    // IP 节点的端口/协议签名（列表），端口服务域/策略域聚类依赖
+    ports?: number[];
+    protocols?: string[];
   }>;
   links: Array<{
     source: string;
@@ -43,6 +47,9 @@ export interface Neo4jTopologyResponse {
     weight: number;
     bytes: number;
     is_cross_domain: boolean;
+    // CONNECTS_TO 关系的端口/协议签名（列表）
+    ports?: number[];
+    protocols?: string[];
   }>;
   zones: Array<{
     id: string;
@@ -156,5 +163,13 @@ export async function getGDSStatus(): Promise<{
   zoneDetails: GDSZoneDetail[];
 }> {
   const response = await fetch('/api/analysis/gds', { cache: 'no-store' });
-  return response.json();
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.error || `GDS 状态加载失败（HTTP ${response.status}）`);
+  }
+  const data = await response.json();
+  if (data?.success === false) {
+    throw new Error(data.error || 'GDS 状态加载失败');
+  }
+  return data;
 }

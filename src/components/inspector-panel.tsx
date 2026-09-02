@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import type { TopologyData, TopologyNode, TopologyLink } from '@/lib/types';
-import { COMMUNITY_COLORS, ROLE_LABELS, ANOMALY_LEVEL_COLORS, formatBytes, formatNumber } from '@/lib/types';
+import { communityColor, ROLE_LABELS, ANOMALY_LEVEL_COLORS, formatBytes, formatNumber } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -69,7 +69,7 @@ export function InspectorPanel({
   }
 
   return (
-    <div className="w-[320px] h-full flex flex-col glass-panel rounded-l-xl border-r-0 shadow-2xl">
+    <div className="w-[400px] h-full flex flex-col glass-panel rounded-l-xl border-r-0 shadow-2xl">
       {/* Header */}
       <div className="px-3 py-2 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -102,13 +102,13 @@ export function InspectorPanel({
       <div className="flex border-b border-border">
         {[
           { key: 'detail' as const, label: '详情', icon: Activity },
-          { key: 'enrich' as const, label: 'Enrich', icon: Zap },
+          { key: 'enrich' as const, label: '富化', icon: Zap },
           { key: 'connections' as const, label: '连接', icon: Link2 },
         ].map(tab => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`flex-1 flex items-center justify-center gap-1 py-2 text-[11px] font-medium transition-colors
+            className={`flex-1 flex items-center justify-center gap-1 py-2 text-xs font-medium transition-colors
               ${activeTab === tab.key
                 ? 'text-primary border-b-2 border-primary bg-primary/5'
                 : 'text-muted-foreground hover:text-foreground'
@@ -135,37 +135,37 @@ export function InspectorPanel({
                   <>
                     <Separator className="my-4" />
                     <div className="text-left space-y-2">
-                      <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      <div className="text-[11px] font-medium text-muted-foreground">
                         全局统计
                       </div>
-                      <div className="grid grid-cols-2 gap-2 text-[11px]">
+                      <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="rounded-md bg-secondary/30 px-2.5 py-2">
                           <div className="flex items-center gap-1.5 mb-1">
-                            <Server className="w-3 h-3 text-cyan-400" />
+                            <Server className="w-3 h-3 text-muted-foreground" />
                             <span className="text-[10px] text-muted-foreground">节点</span>
                           </div>
-                          <div className="text-sm font-semibold font-mono text-cyan-400">{formatNumber(data.nodes.length)}</div>
+                          <div className="text-sm font-semibold font-mono text-foreground">{formatNumber(data.nodes.length)}</div>
                         </div>
                         <div className="rounded-md bg-secondary/30 px-2.5 py-2">
                           <div className="flex items-center gap-1.5 mb-1">
-                            <Link2 className="w-3 h-3 text-indigo-400" />
+                            <Link2 className="w-3 h-3 text-muted-foreground" />
                             <span className="text-[10px] text-muted-foreground">连接</span>
                           </div>
-                          <div className="text-sm font-semibold font-mono text-indigo-400">{formatNumber(data.links.length)}</div>
+                          <div className="text-sm font-semibold font-mono text-foreground">{formatNumber(data.links.length)}</div>
                         </div>
                         <div className="rounded-md bg-secondary/30 px-2.5 py-2">
                           <div className="flex items-center gap-1.5 mb-1">
-                            <Network className="w-3 h-3 text-emerald-400" />
+                            <Network className="w-3 h-3 text-muted-foreground" />
                             <span className="text-[10px] text-muted-foreground">安全域</span>
                           </div>
-                          <div className="text-sm font-semibold font-mono text-emerald-400">{effectiveCommunityCount}{gdsAlgorithm !== 'original' && <span className="text-[11px] text-muted-foreground ml-1">({gdsAlgorithm.toUpperCase()})</span>}</div>
+                          <div className="text-sm font-semibold font-mono text-foreground">{effectiveCommunityCount}{gdsAlgorithm !== 'original' && <span className="text-[11px] text-muted-foreground ml-1">({gdsAlgorithm.toUpperCase()})</span>}</div>
                         </div>
                         <div className="rounded-md bg-secondary/30 px-2.5 py-2">
                           <div className="flex items-center gap-1.5 mb-1">
-                            <AlertTriangle className="w-3 h-3 text-red-400" />
+                            <AlertTriangle className="w-3 h-3 text-destructive" />
                             <span className="text-[10px] text-muted-foreground">异常</span>
                           </div>
-                          <div className="text-sm font-semibold font-mono text-red-400">
+                          <div className="text-sm font-semibold font-mono text-destructive">
                             {formatNumber(data.nodes.filter(n => n.is_anomaly).length)}
                           </div>
                         </div>
@@ -249,7 +249,7 @@ function NodeDetail({ node, data, onNodeSelect }: {
         <div className="flex items-center gap-2 mb-1">
           <div
             className="w-3 h-3 rounded-full"
-            style={{ backgroundColor: COMMUNITY_COLORS[node.community % COMMUNITY_COLORS.length] }}
+            style={{ backgroundColor: communityColor(node.community) }}
           />
           <span className="text-sm font-mono font-semibold">{node.id}</span>
         </div>
@@ -261,9 +261,12 @@ function NodeDetail({ node, data, onNodeSelect }: {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[11px]">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
         <DetailRow label="角色" value={ROLE_LABELS[node.role_guess] || node.role_guess} />
-        <DetailRow label="安全域" value={`Community ${node.community}`} />
+        {node.is_critical && (
+          <DetailRow label="资产属性" value="重要（关键服务）" tone="gold" />
+        )}
+        <DetailRow label="安全域" value={`安全域 ${node.community}`} />
         <DetailRow label="连接数" value={`${node.degree}`} />
         <DetailRow label="入/出" value={`${node.in_degree} / ${node.out_degree}`} />
         <DetailRow label="发送" value={formatBytes(node.bytes_sent)} />
@@ -275,7 +278,7 @@ function NodeDetail({ node, data, onNodeSelect }: {
         <>
           <Separator />
           <div>
-            <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
+            <div className="text-[11px] font-medium text-muted-foreground mb-1.5">
               CMDB 标签
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -292,7 +295,7 @@ function NodeDetail({ node, data, onNodeSelect }: {
       <Separator />
 
       <div>
-        <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
+        <div className="text-[11px] font-medium text-muted-foreground mb-1.5">
           邻居节点 ({neighbors.length})
         </div>
         <div className="space-y-0.5 max-h-[200px] overflow-y-auto">
@@ -304,7 +307,7 @@ function NodeDetail({ node, data, onNodeSelect }: {
             >
               <div
                 className="w-2 h-2 rounded-full shrink-0"
-                style={{ backgroundColor: COMMUNITY_COLORS[n.community % COMMUNITY_COLORS.length] }}
+                style={{ backgroundColor: communityColor(n.community) }}
               />
               <span className="font-mono truncate">{n.id}</span>
               {n.is_anomaly && <AlertTriangle className="w-2.5 h-2.5 text-red-500 shrink-0" />}
@@ -321,11 +324,12 @@ function NodeDetail({ node, data, onNodeSelect }: {
   );
 }
 
-function DetailRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+function DetailRow({ label, value, highlight, tone }: { label: string; value: string; highlight?: boolean; tone?: 'gold' }) {
+  const color = tone === 'gold' ? 'text-amber-400' : highlight ? 'text-red-400' : '';
   return (
     <div className="flex justify-between">
       <span className="text-muted-foreground">{label}</span>
-      <span className={`font-mono ${highlight ? 'text-red-400' : ''}`}>{value}</span>
+      <span className={`font-mono ${color}`}>{value}</span>
     </div>
   );
 }
@@ -360,25 +364,25 @@ function NodeConnections({ node, data, onNodeSelect }: {
       <div className="flex items-center gap-2 mb-1">
         <div
           className="w-2.5 h-2.5 rounded-full"
-          style={{ backgroundColor: COMMUNITY_COLORS[node.community % COMMUNITY_COLORS.length] }}
+          style={{ backgroundColor: communityColor(node.community) }}
         />
         <span className="text-xs font-mono font-semibold">{node.id}</span>
         <Badge variant="secondary" className="text-[11px]">{connections.length} 连接</Badge>
       </div>
 
-      <div className="flex gap-2 text-[10px]">
-        <span className="px-2 py-1 rounded bg-cyan-500/10 text-cyan-400">
-          出向: {outConnections.length}
+      <div className="flex gap-2 text-[11px]">
+        <span className="px-2 py-1 rounded bg-secondary/40 text-muted-foreground">
+          出向 {outConnections.length}
         </span>
-        <span className="px-2 py-1 rounded bg-amber-500/10 text-amber-400">
-          入向: {inConnections.length}
+        <span className="px-2 py-1 rounded bg-secondary/40 text-muted-foreground">
+          入向 {inConnections.length}
         </span>
       </div>
 
       {outConnections.length > 0 && (
         <div>
-          <div className="text-[10px] text-cyan-400 font-medium mb-1.5 flex items-center gap-1">
-            <div className="w-3 h-0.5 bg-cyan-400 rounded"></div>
+          <div className="text-[11px] text-muted-foreground font-medium mb-1.5 flex items-center gap-1">
+            <div className="w-3 h-0.5 bg-muted-foreground/60 rounded"></div>
             出向连接
           </div>
           <div className="space-y-1 max-h-[200px] overflow-y-auto pr-1 scrollbar-thin">
@@ -391,13 +395,13 @@ function NodeConnections({ node, data, onNodeSelect }: {
                   onClick={() => conn.peerNode && onNodeSelect(conn.peerNode)}
                 >
                   <div className="flex items-center gap-1">
-                    <span className="text-cyan-400 truncate">{node.id}</span>
+                    <span className="text-foreground truncate">{node.id}</span>
                     <ArrowRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                    <span className="text-cyan-400 truncate">{conn.peerId}</span>
+                    <span className="text-foreground truncate">{conn.peerId}</span>
                   </div>
                   {ports.length > 0 && (
                     <div className="text-[11px] text-muted-foreground mt-0.5">
-                      端口: {ports.slice(0, 5).join(', ')}{ports.length > 5 ? '...' : ''}
+                      端口 {ports.slice(0, 5).join(', ')}{ports.length > 5 ? '...' : ''}
                     </div>
                   )}
                 </div>
@@ -409,8 +413,8 @@ function NodeConnections({ node, data, onNodeSelect }: {
 
       {inConnections.length > 0 && (
         <div>
-          <div className="text-[10px] text-amber-400 font-medium mb-1.5 flex items-center gap-1">
-            <div className="w-3 h-0.5 bg-amber-400 rounded"></div>
+          <div className="text-[11px] text-muted-foreground font-medium mb-1.5 flex items-center gap-1">
+            <div className="w-3 h-0.5 bg-muted-foreground/60 rounded"></div>
             入向连接
           </div>
           <div className="space-y-1 max-h-[200px] overflow-y-auto pr-1 scrollbar-thin">
@@ -419,17 +423,17 @@ function NodeConnections({ node, data, onNodeSelect }: {
               return (
                 <div
                   key={idx}
-                  className="text-[10px] p-1.5 rounded bg-secondary/30 font-mono cursor-pointer hover:bg-secondary/50"
+                  className="text-[11px] p-1.5 rounded bg-secondary/30 font-mono cursor-pointer hover:bg-secondary/50"
                   onClick={() => conn.peerNode && onNodeSelect(conn.peerNode)}
                 >
                   <div className="flex items-center gap-1">
-                    <span className="text-amber-400 truncate">{conn.peerId}</span>
+                    <span className="text-foreground truncate">{conn.peerId}</span>
                     <ArrowRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                    <span className="text-amber-400 truncate">{node.id}</span>
+                    <span className="text-foreground truncate">{node.id}</span>
                   </div>
                   {ports.length > 0 && (
                     <div className="text-[11px] text-muted-foreground mt-0.5">
-                      端口: {ports.slice(0, 5).join(', ')}{ports.length > 5 ? '...' : ''}
+                      端口 {ports.slice(0, 5).join(', ')}{ports.length > 5 ? '...' : ''}
                     </div>
                   )}
                 </div>
@@ -490,22 +494,22 @@ function ConnectionList({ data, focusedCommunity, onNodeSelect }: {
 
   return (
     <div className="space-y-3">
-      <div className="flex gap-2 text-[10px]">
-        <span className="px-2 py-1 rounded bg-cyan-500/10 text-cyan-400">
-          域内连接: {internalLinks.length}
+      <div className="flex gap-2 text-[11px]">
+        <span className="px-2 py-1 rounded bg-secondary/40 text-muted-foreground">
+          域内 {internalLinks.length}
         </span>
-        <span className="px-2 py-1 rounded bg-amber-500/10 text-amber-400">
-          跨域连接: {crossDomainLinks.length}
+        <span className="px-2 py-1 rounded bg-secondary/40 text-muted-foreground">
+          跨域 {crossDomainLinks.length}
         </span>
-        <span className="px-2 py-1 rounded bg-muted text-muted-foreground">
-          总计: {domainLinks.length}
+        <span className="px-2 py-1 rounded bg-secondary/40 text-muted-foreground">
+          总计 {domainLinks.length}
         </span>
       </div>
 
       {internalLinks.length > 0 && (
         <div>
-          <div className="text-[10px] text-cyan-400 font-medium mb-1.5 flex items-center gap-1">
-            <div className="w-3 h-0.5 bg-cyan-400 rounded"></div>
+          <div className="text-[11px] text-muted-foreground font-medium mb-1.5 flex items-center gap-1">
+            <div className="w-3 h-0.5 bg-muted-foreground/60 rounded"></div>
             域内连接
           </div>
           <div className="space-y-1 max-h-[200px] overflow-y-auto pr-1 scrollbar-thin">
@@ -514,15 +518,15 @@ function ConnectionList({ data, focusedCommunity, onNodeSelect }: {
               const targetId = typeof link.target === 'object' ? (link.target as any).id : link.target;
               const ports = (link as any).ports || [];
               return (
-                <div key={idx} className="text-[10px] p-1.5 rounded bg-secondary/30 font-mono">
+                <div key={idx} className="text-[11px] p-1.5 rounded bg-secondary/30 font-mono">
                   <div className="flex items-center gap-1">
-                    <span className="text-cyan-400 truncate">{sourceId}</span>
+                    <span className="text-foreground truncate">{sourceId}</span>
                     <ArrowRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                    <span className="text-cyan-400 truncate">{targetId}</span>
+                    <span className="text-foreground truncate">{targetId}</span>
                   </div>
                   {ports.length > 0 && (
                     <div className="text-[11px] text-muted-foreground mt-0.5">
-                      端口: {ports.slice(0, 5).join(', ')}{ports.length > 5 ? '...' : ''}
+                      端口 {ports.slice(0, 5).join(', ')}{ports.length > 5 ? '...' : ''}
                     </div>
                   )}
                 </div>
@@ -534,8 +538,8 @@ function ConnectionList({ data, focusedCommunity, onNodeSelect }: {
 
       {crossDomainLinks.length > 0 && (
         <div>
-          <div className="text-[10px] text-amber-400 font-medium mb-1.5 flex items-center gap-1">
-            <div className="w-3 h-0.5 bg-amber-400 rounded border-dashed border-t"></div>
+          <div className="text-[11px] text-muted-foreground font-medium mb-1.5 flex items-center gap-1">
+            <div className="w-3 h-0.5 bg-muted-foreground/60 rounded border-dashed border-t"></div>
             跨域连接
           </div>
           <div className="space-y-1 max-h-[200px] overflow-y-auto pr-1 scrollbar-thin">
@@ -545,19 +549,19 @@ function ConnectionList({ data, focusedCommunity, onNodeSelect }: {
               const isSourceInDomain = domainNodeIds.has(sourceId);
               const ports = (link as any).ports || [];
               return (
-                <div key={idx} className="text-[10px] p-1.5 rounded bg-secondary/30 font-mono">
+                <div key={idx} className="text-[11px] p-1.5 rounded bg-secondary/30 font-mono">
                   <div className="flex items-center gap-1">
-                    <span className={isSourceInDomain ? 'text-amber-400' : 'text-muted-foreground'}>
+                    <span className={isSourceInDomain ? 'text-foreground' : 'text-muted-foreground'}>
                       {sourceId}
                     </span>
                     <ArrowRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                    <span className={!isSourceInDomain ? 'text-amber-400' : 'text-muted-foreground'}>
+                    <span className={!isSourceInDomain ? 'text-foreground' : 'text-muted-foreground'}>
                       {targetId}
                     </span>
                   </div>
                   {ports.length > 0 && (
                     <div className="text-[11px] text-muted-foreground mt-0.5">
-                      端口: {ports.slice(0, 5).join(', ')}{ports.length > 5 ? '...' : ''}
+                      端口 {ports.slice(0, 5).join(', ')}{ports.length > 5 ? '...' : ''}
                     </div>
                   )}
                 </div>

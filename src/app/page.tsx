@@ -3,7 +3,7 @@ import { useState, useCallback, useMemo, useRef, useEffect, startTransition } fr
 import dynamic from 'next/dynamic';
 import { TopologyGraph } from '@/components/topology-graph';
 import type { TopologyData, TopologyNode, TopologyLink, BaselineRule, WhitelistRule, GDSHubNode, GdsRunInfo, GraphLayoutPreset, GraphPhysics } from '@/lib/types';
-import { COMMUNITY_COLORS, getAnomalyLevel } from '@/lib/types';
+import { communityColor, getAnomalyLevel } from '@/lib/types';
 import { loadFromNeo4j } from "@/lib/topology-api";
 import { computeClustering, ClusteringStrategy, deriveZoneLabel, SecurityV3Granularity } from '@/lib/clustering';
 import { buildLocalGdsData, buildAttrSubZoneIndex } from '@/lib/localGds';
@@ -203,6 +203,32 @@ export default function Home() {
   const [statsOpen, setStatsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
+  // 抽屉宽度（边缘可拖拽调节，左侧 4 个抽屉共享，右侧设置独立）
+  const [drawerWidth, setDrawerWidth] = useState(400);
+  const [settingsWidth, setSettingsWidth] = useState(360);
+  const startResize = useCallback((side: 'left' | 'right') => (e: React.PointerEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startW = side === 'left' ? drawerWidth : settingsWidth;
+    const onMove = (ev: PointerEvent) => {
+      const w = side === 'left'
+        ? Math.min(640, Math.max(320, startW + (ev.clientX - startX)))
+        : Math.min(560, Math.max(280, startW - (ev.clientX - startX)));
+      if (side === 'left') setDrawerWidth(w);
+      else setSettingsWidth(w);
+    };
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  }, [drawerWidth, settingsWidth]);
+
   // 主题：默认暗黑，通过 data-theme 属性切换并持久化
   const [darkMode, setDarkMode] = useState<boolean>(true);
 
@@ -339,8 +365,24 @@ export default function Home() {
     setLoading(true);
     try {
       const neo4jData = await loadFromNeo4j(true);
+      if (!neo4jData.nodes || neo4jData.nodes.length === 0) {
+        alert('Neo4j 中暂无拓扑数据，请先用脚本向 Neo4j 导入数据');
+        return;
+      }
+      // 只加载有连接关系的节点（≈ 核心图规模），避免一次性渲染数千个孤立节点卡死；
+      // Neo4j 里的全量数据保留，供 APOC / Cypher 查询使用。
+      const linkNodeIds = new Set<string>();
+      neo4jData.links.forEach(l => {
+        linkNodeIds.add(l.source);
+        linkNodeIds.add(l.target);
+      });
+      const connectedNodes = neo4jData.nodes.filter(n => linkNodeIds.has(n.id));
+      if (connectedNodes.length === 0) {
+        alert('Neo4j 中暂无有连接关系的拓扑数据');
+        return;
+      }
       const topologyData: TopologyData = {
-        nodes: neo4jData.nodes.map(n => ({
+        nodes: connectedNodes.map(n => ({
           ...n,
           zone: n.zone_id,
           bytes_sent: 0,
@@ -367,16 +409,31 @@ export default function Home() {
     }
   }, [handleImportData]);
 
-  const handleLoadBusinessModel = useCallback(async () => {
+  const handleLoadCoreGraph = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/topology_data_business.json', { cache: 'no-store' });
+      const res = await fetch('/topology_data_core.json', { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       handleImportData(json as TopologyData);
     } catch (error) {
-      console.error('加载业务建模数据失败:', error);
-      alert('无法加载业务建模数据，请确认 public/topology_data_business.json 存在');
+      console.error('加载业务核心图失败:', error);
+      alert('无法加载业务核心图，请确认 public/topology_data_core.json 存在');
+    } finally {
+      setLoading(false);
+    }
+  }, [handleImportData]);
+
+  const handleLoadPurified = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/topology_data_purified.json', { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      handleImportData(json as TopologyData);
+    } catch (error) {
+      console.error('加载净化全量数据失败:', error);
+      alert('无法加载净化全量数据，请确认 public/topology_data_purified.json 存在');
     } finally {
       setLoading(false);
     }
@@ -489,14 +546,14 @@ export default function Home() {
   }, [handleRunGDS, hasGdsAlgorithmResults]);
 
   const handleSwitchClustering = useCallback((strategy: ClusteringStrategy | null) => {
-    if (strategy === 'zone_label' && clusteringStrategy === 'security_v3') {
+    if (strategy === 'zone_label' && (clusteringStrategy === 'security_v3' || clusteringStrategy === 'service_port' || clusteringStrategy === 'flow_anchor')) {
       const nextEnrich = !securityEnrich;
       setSecurityEnrich(nextEnrich);
       setFocusedCommunity(null);
       setHighlightedCommunity(null);
       if (originalData) {
         startTransition(() => {
-          const result = computeClustering(originalData.nodes, originalData.links, 'security_v3', securityGranularity, nextEnrich);
+          const result = computeClustering(originalData.nodes, originalData.links, clusteringStrategy, securityGranularity, nextEnrich);
           setClusteringResult(result);
         });
       }
@@ -697,31 +754,60 @@ export default function Home() {
 
   const filteredData = useMemo((): TopologyData => {
     if (!clusteringAppliedData) return null as unknown as TopologyData;
-    if (focusedCommunity === null) return clusteringAppliedData;
-    const domainNodes = clusteringAppliedData.nodes.filter(n => n.community === focusedCommunity);
-    if (domainNodes.length === 0) return clusteringAppliedData;
-    const domainNodeIds = new Set(domainNodes.map(n => n.id));
-    const relevantLinks = clusteringAppliedData.links.filter(l => {
-      const srcId = typeof l.source === 'string' ? l.source : (l.source as any)?.id;
-      const tgtId = typeof l.target === 'string' ? l.target : (l.target as any)?.id;
-      return domainNodeIds.has(srcId) || domainNodeIds.has(tgtId);
-    });
-    const allRelatedNodeIds = new Set<string>();
-    domainNodes.forEach(n => allRelatedNodeIds.add(n.id));
-    relevantLinks.forEach(l => {
-      const srcId = typeof l.source === 'string' ? l.source : (l.source as any)?.id;
-      const tgtId = typeof l.target === 'string' ? l.target : (l.target as any)?.id;
-      if (srcId) allRelatedNodeIds.add(srcId);
-      if (tgtId) allRelatedNodeIds.add(tgtId);
-    });
-    const allNodes = clusteringAppliedData.nodes.filter(n => allRelatedNodeIds.has(n.id));
-    const nodesWithFocusFlag = allNodes.map(n => ({ ...n, isFocusedDomain: domainNodeIds.has(n.id) }));
-    const linksWithCrossFlag = relevantLinks.map(l => {
-      const srcId = typeof l.source === 'string' ? l.source : (l.source as any)?.id;
-      const tgtId = typeof l.target === 'string' ? l.target : (l.target as any)?.id;
-      return { ...l, isCrossDomain: !(domainNodeIds.has(srcId) && domainNodeIds.has(tgtId)) };
-    });
-    return { ...clusteringAppliedData, nodes: nodesWithFocusFlag, links: [...linksWithCrossFlag] };
+    // 聚焦安全域（聚焦后数据量小）
+    if (focusedCommunity !== null) {
+      const domainNodes = clusteringAppliedData.nodes.filter(n => n.community === focusedCommunity);
+      if (domainNodes.length > 0) {
+        const domainNodeIds = new Set(domainNodes.map(n => n.id));
+        const relevantLinks = clusteringAppliedData.links.filter(l => {
+          const srcId = typeof l.source === 'string' ? l.source : (l.source as any)?.id;
+          const tgtId = typeof l.target === 'string' ? l.target : (l.target as any)?.id;
+          return domainNodeIds.has(srcId) || domainNodeIds.has(tgtId);
+        });
+        const allRelatedNodeIds = new Set<string>();
+        domainNodes.forEach(n => allRelatedNodeIds.add(n.id));
+        relevantLinks.forEach(l => {
+          const srcId = typeof l.source === 'string' ? l.source : (l.source as any)?.id;
+          const tgtId = typeof l.target === 'string' ? l.target : (l.target as any)?.id;
+          if (srcId) allRelatedNodeIds.add(srcId);
+          if (tgtId) allRelatedNodeIds.add(tgtId);
+        });
+        const allNodes = clusteringAppliedData.nodes.filter(n => allRelatedNodeIds.has(n.id));
+        const nodesWithFocusFlag = allNodes.map(n => ({ ...n, isFocusedDomain: domainNodeIds.has(n.id) }));
+        const linksWithCrossFlag = relevantLinks.map(l => {
+          const srcId = typeof l.source === 'string' ? l.source : (l.source as any)?.id;
+          const tgtId = typeof l.target === 'string' ? l.target : (l.target as any)?.id;
+          return { ...l, isCrossDomain: !(domainNodeIds.has(srcId) && domainNodeIds.has(tgtId)) };
+        });
+        return { ...clusteringAppliedData, nodes: nodesWithFocusFlag, links: [...linksWithCrossFlag] };
+      }
+    }
+    // 大图渲染保护：节点 > 1500 时画布只渲染核心节点，避免卡死。
+    // 全量数据仍用于聚类/统计（安全域划分不受影响）。
+    if (clusteringAppliedData.nodes.length > 1500) {
+      const linkedIds = new Set<string>();
+      clusteringAppliedData.links.forEach(l => {
+        const srcId = typeof l.source === 'string' ? l.source : (l.source as any)?.id;
+        const tgtId = typeof l.target === 'string' ? l.target : (l.target as any)?.id;
+        if (srcId) linkedIds.add(srcId);
+        if (tgtId) linkedIds.add(tgtId);
+      });
+      let renderNodes = clusteringAppliedData.nodes.filter(n => linkedIds.has(n.id));
+      if (renderNodes.length > 1500) {
+        // 全星型/超大连通图：异常节点优先保留（必须可见，否则行为导向后的低度异常节点会被挤出画布），
+        // 其余按度数取前 600（枢纽 + 繁忙主机）。
+        const isAnomalyNode = (n: TopologyNode) =>
+          n.is_anomaly || n.anomaly_level === 'Critical' || n.anomaly_level === 'High' || (n.anomaly_score ?? 0) >= 0.45;
+        const anomalyNodes = renderNodes.filter(isAnomalyNode);
+        const rest = renderNodes
+          .filter(n => !isAnomalyNode(n))
+          .sort((a, b) => (b.degree ?? 0) - (a.degree ?? 0));
+        const budget = Math.max(600 - anomalyNodes.length, 0);
+        renderNodes = [...anomalyNodes, ...rest.slice(0, budget)];
+      }
+      return { ...clusteringAppliedData, nodes: renderNodes };
+    }
+    return clusteringAppliedData;
   }, [clusteringAppliedData, focusedCommunity]);
 
   const handleHeaderSearch = useCallback(() => {
@@ -817,7 +903,7 @@ export default function Home() {
                   <FolderOpen className="w-5 h-5" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="right" sideOffset={8}><p>安全域过滤</p></TooltipContent>
+              <TooltipContent side="right" sideOffset={8}><p>数据源管理</p></TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -871,7 +957,7 @@ export default function Home() {
               {focusedCommunity !== null && clusteringAppliedData && (() => {
                 const domainNodeIds = new Set(clusteringAppliedData.nodes.filter(n => n.community === focusedCommunity).map(n => n.id));
                 const neighborNodeCount = filteredData.nodes.length - domainNodeIds.size;
-                const focusColor = COMMUNITY_COLORS[focusedCommunity % COMMUNITY_COLORS.length];
+                const focusColor = communityColor(focusedCommunity);
                 return (
                   <div className="absolute top-4 left-4 glass-panel stat-card-glow flex items-center gap-3 px-4 py-2.5 rounded-xl z-20" style={{ borderColor: `${focusColor}40` }}>
                     <div className="flex items-center gap-2">
@@ -950,25 +1036,37 @@ export default function Home() {
 
       {/* DRAWER: Data Source */}
       <Sheet open={dataSourceOpen} onOpenChange={setDataSourceOpen}>
-        <SheetContent side="left" className="w-[400px] sm:max-w-none sheet-drawer-glass p-0">
+        <SheetContent side="left" className="sm:max-w-none sheet-drawer-glass p-0 gap-0 overflow-hidden" style={{ width: drawerWidth }}>
+          {/* 拖拽调整宽度 */}
+          <div
+            className="absolute top-0 bottom-0 right-0 z-20 w-1.5 cursor-col-resize bg-transparent hover:bg-primary/40 active:bg-primary/50 transition-colors"
+            onPointerDown={startResize('left')}
+            title="拖拽调整宽度"
+          />
           <SheetHeader className="px-4 py-3 border-b border-border shrink-0">
             <SheetTitle className="text-sm font-mono flex items-center gap-2">
           <FolderOpen className="w-4 h-4 text-primary" /> 数据源管理</SheetTitle>
           </SheetHeader>
-          <ScrollArea className="flex-1 px-4 py-4">
-            <DataSourcePanel onImportData={handleImportData} onLoadFromNeo4j={handleLoadFromNeo4j} onLoadBusinessModel={handleLoadBusinessModel} loading={loading} data={clusteringAppliedData || data} />
+          <ScrollArea className="flex-1 min-h-0 px-4 py-4">
+            <DataSourcePanel onImportData={handleImportData} onLoadFromNeo4j={handleLoadFromNeo4j} onLoadCoreGraph={handleLoadCoreGraph} onLoadPurified={handleLoadPurified} loading={loading} data={clusteringAppliedData || data} />
           </ScrollArea>
         </SheetContent>
       </Sheet>
 
       {/* DRAWER: Algorithm Toolbox */}
       <Sheet open={algorithmOpen} onOpenChange={setAlgorithmOpen}>
-        <SheetContent side="left" className="w-[420px] sm:max-w-none sheet-drawer-glass p-0">
+        <SheetContent side="left" className="sm:max-w-none sheet-drawer-glass p-0 gap-0 overflow-hidden" style={{ width: drawerWidth }}>
+          {/* 拖拽调整宽度 */}
+          <div
+            className="absolute top-0 bottom-0 right-0 z-20 w-1.5 cursor-col-resize bg-transparent hover:bg-primary/40 active:bg-primary/50 transition-colors"
+            onPointerDown={startResize('left')}
+            title="拖拽调整宽度"
+          />
           <SheetHeader className="px-4 py-3 border-b border-border shrink-0">
             <SheetTitle className="text-sm font-mono flex items-center gap-2">
           <Puzzle className="w-4 h-4 text-violet-400" /> 算法工具箱</SheetTitle>
           </SheetHeader>
-          <ScrollArea className="flex-1 px-4 py-4">
+          <ScrollArea className="flex-1 min-h-0 px-4 py-4">
             <AlgorithmPanel
               data={clusteringAppliedData || data}
               originalCommunities={originalData ? new Set(originalData.nodes.map(n => n.community)).size : 0}
@@ -993,13 +1091,19 @@ export default function Home() {
 
       {/* DRAWER: Security Policy */}
       <Sheet open={securityOpen} onOpenChange={setSecurityOpen}>
-        <SheetContent side="left" className="w-[440px] sm:max-w-none sheet-drawer-glass p-0">
+        <SheetContent side="left" className="sm:max-w-none sheet-drawer-glass p-0 gap-0 overflow-hidden" style={{ width: drawerWidth }}>
+          {/* 拖拽调整宽度 */}
+          <div
+            className="absolute top-0 bottom-0 right-0 z-20 w-1.5 cursor-col-resize bg-transparent hover:bg-primary/40 active:bg-primary/50 transition-colors"
+            onPointerDown={startResize('left')}
+            title="拖拽调整宽度"
+          />
           <SheetHeader className="px-4 py-3 border-b border-border shrink-0">
             <SheetTitle className="text-sm font-mono flex items-center gap-2">
               <Shield className="w-4 h-4 text-amber-400" /> 安全策略
             </SheetTitle>
           </SheetHeader>
-          <ScrollArea className="flex-1 px-4 py-4">
+          <ScrollArea className="flex-1 min-h-0 px-4 py-4">
             <SecurityPanel data={clusteringAppliedData} baselineRules={baselineRules} onBaselineRulesChange={setBaselineRules} whitelist={whitelist} onAddToWhitelist={handleAddToWhitelist} onRemoveFromWhitelist={handleRemoveFromWhitelist} onNodeSelect={(node) => handleNodeSelect(node)} />
           </ScrollArea>
         </SheetContent>
@@ -1007,12 +1111,18 @@ export default function Home() {
 
       {/* DRAWER: Stats Panel */}
       <Sheet open={statsOpen} onOpenChange={setStatsOpen}>
-        <SheetContent side="left" className="w-[480px] sm:max-w-none sheet-drawer-glass p-0">
+        <SheetContent side="left" className="sm:max-w-none sheet-drawer-glass p-0 gap-0 overflow-hidden" style={{ width: drawerWidth }}>
+          {/* 拖拽调整宽度 */}
+          <div
+            className="absolute top-0 bottom-0 right-0 z-20 w-1.5 cursor-col-resize bg-transparent hover:bg-primary/40 active:bg-primary/50 transition-colors"
+            onPointerDown={startResize('left')}
+            title="拖拽调整宽度"
+          />
           <SheetHeader className="px-4 py-3 border-b border-border shrink-0">
             <SheetTitle className="text-sm font-mono flex items-center gap-2">
           <BarChart3 className="w-4 h-4 text-primary" /> 统计面板</SheetTitle>
           </SheetHeader>
-          <ScrollArea className="flex-1 px-4 py-4">
+          <ScrollArea className="flex-1 min-h-0 px-4 py-4">
             <StatsPanel data={clusteringAppliedData} onSearchNode={handleSearchNode} onHighlightCommunity={setHighlightedCommunity} focusedCommunity={focusedCommunity} onToggleFocus={handleToggleFocus} gdsAlgorithm={gdsAlgorithm} gdsRunInfo={gdsRunInfo} clusteringStrategy={clusteringStrategy} clusteringResult={clusteringResult} originalCommunities={originalData ? new Set(originalData.nodes.map(n => n.community)).size : 0} hubNodes={gdsData?.hubNodes || []} onQueryPath={handleQueryPath} onClearPath={handleClearPath} pathNodeIds={pathNodeIds} onExpandNeighbors={handleExpandNeighbors} onClearExpansion={handleClearExpansion} expansionNodeCount={expansionNodes.length} selectedNode={selectedNode} />
           </ScrollArea>
         </SheetContent>
@@ -1020,16 +1130,22 @@ export default function Home() {
 
       {/* DRAWER: Settings */}
       <Sheet open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <SheetContent side="right" className="w-[360px] sm:max-w-none sheet-drawer-glass p-0">
+        <SheetContent side="right" className="sm:max-w-none sheet-drawer-glass p-0 gap-0 overflow-hidden" style={{ width: settingsWidth }}>
+          {/* 拖拽调整宽度 */}
+          <div
+            className="absolute top-0 bottom-0 left-0 z-20 w-1.5 cursor-col-resize bg-transparent hover:bg-primary/40 active:bg-primary/50 transition-colors"
+            onPointerDown={startResize('right')}
+            title="拖拽调整宽度"
+          />
           <SheetHeader className="px-4 py-3 border-b border-border shrink-0">
             <SheetTitle className="text-sm font-mono flex items-center gap-2">
               <Settings className="w-4 h-4 text-primary" /> 设置
             </SheetTitle>
           </SheetHeader>
-          <ScrollArea className="flex-1 px-4 py-4">
+          <ScrollArea className="flex-1 min-h-0 px-4 py-4">
             <div className="space-y-5">
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">外观</div>
+                <div className="text-xs font-medium text-muted-foreground mb-2">外观</div>
                 <div className="flex items-center justify-between rounded-md bg-secondary/30 border border-border/50 px-3 py-2">
                   <div>
                     <div className="text-[11px] font-medium text-foreground">暗黑模式</div>
@@ -1039,7 +1155,7 @@ export default function Home() {
                 </div>
               </div>
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">图布局</div>
+                <div className="text-xs font-medium text-muted-foreground mb-2">图布局</div>
                 <div className="grid grid-cols-3 gap-1.5 mb-3">
                   {[
                     { value: 'force' as GraphLayoutPreset, label: '力导向', icon: Network },
@@ -1061,50 +1177,50 @@ export default function Home() {
                     );
                   })}
                 </div>
-                <div className="grid grid-cols-2 gap-x-3 gap-y-2">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
                   <div>
-                    <div className="flex justify-between text-[11px] mb-1">
-                      <span className="text-muted-foreground">边距距离</span>
-                      <span className="font-mono">{graphPhysics.linkDistance}</span>
+                    <div className="flex items-baseline justify-between mb-1.5">
+                      <span className="text-xs text-muted-foreground">边距距离</span>
+                      <span className="text-xs font-mono text-foreground tabular-nums">{graphPhysics.linkDistance}</span>
                     </div>
                     <Slider value={[graphPhysics.linkDistance]} min={40} max={160} step={5} onValueChange={([v]) => setGraphPhysics(prev => ({ ...prev, linkDistance: v }))} className="py-1" />
                   </div>
                   <div>
-                    <div className="flex justify-between text-[11px] mb-1">
-                      <span className="text-muted-foreground">斥力</span>
-                      <span className="font-mono">{Math.abs(graphPhysics.chargeStrength)}</span>
+                    <div className="flex items-baseline justify-between mb-1.5">
+                      <span className="text-xs text-muted-foreground">斥力强度</span>
+                      <span className="text-xs font-mono text-foreground tabular-nums">{Math.abs(graphPhysics.chargeStrength)}</span>
                     </div>
                     <Slider value={[Math.abs(graphPhysics.chargeStrength)]} min={50} max={800} step={10} onValueChange={([v]) => setGraphPhysics(prev => ({ ...prev, chargeStrength: -v }))} className="py-1" />
                   </div>
                   <div>
-                    <div className="flex justify-between text-[11px] mb-1">
-                      <span className="text-muted-foreground">引力</span>
-                      <span className="font-mono">{graphPhysics.centerStrength.toFixed(2)}</span>
+                    <div className="flex items-baseline justify-between mb-1.5">
+                      <span className="text-xs text-muted-foreground">中心引力</span>
+                      <span className="text-xs font-mono text-foreground tabular-nums">{graphPhysics.centerStrength.toFixed(2)}</span>
                     </div>
                     <Slider value={[graphPhysics.centerStrength]} min={0} max={1} step={0.05} onValueChange={([v]) => setGraphPhysics(prev => ({ ...prev, centerStrength: v }))} className="py-1" />
                   </div>
                   <div>
-                    <div className="flex justify-between text-[11px] mb-1">
-                      <span className="text-muted-foreground">碰撞间距</span>
-                      <span className="font-mono">{graphPhysics.collideRadius}</span>
+                    <div className="flex items-baseline justify-between mb-1.5">
+                      <span className="text-xs text-muted-foreground">碰撞间距</span>
+                      <span className="text-xs font-mono text-foreground tabular-nums">{graphPhysics.collideRadius}</span>
                     </div>
                     <Slider value={[graphPhysics.collideRadius]} min={0} max={16} step={1} onValueChange={([v]) => setGraphPhysics(prev => ({ ...prev, collideRadius: v }))} className="py-1" />
                   </div>
                 </div>
               </div>
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">显示控制</div>
+                <div className="text-xs font-medium text-muted-foreground mb-2">显示控制</div>
                 <div>
-                  <div className="flex justify-between text-[11px] mb-1">
-                    <span className="text-muted-foreground">边过滤</span>
-                    <span className="font-mono">{Math.round(edgeThreshold * 100)}%</span>
+                  <div className="flex items-baseline justify-between mb-1.5">
+                    <span className="text-xs text-muted-foreground">边过滤</span>
+                    <span className="text-xs font-mono text-foreground tabular-nums">{Math.round(edgeThreshold * 100)}%</span>
                   </div>
                   <Slider value={[edgeThreshold]} min={0} max={0.95} step={0.05} onValueChange={([v]) => setEdgeThreshold(v)} className="py-1" />
                 </div>
                 <div>
-                  <div className="flex justify-between text-[11px] mb-1">
-                    <span className="text-muted-foreground">最小连接数</span>
-                    <span className="font-mono">{nodeMinDegree}</span>
+                  <div className="flex items-baseline justify-between mb-1.5">
+                    <span className="text-xs text-muted-foreground">最小连接数</span>
+                    <span className="text-xs font-mono text-foreground tabular-nums">{nodeMinDegree}</span>
                   </div>
                   <Slider value={[nodeMinDegree]} min={0} max={Math.min(Math.max(...(data?.nodes.map(n => n.degree || 0) ?? [0]), 0), 30)} step={1} onValueChange={([v]) => setNodeMinDegree(v)} className="py-1" />
                 </div>

@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import {
   Zap, Play, Loader2, CheckCircle, XCircle, AlertCircle,
-  RefreshCw, ChevronDown, ChevronRight,
+  RefreshCw, ChevronDown, ChevronRight, Check, X,
 } from 'lucide-react';
 import type { TopologyNode } from '@/lib/types';
 
@@ -238,8 +238,8 @@ export function EnrichPanel({ selectedNodeId, selectedNode, onEnrichComplete }: 
       {/* 标题 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Zap className="w-4 h-4 text-amber-400" />
-          <span className="text-xs font-semibold text-foreground">Enricher 执行</span>
+          <Zap className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm font-medium text-foreground">数据富化</span>
         </div>
         <Button
           variant="ghost"
@@ -254,15 +254,15 @@ export function EnrichPanel({ selectedNodeId, selectedNode, onEnrichComplete }: 
 
       {/* 目标 IP 显示 */}
       {selectedNodeId && (
-        <div className="rounded-md bg-primary/10 border border-primary/20 px-3 py-2">
-          <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">目标节点</div>
-          <div className="text-xs font-mono font-medium text-primary">{selectedNodeId}</div>
+        <div className="rounded-md bg-secondary/40 border border-border/60 px-3 py-2">
+          <div className="text-[11px] text-muted-foreground mb-0.5">目标节点</div>
+          <div className="text-xs font-mono font-medium text-foreground">{selectedNodeId}</div>
         </div>
       )}
 
       {!selectedNodeId && (
         <div className="text-xs text-muted-foreground text-center py-4 border border-dashed border-border/50 rounded-md">
-          选中一个节点后，可对其执行 Enricher
+          选中一个节点后，可对其执行数据富化
         </div>
       )}
 
@@ -331,17 +331,17 @@ export function EnrichPanel({ selectedNodeId, selectedNode, onEnrichComplete }: 
           <Separator />
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+              <span className="text-[11px] font-medium text-muted-foreground">
                 执行结果
               </span>
               {result.enriched ? (
-                <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[11px]">
-                  <CheckCircle className="w-2.5 h-2.5 mr-0.5" />
+                <Badge className="bg-secondary text-foreground border-border/60 text-[11px]">
+                  <CheckCircle className="w-2.5 h-2.5 mr-0.5 text-success" />
                   成功
                 </Badge>
               ) : (
-                <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-[11px]">
-                  <XCircle className="w-2.5 h-2.5 mr-0.5" />
+                <Badge className="bg-secondary text-foreground border-border/60 text-[11px]">
+                  <XCircle className="w-2.5 h-2.5 mr-0.5 text-destructive" />
                   失败
                 </Badge>
               )}
@@ -417,9 +417,9 @@ export function EnrichPanel({ selectedNodeId, selectedNode, onEnrichComplete }: 
             {/* Enricher 链 */}
             {result.enricher_chain && result.enricher_chain.length > 0 && (
               <div className="flex items-center gap-1 flex-wrap">
-                <span className="text-[11px] text-muted-foreground">经过:</span>
+                <span className="text-[11px] text-muted-foreground">处理链</span>
                 {result.enricher_chain.map(name => (
-                  <Badge key={name} variant="outline" className="text-[8px] px-1 py-0">
+                  <Badge key={name} variant="outline" className="text-[10px] px-1 py-0">
                     {name}
                   </Badge>
                 ))}
@@ -428,9 +428,9 @@ export function EnrichPanel({ selectedNodeId, selectedNode, onEnrichComplete }: 
 
             {/* Enricher 统计 - 只显示有实际执行的 */}
             {result.enricher_stats && (
-              <div className="rounded-md bg-secondary/30 border border-border/50 p-2">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-medium text-muted-foreground">执行链</span>
+              <div className="rounded-md bg-secondary/40 border border-border/50 p-2">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[11px] font-medium text-muted-foreground">执行统计</span>
                   <button
                     onClick={() => setShowAllResults(!showAllResults)}
                     className="text-[11px] text-muted-foreground hover:text-foreground"
@@ -438,7 +438,7 @@ export function EnrichPanel({ selectedNodeId, selectedNode, onEnrichComplete }: 
                     {showAllResults ? '收起' : '展开'}
                   </button>
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1">
                   {Object.entries(result.enricher_stats)
                     .filter(([name, stats]) => showAllResults || stats.succeeded > 0 || stats.errors > 0)
                     .map(([name, stats]) => (
@@ -446,18 +446,18 @@ export function EnrichPanel({ selectedNodeId, selectedNode, onEnrichComplete }: 
                         <span className="font-mono truncate max-w-[120px]">{name}</span>
                         <div className="flex items-center gap-2">
                           {stats.succeeded > 0 ? (
-                            <span className="text-emerald-400">✓ {stats.succeeded}</span>
+                            <span className="text-success flex items-center gap-0.5"><Check className="w-2.5 h-2.5" />{stats.succeeded}</span>
                           ) : (
                             <span className="text-muted-foreground/50">跳过</span>
                           )}
-                          {stats.errors > 0 && <span className="text-red-400">✗ {stats.errors}</span>}
-                          <span className="text-muted-foreground/60">{stats.duration_ms}ms</span>
+                          {stats.errors > 0 && <span className="text-destructive flex items-center gap-0.5"><X className="w-2.5 h-2.5" />{stats.errors}</span>}
+                          <span className="text-muted-foreground/60 tabular-nums">{stats.duration_ms}ms</span>
                         </div>
                       </div>
                     ))}
                   {!showAllResults && Object.entries(result.enricher_stats).filter(([, s]) => s.succeeded === 0 && s.errors === 0).length > 0 && (
-                    <div className="text-[8px] text-muted-foreground/50 mt-0.5">
-                      {Object.entries(result.enricher_stats).filter(([, s]) => s.succeeded === 0 && s.errors === 0).length} 个 enricher 被跳过
+                    <div className="text-[10px] text-muted-foreground/50 mt-0.5">
+                      {Object.entries(result.enricher_stats).filter(([, s]) => s.succeeded === 0 && s.errors === 0).length} 个富化器被跳过
                     </div>
                   )}
                 </div>

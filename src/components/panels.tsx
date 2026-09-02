@@ -1,19 +1,20 @@
 "use client";
 
 import { useState, useMemo } from 'react';
-import type { TopologyData, TopologyNode, SecurityDomain, BaselineRule, BaselineViolation, NetworkStats, GDSHubNode, GdsRunInfo } from '@/lib/types';
-import { COMMUNITY_COLORS, ANOMALY_LEVEL_COLORS, formatBytes, getAnomalyLevel } from '@/lib/types';
+import type { TopologyData, TopologyNode, TopologyLink, SecurityDomain, BaselineRule, BaselineViolation, NetworkStats, GDSHubNode, GdsRunInfo } from '@/lib/types';
+import { communityColor, ANOMALY_LEVEL_COLORS, formatBytes, getAnomalyLevel } from '@/lib/types';
 import type { ClusteringStrategy } from '@/lib/clustering';
-import { CLUSTERING_LABELS, SECURITY_V3_GRANULARITY_LABELS } from '@/lib/clustering';
+import { SECURITY_V3_GRANULARITY_LABELS } from '@/lib/clustering';
 import type { SecurityV3Granularity } from '@/lib/clustering';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import {
   Search, Network, Tags, AlertTriangle, Activity, Eye,
   Upload, CheckCircle, Plus, X, TrendingUp, Route, Expand,
-  ChevronDown, ChevronRight, Layers, Shield, ShieldCheck, AlertCircle, Database, Zap,
+  ChevronDown, ChevronRight, Layers, Shield, ShieldCheck, AlertCircle, Database, Zap, Loader2, Info, Server, Download,
 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { GDSPanel } from '@/components/gds-panel';
@@ -136,9 +137,10 @@ function DomainTopologyPreview({ nodes, links, color }: {
   );
 }
 
-function VirtualizedDomainList({ domains, data, focusedCommunity, onToggleFocus, onHighlightCommunity }: {
+function VirtualizedDomainList({ domains, communityNodes, communityLinks, focusedCommunity, onToggleFocus, onHighlightCommunity }: {
   domains: SecurityDomain[];
-  data: TopologyData | null;
+  communityNodes?: Map<number, TopologyNode[]>;
+  communityLinks?: Map<number, TopologyLink[]>;
   focusedCommunity: number | null;
   onToggleFocus: (id: number) => void;
   onHighlightCommunity: (id: number | null) => void;
@@ -149,21 +151,16 @@ function VirtualizedDomainList({ domains, data, focusedCommunity, onToggleFocus,
       <div style={{ height: totalHeight, position: 'relative' }}>
         {visible.map((domain, i) => {
           const index = start + i;
-          const domainNodes = data?.nodes.filter(n => n.community === domain.id) || [];
-          const domainLinks = data?.links.filter(l => {
-            const srcId = typeof l.source === 'string' ? l.source : l.source.id;
-            const tgtId = typeof l.target === 'string' ? l.target : l.target.id;
-            const srcNode = data?.nodes.find(n => n.id === srcId);
-            const tgtNode = data?.nodes.find(n => n.id === tgtId);
-            return srcNode?.community === domain.id && tgtNode?.community === domain.id;
-          }) || [];
+          // 用预计算索引 O(1) 取域内节点/边，避免每行全量过滤
+          const domainNodes = communityNodes?.get(domain.id) ?? [];
+          const domainLinks = communityLinks?.get(domain.id) ?? [];
           return (
             <div
               key={domain.id}
               className={`absolute left-0 right-0 flex items-center gap-2 pl-3 pr-2 py-2 rounded-lg transition-colors group cursor-pointer overflow-hidden ${
                 focusedCommunity === domain.id
-                  ? 'bg-primary/10 border border-primary/35 shadow-[0_0_12px_color-mix(in_srgb,var(--primary)_12%,transparent)]'
-                  : 'bg-secondary/40 border border-border/60 hover:border-primary/40 hover:shadow-[0_0_10px_color-mix(in_srgb,var(--primary)_10%,transparent)]'
+                  ? 'bg-primary/10 border border-primary/35'
+                  : 'bg-secondary/40 border border-border/60 hover:border-primary/40'
               }`}
               style={{ top: index * rowHeight, height: rowHeight }}
               onClick={() => onToggleFocus(domain.id)}
@@ -172,12 +169,7 @@ function VirtualizedDomainList({ domains, data, focusedCommunity, onToggleFocus,
             >
               <div
                 className="absolute left-0 top-0 bottom-0 w-[3px]"
-                style={{
-                  backgroundColor: domain.avgAnomalyScore > 0.5 ? '#ff4d6a' : domain.color,
-                  boxShadow: domain.avgAnomalyScore > 0.5
-                    ? '0 0 8px rgba(255,77,106,0.5)'
-                    : `0 0 6px ${domain.color}40`,
-                }}
+                style={{ backgroundColor: domain.avgAnomalyScore > 0.5 ? '#ff4d6a' : domain.color }}
               />
               <div
                 className="w-2.5 h-2.5 rounded-full shrink-0 ml-1"
@@ -185,8 +177,8 @@ function VirtualizedDomainList({ domains, data, focusedCommunity, onToggleFocus,
               />
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-medium truncate">{domain.name}</div>
-                <div className="text-[10px] text-muted-foreground">
-                  {domain.nodeCount} 节点 | {domain.linkCount} 连接
+                <div className="text-[11px] text-muted-foreground">
+                  {domain.nodeCount} 节点 · {domain.linkCount} 连接
                 </div>
               </div>
               <DomainTopologyPreview nodes={domainNodes} links={domainLinks} color={domain.color} />
@@ -240,19 +232,14 @@ function PathQueryForm({ onQuery, hasResult, pathLength }: {
       />
       <Button
         size="sm"
-        className="w-full h-8 text-[11px] font-medium"
-        style={{
-          background: 'linear-gradient(135deg, color-mix(in srgb, var(--primary) 22%, transparent), color-mix(in srgb, var(--primary) 6%, transparent))',
-          border: '1px solid color-mix(in srgb, var(--primary) 32%, transparent)',
-          color: 'var(--primary)',
-        }}
+        className="w-full h-8 text-xs font-medium"
         onClick={handleSubmit}
         disabled={queryLoading || !source.trim() || !target.trim()}
       >
         {queryLoading ? '查询中…' : '查询路径'}
       </Button>
       {hasResult && (
-        <div className="text-[10px] text-primary">找到路径: {pathLength} 个节点</div>
+        <div className="text-[11px] text-primary">找到路径：{pathLength} 个节点</div>
       )}
     </div>
   );
@@ -272,14 +259,14 @@ function NeighborExpansion({ selectedNodeId, onExpand, expansionNodeCount }: {
             从节点 <span className="font-mono text-foreground">{selectedNodeId}</span> 扩展
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-muted-foreground">跳数:</span>
+            <span className="text-[11px] text-muted-foreground">跳数</span>
             {[1, 2, 3].map(h => (
               <button
                 key={h}
                 onClick={() => setHops(h)}
-                className={`w-7 h-7 rounded-full text-[10px] font-mono transition-colors duration-200 ${
+                className={`w-7 h-7 rounded-full text-[11px] font-mono transition-colors duration-200 ${
                   hops === h
-                    ? 'bg-primary/15 text-primary border border-primary/40 shadow-[0_0_8px_color-mix(in_srgb,var(--primary)_20%,transparent)]'
+                    ? 'bg-primary/15 text-primary border border-primary/40'
                     : 'bg-secondary/40 text-muted-foreground border border-border/70 hover:border-primary/40 hover:text-foreground'
                 }`}
               >
@@ -289,18 +276,13 @@ function NeighborExpansion({ selectedNodeId, onExpand, expansionNodeCount }: {
           </div>
           <Button
             size="sm"
-            className="w-full h-8 text-[11px] font-medium"
-            style={{
-              background: 'linear-gradient(135deg, color-mix(in srgb, var(--primary) 22%, transparent), color-mix(in srgb, var(--primary) 6%, transparent))',
-              border: '1px solid color-mix(in srgb, var(--primary) 32%, transparent)',
-              color: 'var(--primary)',
-            }}
+            className="w-full h-8 text-xs font-medium"
             onClick={() => onExpand?.(selectedNodeId, hops)}
           >
             扩展 {hops} 跳邻居
           </Button>
           {expansionNodeCount > 0 && (
-            <div className="text-[10px] text-success">已扩展 {expansionNodeCount} 个邻居节点</div>
+            <div className="text-[11px] text-success">已扩展 {expansionNodeCount} 个邻居节点</div>
           )}
         </>
       ) : (
@@ -330,27 +312,185 @@ function BaselineRuleItem({ rule, violationCount, onToggle }: {
   const operatorLabels: Record<string, string> = { gt: '>', lt: '<', eq: '=', between: '范围' };
   return (
     <div
-      className={`relative overflow-hidden rounded-lg px-2.5 py-2 ${rule.enabled ? '' : 'opacity-50'}`}
-      style={{
-        background: 'color-mix(in srgb, var(--muted) 60%, transparent)',
-        border: '1px solid var(--border)',
-      }}
+      className={`relative overflow-hidden rounded-lg px-2.5 py-2 bg-secondary/40 border border-border/60 ${rule.enabled ? '' : 'opacity-50'}`}
     >
       <div className="flex items-center justify-between mb-1">
-        <span className="text-[11px] font-medium">{rule.name}</span>
-        <button onClick={onToggle} className="text-[10px] text-muted-foreground hover:text-foreground">
-          {rule.enabled ? 'ON' : 'OFF'}
+        <span className="text-xs font-medium">{rule.name}</span>
+        <button onClick={onToggle} className="text-[11px] text-muted-foreground hover:text-foreground">
+          {rule.enabled ? '启用' : '停用'}
         </button>
       </div>
-      <div className="text-[10px] text-muted-foreground">
+      <div className="text-[11px] text-muted-foreground">
         {fieldLabels[rule.field]} {operatorLabels[rule.operator]} {rule.threshold}
         {rule.operator === 'between' ? ` ~ ${rule.thresholdMax}` : ''}
       </div>
       {violationCount > 0 && (
-        <Badge variant="destructive" className="mt-1 text-[11px] px-1.5 py-0">{violationCount} 违规</Badge>
+        <Badge variant="destructive" className="mt-1.5 text-[11px] px-1.5 py-0">{violationCount} 违规</Badge>
       )}
     </div>
   );
+}
+
+/* ============================================================
+ * 指标瓦片（统计面板内通用）
+ * ============================================================ */
+
+function MetricTile({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-md bg-secondary/50 border border-border/50 px-2.5 py-2">
+      <div className="text-[11px] text-muted-foreground mb-0.5">{label}</div>
+      <div className="text-sm font-semibold font-mono text-foreground tabular-nums">{value}</div>
+    </div>
+  );
+}
+
+/* ============================================================
+ * 安全域数据导出（CSV / JSON）
+ * ============================================================ */
+
+function downloadBlob(name: string, content: string, mime: string) {
+  const blob = new Blob([content], { type: `${mime};charset=utf-8` });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/** 当前聚类结果 → 节点到域的映射（无聚类时退回 community） */
+function buildZoneMapping(clusteringResult: any): {
+  zoneOf: Map<string, string>;
+  labels: Map<string, string>;
+  nodeMeta: Map<string, { direction?: string; callers?: string; peers?: string }>;
+} {
+  const zoneOf = new Map<string, string>();
+  const labels = new Map<string, string>();
+  const nodeMeta = new Map<string, { direction?: string; callers?: string; peers?: string }>();
+  if (clusteringResult?.zones) {
+    for (const z of clusteringResult.zones) {
+      zoneOf.set(z.node_id, z.zone_id);
+      const lb = clusteringResult.zoneLabels?.[z.zone_id];
+      if (lb) labels.set(z.zone_id, lb);
+      if (z.direction || z.callers || z.peers) {
+        nodeMeta.set(z.node_id, { direction: z.direction, callers: z.callers, peers: z.peers });
+      }
+    }
+  }
+  return { zoneOf, labels, nodeMeta };
+}
+
+/**
+ * 连接关系（Edge）区块：Source_IP, Dest_IP, Dest_Port, Protocol, Connection_Count …
+ * 数据与检查器"出向/入向连接"同源（当前加载图的 links），每条边端口列表逐端口展开一行。
+ * Connection_Count = 该边 weight（(src,dst) 对聚合的连接次数；端口级精确计数需重扫原始日志，
+ * 可用 scripts/export_connections.js 获得）。用于横向移动检测与访问控制审计。
+ */
+function buildConnectionsCSVRows(data: TopologyData | null): string[] {
+  if (!data || data.links.length === 0) return [];
+  const subnetOf = (ip: string) => {
+    const p = ip.split('.');
+    return p.length === 4 ? `${p[0]}.${p[1]}.${p[2]}.0/24` : '0.0.0.0/0';
+  };
+  const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const rows: string[] = [
+    ['Source_IP', 'Dest_IP', 'Dest_Port', 'Protocol', 'Connection_Count', 'Source_Subnet', 'Dest_Subnet', 'Cross_Subnet']
+      .map(esc).join(','),
+  ];
+  for (const link of data.links) {
+    const s = typeof link.source === 'string' ? link.source : link.source?.id ?? String(link.source);
+    const t = typeof link.target === 'string' ? link.target : link.target?.id ?? String(link.target);
+    const weight = Number((link as any).weight) || 1;
+    const ports: number[] = Array.isArray((link as any).ports) ? (link as any).ports.map(Number) : [];
+    const protocols: string[] = Array.isArray((link as any).protocols) ? (link as any).protocols : [];
+    const proto = protocols.length > 0 ? [...new Set(protocols)].join('+') : '';
+    const cross = subnetOf(s) !== subnetOf(t);
+    if (ports.length === 0) {
+      rows.push([s, t, '', proto, String(weight), subnetOf(s), subnetOf(t), cross ? 'TRUE' : 'FALSE'].map(esc).join(','));
+    } else {
+      for (const p of ports) {
+        rows.push([s, t, String(p), proto, String(weight), subnetOf(s), subnetOf(t), cross ? 'TRUE' : 'FALSE'].map(esc).join(','));
+      }
+    }
+  }
+  return rows;
+}
+
+/**
+ * 导出全景 CSV —— 一键生成两份文件：
+ *   文件1 资产全景（IP 级：安全域/方向/调用方/异常，基于当前策略即方案2 flow_anchor）
+ *   文件2 连接明细（Edge：Source_IP/Dest_IP/Dest_Port/Protocol/Connection_Count）——原始连接数据，横向移动检测/访问控制审计用
+ * 两份均为 UTF-8-SIG（BOM），Excel 直接打开。
+ */
+export function exportSecurityZonesCSV(data: TopologyData | null, clusteringResult: any, strategy: string | null) {
+  if (!data) return;
+  const { zoneOf, labels, nodeMeta } = buildZoneMapping(clusteringResult);
+  const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const nodeRows: string[] = [
+    ['IP', '安全域ID', '安全域名称', '子网', '服务端口', '异常级别', '角色', '异常分', '方向类型', '调用方子网', '对端子网']
+      .map(esc).join(','),
+  ];
+  for (const n of data.nodes) {
+    const zid = zoneOf.get(n.id) ?? `community_${n.community ?? -1}`;
+    const meta = nodeMeta.get(n.id);
+    const direction = meta?.direction === 'service' ? '服务提供'
+      : meta?.direction === 'client' ? '客户端'
+      : meta?.direction === 'terminal' ? '监控终端' : '';
+    nodeRows.push([
+      n.id,
+      zid,
+      labels.get(zid) ?? `域 ${zid}`,
+      n.subnet_24 ?? '',
+      Array.isArray(n.ports) ? n.ports.join('|') : '',
+      n.anomaly_level ?? '',
+      n.role_guess ?? '',
+      String(Number(n.anomaly_score || 0).toFixed(4)),
+      direction,
+      meta?.callers ?? '',
+      meta?.peers ?? '',
+    ].map(esc).join(','));
+  }
+  // 文件1：资产全景（方案二）
+  downloadBlob(`资产全景_${strategy ?? 'current'}.csv`, '\uFEFF' + nodeRows.join('\r\n'), 'text/csv');
+  // 文件2：原始连接明细（Edge，逐端口展开）
+  const edgeRows = buildConnectionsCSVRows(data);
+  if (edgeRows.length > 0) {
+    downloadBlob('连接明细_edges.csv', '\uFEFF' + edgeRows.join('\r\n'), 'text/csv');
+  }
+}
+
+/** 导出安全域为 JSON（域 → 节点映射 + 指标） */
+export function exportSecurityZonesJSON(data: TopologyData | null, clusteringResult: any, strategy: string | null) {
+  if (!data) return;
+  const { zoneOf, labels } = buildZoneMapping(clusteringResult);
+  const zones: Record<string, { label: string; nodes: string[] }> = {};
+  for (const n of data.nodes) {
+    const zid = zoneOf.get(n.id) ?? `community_${n.community ?? -1}`;
+    if (!zones[zid]) zones[zid] = { label: labels.get(zid) ?? `域 ${zid}`, nodes: [] };
+    zones[zid].nodes.push(n.id);
+  }
+  const payload = {
+    strategy: strategy ?? 'original',
+    zone_count: Object.keys(zones).length,
+    generated_at: new Date().toISOString(),
+    metrics: clusteringResult?.metrics ?? null,
+    zones,
+  };
+  downloadBlob(`安全域_${strategy ?? 'current'}.json`, JSON.stringify(payload, null, 2), 'application/json');
+}
+
+/**
+ * 导出连接关系（Edge）CSV：Source_IP, Dest_IP, Dest_Port, Protocol, Connection_Count …
+ * 数据来自当前加载图的 links（与检查器"出向/入向连接"同源），每条边的端口列表逐端口展开一行。
+ * Connection_Count = 该边 weight（(src,dst) 对聚合的连接次数，端口级精确计数需重扫原始日志，
+ * 可用 scripts/export_connections.js 获得）。用于横向移动检测与访问控制审计。
+ */
+export function exportConnectionsCSV(data: TopologyData | null) {
+  const rows = buildConnectionsCSVRows(data);
+  if (rows.length === 0) return;
+  downloadBlob('网络连接关系_edges.csv', '\uFEFF' + rows.join('\r\n'), 'text/csv');
 }
 
 /* ============================================================
@@ -392,12 +532,13 @@ function processImportedJSON(json: any, fileName: string): any {
 interface DataSourcePanelProps {
   onImportData: (data: TopologyData) => void;
   onLoadFromNeo4j?: () => void;
-  onLoadBusinessModel?: () => void;
+  onLoadCoreGraph?: () => void;
+  onLoadPurified?: () => void;
   loading?: boolean;
   data: TopologyData | null;
 }
 
-export function DataSourcePanel({ onImportData, onLoadFromNeo4j, onLoadBusinessModel, loading, data }: DataSourcePanelProps) {
+export function DataSourcePanel({ onImportData, onLoadFromNeo4j, onLoadCoreGraph, onLoadPurified, loading, data }: DataSourcePanelProps) {
   const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -443,63 +584,78 @@ export function DataSourcePanel({ onImportData, onLoadFromNeo4j, onLoadBusinessM
     <div className="space-y-4">
       {/* File Import */}
       <div>
-        <div className="flex items-center gap-1.5 mb-3">
-          <Upload className="w-3.5 h-3.5 text-primary" />
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">本地文件导入</span>
+        <div className="flex items-center gap-1.5 mb-2.5">
+          <Upload className="w-3.5 h-3.5 text-muted-foreground" />
+          <span className="text-xs font-medium text-foreground">本地文件导入</span>
         </div>
-        <label className="flex flex-col items-center justify-center gap-2 w-full h-24 rounded-lg border border-dashed border-border/60 hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-colors">
+        <label className="flex flex-col items-center justify-center gap-1.5 w-full h-24 rounded-lg border border-dashed border-border/60 hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-colors">
           <Upload className="w-5 h-5 text-muted-foreground" />
-          <span className="text-[11px] text-muted-foreground">导入 Excel / JSON 文件</span>
-          <span className="text-[11px] text-muted-foreground/60">支持 .xlsx, .xls, .json</span>
+          <span className="text-xs text-muted-foreground">导入 Excel / JSON 文件</span>
+          <span className="text-[11px] text-muted-foreground/60">支持 .xlsx、.xls、.json</span>
           <input type="file" accept=".json,.xlsx,.xls" className="hidden" onChange={handleFileImport} />
         </label>
       </div>
 
       {/* Neo4j */}
       <div>
-        <div className="flex items-center gap-1.5 mb-3">
-          <Database className="w-3.5 h-3.5 text-warning" />
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Neo4j 数据库</span>
+        <div className="flex items-center gap-1.5 mb-2.5">
+          <Database className="w-3.5 h-3.5 text-muted-foreground" />
+          <span className="text-xs font-medium text-foreground">Neo4j 数据库</span>
         </div>
         {onLoadFromNeo4j && (
           <Button
             onClick={onLoadFromNeo4j}
             disabled={loading}
             size="sm"
-            className="w-full h-9 text-[11px] font-medium"
-            style={{
-              background: 'linear-gradient(135deg, color-mix(in srgb, var(--warning) 18%, transparent), color-mix(in srgb, var(--warning) 6%, transparent))',
-              border: '1px solid color-mix(in srgb, var(--warning) 30%, transparent)',
-              color: 'var(--warning)',
-            }}
+            variant="outline"
+            className="w-full h-9 text-xs font-medium"
           >
-            <Database className="w-3.5 h-3.5 mr-1.5" />
+            <Database className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
             {loading ? '连接中…' : '从 Neo4j 加载数据'}
           </Button>
         )}
       </div>
 
-      {/* Business model */}
-      {onLoadBusinessModel && (
+      {/* Core graph (212 nodes) */}
+      {onLoadCoreGraph && (
         <div>
-          <div className="flex items-center gap-1.5 mb-3">
-            <Network className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">业务建模数据</span>
+          <div className="flex items-center gap-1.5 mb-2.5">
+            <Activity className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-xs font-medium text-foreground">业务核心图</span>
           </div>
           <Button
-            onClick={onLoadBusinessModel}
+            onClick={onLoadCoreGraph}
             disabled={loading}
             size="sm"
-            className="w-full h-9 text-[11px] font-medium"
-            style={{
-              background: 'linear-gradient(135deg, color-mix(in srgb, #10b981 18%, transparent), color-mix(in srgb, #10b981 6%, transparent))',
-              border: '1px solid color-mix(in srgb, #10b981 30%, transparent)',
-              color: 'var(--success)',
-            }}
+            variant="outline"
+            className="w-full h-9 text-xs font-medium"
           >
-            <Network className="w-3.5 h-3.5 mr-1.5" />
-            {loading ? '加载中…' : '加载业务建模数据'}
+            <Activity className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
+            {loading ? '加载中…' : '加载核心图（212 节点）'}
           </Button>
+        </div>
+      )}
+
+      {/* Purified full data (no collectors) */}
+      {onLoadPurified && (
+        <div>
+          <div className="flex items-center gap-1.5 mb-2.5">
+            <Server className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-xs font-medium text-foreground">净化全量数据</span>
+          </div>
+          <Button
+            onClick={onLoadPurified}
+            disabled={loading}
+            size="sm"
+            variant="outline"
+            className="w-full h-9 text-xs font-medium"
+          >
+            <Server className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
+            {loading ? '加载中…' : '加载净化数据（全量，无采集节点）'}
+          </Button>
+          <div className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
+            全量 3736 节点用于安全域划分（端口服务域可出 ~280 域）；画布只渲染有连接的节点，避免卡死
+          </div>
         </div>
       )}
 
@@ -508,30 +664,30 @@ export function DataSourcePanel({ onImportData, onLoadFromNeo4j, onLoadBusinessM
         <>
           <Separator />
           <div>
-            <div className="flex items-center gap-1.5 mb-2">
-              <Activity className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">当前数据源</span>
+            <div className="flex items-center gap-1.5 mb-2.5">
+              <Activity className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-xs font-medium text-foreground">当前数据源</span>
             </div>
-            <div className="rounded-lg p-3 space-y-2" style={{ background: 'color-mix(in srgb, var(--muted) 60%, transparent)', border: '1px solid var(--border)' }}>
-              <div className="flex justify-between text-[11px]">
+            <div className="rounded-lg p-3 space-y-2 bg-secondary/40 border border-border/60">
+              <div className="flex justify-between text-xs">
                 <span className="text-muted-foreground">来源</span>
                 <span className="font-mono text-foreground">{data.metadata.source}</span>
               </div>
-              <div className="flex justify-between text-[11px]">
+              <div className="flex justify-between text-xs">
                 <span className="text-muted-foreground">生成时间</span>
                 <span className="font-mono text-foreground">{data.metadata.generated_at}</span>
               </div>
-              <div className="flex justify-between text-[11px]">
+              <div className="flex justify-between text-xs">
                 <span className="text-muted-foreground">节点数</span>
-                <span className="font-mono text-primary">{data.metadata.total_nodes}</span>
+                <span className="font-mono text-foreground font-semibold">{data.metadata.total_nodes}</span>
               </div>
-              <div className="flex justify-between text-[11px]">
+              <div className="flex justify-between text-xs">
                 <span className="text-muted-foreground">连接数</span>
-                <span className="font-mono text-primary">{data.metadata.total_links}</span>
+                <span className="font-mono text-foreground font-semibold">{data.metadata.total_links}</span>
               </div>
-              <div className="flex justify-between text-[11px]">
-                <span className="text-muted-foreground">社区数</span>
-                <span className="font-mono text-success">{data.metadata.communities}</span>
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">安全域数</span>
+                <span className="font-mono text-foreground font-semibold">{data.metadata.communities}</span>
               </div>
             </div>
           </div>
@@ -544,38 +700,6 @@ export function DataSourcePanel({ onImportData, onLoadFromNeo4j, onLoadBusinessM
 /* ============================================================
  * 🧩 AlgorithmPanel — 算法工具箱
  * ============================================================ */
-
-interface PartitionBasisInput {
-  gdsAlgorithm: 'louvain' | 'wcc' | 'original';
-  clusteringStrategy: ClusteringStrategy | null;
-  gdsRunInfo: GdsRunInfo | null;
-  originalCommunities: number;
-  clusteringResult: any | null;
-}
-
-function getPartitionBasisText(input: PartitionBasisInput): string {
-  if (input.gdsAlgorithm !== 'original') {
-    const algo = input.gdsAlgorithm.toUpperCase();
-    const info = input.gdsRunInfo;
-    if (info) {
-      const source = info.source === 'neo4j' ? 'Neo4j GDS' : '本地算法';
-      const fallback = info.fallback ? `，已降级（${info.fallbackReason}）` : '';
-      const modularity = info.modularity != null ? `，模块度 ${info.modularity.toFixed(4)}` : '';
-      const pz = info.physicalZoneZones != null ? `，PhysicalZone ${info.physicalZoneZones}` : '';
-      return `${algo}（${source}）：基域 ${info.baseZones}${pz} + 属性细分${fallback}${modularity}`;
-    }
-    return `${algo} 动态分区`;
-  }
-  if (input.clusteringStrategy === 'zone_label' && input.clusteringResult) {
-    return `Enrich zone_label 细分：${input.clusteringResult.zoneCount} 域`;
-  }
-  if (input.clusteringStrategy === 'security_v3' && input.clusteringResult) {
-    const m = input.clusteringResult.metrics;
-    const metricText = m ? `，模块度 ${m.modularity.toFixed(3)}，域内连接 ${m.intraEdgePct}%，平均 ${m.avgSize}，单节点域 ${m.singletons}` : '';
-    return `三层安全域（核心基础设施 + 物理域 + 业务社区 + 属性细分）：${input.clusteringResult.zoneCount} 域${metricText}`;
-  }
-  return `数据原始分区：${input.originalCommunities} 域`;
-}
 
 interface AlgorithmPanelProps {
   data: TopologyData | null;
@@ -614,68 +738,88 @@ export function AlgorithmPanel({
   securityEnrich,
   onSecurityEnrichChange,
 }: AlgorithmPanelProps) {
-  const enrichActive = clusteringStrategy === 'security_v3' ? securityEnrich : clusteringStrategy === 'zone_label';
+  const enrichActive = (clusteringStrategy === 'security_v3' || clusteringStrategy === 'service_port' || clusteringStrategy === 'flow_anchor')
+    ? securityEnrich
+    : clusteringStrategy === 'zone_label';
   return (
     <div className="space-y-5">
       {/* 智能聚类 */}
       <div>
-        <div className="flex items-center gap-1.5 mb-3">
-          <Layers className="w-3.5 h-3.5 text-primary" />
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">智能聚类</span>
+        <div className="flex items-center gap-1.5 mb-2.5">
+          <Layers className="w-3.5 h-3.5 text-muted-foreground" />
+          <span className="text-xs font-medium text-foreground">智能聚类</span>
         </div>
         <button
           onClick={() => {
-            if (clusteringStrategy === 'security_v3') {
+            if (clusteringStrategy === 'security_v3' || clusteringStrategy === 'service_port' || clusteringStrategy === 'flow_anchor') {
               onSecurityEnrichChange?.(!securityEnrich);
             } else {
               onSwitchClustering?.('zone_label');
             }
           }}
-          className={`w-full text-[11px] px-3 py-2.5 rounded-lg border transition-colors text-left flex items-center justify-between mt-2
+          className={`w-full text-xs px-3 py-2.5 rounded-lg border transition-colors text-left flex items-center justify-between mt-2
             ${enrichActive
-              ? 'bg-warning/15 border-warning/40 text-warning'
+              ? 'bg-primary/10 border-primary/35 text-primary'
               : 'bg-secondary/40 border-border/60 text-foreground hover:border-primary/40'
             }`}
         >
           <span className="font-medium flex items-center gap-1.5">
-            <Zap className="w-3.5 h-3.5 text-warning" />
-            Enrich 标签细分
+            <Zap className="w-3.5 h-3.5 text-muted-foreground" />
+            标签细分
           </span>
           {enrichActive && clusteringResult ? (
-            <span className="text-[11px] bg-warning/15 text-warning px-1.5 py-0.5 rounded">{clusteringResult.zoneCount} 域</span>
+            <span className="text-[11px] bg-primary/10 text-primary px-1.5 py-0.5 rounded">{clusteringResult.zoneCount} 域</span>
           ) : (
-            <span className="text-[11px] text-muted-foreground">{clusteringStrategy === 'security_v3' ? '叠加到三层安全域' : '使用 zone_label 细分'}</span>
+            <span className="text-[11px] text-muted-foreground">{clusteringStrategy === 'security_v3' ? '叠加到三层安全域' : clusteringStrategy === 'service_port' ? '叠加到端口服务域' : clusteringStrategy === 'flow_anchor' ? '叠加到通信锚点域' : '按标签属性分组'}</span>
           )}
         </button>
         <button
           onClick={() => onSwitchClustering?.('security_v3')}
-          className={`w-full text-[11px] px-3 py-2.5 rounded-lg border transition-colors text-left flex items-center justify-between mt-2
+          className={`w-full text-xs px-3 py-2.5 rounded-lg border transition-colors text-left flex items-center justify-between mt-2
             ${clusteringStrategy === 'security_v3'
-              ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-500'
-              : 'bg-secondary/40 border-border/60 text-foreground hover:border-emerald-500/40'
+              ? 'bg-primary/10 border-primary/35 text-primary'
+              : 'bg-secondary/40 border-border/60 text-foreground hover:border-primary/40'
             }`}
         >
           <span className="font-medium flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <ShieldCheck className="w-3.5 h-3.5 text-muted-foreground" />
             三层安全域
           </span>
           {clusteringStrategy === 'security_v3' && clusteringResult ? (
-            <span className="text-[11px] bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded">{clusteringResult.zoneCount} 域</span>
+            <span className="text-[11px] bg-primary/10 text-primary px-1.5 py-0.5 rounded">{clusteringResult.zoneCount} 域</span>
           ) : (
-            <span className="text-[11px] text-muted-foreground">核心域 + 业务分层</span>
+            <span className="text-[11px] text-muted-foreground">物理域 + 业务分层</span>
+          )}
+        </button>
+        <button
+          onClick={() => onSwitchClustering?.('flow_anchor')}
+          className={`w-full text-xs px-3 py-2.5 rounded-lg border transition-colors text-left flex items-center justify-between mt-2
+            ${clusteringStrategy === 'flow_anchor'
+              ? 'bg-primary/10 border-primary/35 text-primary'
+              : 'bg-secondary/40 border-border/60 text-foreground hover:border-primary/40'
+            }`}
+        >
+          <span className="font-medium flex items-center gap-1.5">
+            <Network className="w-3.5 h-3.5 text-muted-foreground" />
+            通信锚点域（方案2）
+          </span>
+          {clusteringStrategy === 'flow_anchor' && clusteringResult ? (
+            <span className="text-[11px] bg-primary/10 text-primary px-1.5 py-0.5 rounded">{clusteringResult.zoneCount} 域</span>
+          ) : (
+            <span className="text-[11px] text-muted-foreground">源IP+目的IP+目的端口 锚点</span>
           )}
         </button>
         {clusteringStrategy === 'security_v3' && (
-          <div className="mt-2">
-            <div className="text-[10px] text-muted-foreground mb-1.5">粒度档位</div>
+          <div className="mt-2.5">
+            <div className="text-[11px] text-muted-foreground mb-1.5">细分粒度</div>
             <div className="grid grid-cols-3 gap-1.5">
               {(Object.keys(SECURITY_V3_GRANULARITY_LABELS) as SecurityV3Granularity[]).map(granularity => (
                 <button
                   key={granularity}
                   onClick={() => onSecurityGranularityChange?.(granularity)}
-                  className={`h-8 rounded-md border text-[11px] font-medium transition-colors ${
+                  className={`h-8 rounded-md border text-xs font-medium transition-colors ${
                     securityGranularity === granularity
-                      ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-500'
+                      ? 'bg-primary/15 border-primary/40 text-primary'
                       : 'bg-secondary/30 border-border/50 text-muted-foreground hover:text-foreground'
                   }`}
                 >
@@ -685,39 +829,103 @@ export function AlgorithmPanel({
             </div>
           </div>
         )}
-        {clusteringStrategy && clusteringResult && (
-          <div className="text-[11px] text-muted-foreground/70 mt-1.5 leading-relaxed">
-            使用 <span className="text-primary">{CLUSTERING_LABELS[clusteringStrategy as keyof typeof CLUSTERING_LABELS] || clusteringStrategy}</span> 策略进行智能分组，共 {clusteringResult.zoneCount} 个安全域。
-          </div>
-        )}
-        {clusteringStrategy === 'security_v3' && clusteringResult?.metrics && (
-          <div className="text-[11px] font-mono text-emerald-500/90 mt-1.5 leading-relaxed">
-            {SECURITY_V3_GRANULARITY_LABELS[securityGranularity]}档 · 模块度 {clusteringResult.metrics.modularity.toFixed(3)} · 域内连接 {clusteringResult.metrics.intraEdgePct}% · 平均 {clusteringResult.metrics.avgSize} · 单节点域 {clusteringResult.metrics.singletons}{securityEnrich ? ' · 已叠加标签细分' : ''}
-          </div>
-        )}
       </div>
 
       <Separator />
 
       {/* 安全域划分模式 */}
       <div>
-        <div className="flex items-center gap-1.5 mb-3">
-          <Network className="w-3.5 h-3.5 text-violet-400" />
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">安全域划分模式</span>
+        <div className="flex items-center justify-between mb-2.5">
+          <div className="flex items-center gap-1.5">
+            <Network className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-xs font-medium text-foreground">安全域划分模式</span>
+          </div>
+          {/* 当前划分依据：位于本节最右侧，点击弹出详细说明 */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                className="flex items-center gap-1 rounded-md px-1.5 py-1 text-[11px] text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
+                title="查看当前划分依据的详细说明"
+              >
+                <Info className="w-3 h-3" />
+                当前划分依据
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80">
+              <div className="space-y-1.5 text-[11px] leading-relaxed">
+                <div className="text-xs font-medium text-foreground mb-1">当前划分依据</div>
+                {gdsAlgorithm !== 'original' ? (
+                  <div className="text-foreground/80">
+                    {(() => {
+                      const algo = gdsAlgorithm === 'louvain' ? 'Louvain' : 'WCC';
+                      const source = gdsRunInfo?.source === 'neo4j' ? 'Neo4j GDS' : '本地算法';
+                      const fallback = gdsRunInfo?.fallback ? `，已降级（${gdsRunInfo.fallbackReason}）` : '';
+                      const modularity = gdsRunInfo?.modularity != null ? `，模块度 ${gdsRunInfo.modularity.toFixed(4)}` : '';
+                      return `${algo}（${source}）：${gdsRunInfo?.baseZones ?? '-'} 个基域 + 属性细分${fallback}${modularity}`;
+                    })()}
+                  </div>
+                ) : clusteringStrategy === 'security_v3' && clusteringResult ? (
+                  <>
+                    <div className="text-foreground/80">
+                      当前使用「三层安全域」策略，共 {clusteringResult.zoneCount} 个安全域。
+                    </div>
+                    {clusteringResult.metrics && (
+                      <div className="font-mono text-muted-foreground">
+                        {SECURITY_V3_GRANULARITY_LABELS[securityGranularity]}档 · 模块度 {clusteringResult.metrics.modularity.toFixed(3)} · 域内连接 {clusteringResult.metrics.intraEdgePct}% · 平均规模 {clusteringResult.metrics.avgSize}{securityEnrich ? ' · 已叠加标签细分' : ''}
+                      </div>
+                    )}
+                  </>
+                ) : clusteringStrategy === 'zone_label' && clusteringResult ? (
+                  <div className="text-foreground/80">
+                    当前使用「标签细分」策略，共 {clusteringResult.zoneCount} 个安全域。
+                  </div>
+                ) : clusteringStrategy === 'service_port' && clusteringResult ? (
+                  <>
+                    <div className="text-foreground/80">
+                      当前使用「端口服务域」策略，共 {clusteringResult.zoneCount} 个安全域。
+                    </div>
+                    <div className="font-mono text-muted-foreground">
+                      方向感知：入向端口（别人访问我）= 服务签名，出向端口（我访问别人）= 消费签名；剔除监控端口 + 子网细化。
+                    </div>
+                  </>
+                ) : clusteringStrategy === 'flow_anchor' && clusteringResult ? (
+                  <>
+                    <div className="text-foreground/80">
+                      当前使用「通信锚点域（方案2）」策略，共 {clusteringResult.zoneCount} 个安全域。
+                    </div>
+                    <div className="font-mono text-muted-foreground">
+                      (源IP, 目的IP, 固定目的端口) 三元组锚点：域 = 服务类别 × 服务子网 × 调用方子网；接入主机间流量后自动细分"谁调用我的哪个服务"。
+                    </div>
+                  </>
+                ) : clusteringStrategy === 'policy_domain' && clusteringResult ? (
+                  <>
+                    <div className="text-foreground/80">
+                      当前使用「策略域」策略，共 {clusteringResult.zoneCount} 个策略域。
+                    </div>
+                    <div className="font-mono text-muted-foreground">
+                      按服务类别聚合（忽略子网）：每个策略域对应一套安全策略规则（如 Web 放行 443、管理域限制来源、监控域仅内部）。
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-foreground/80">
+                    数据原始分区：{originalCommunities} 个安全域。
+                  </div>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
         <div className="grid grid-cols-3 gap-2">
           <button
             onClick={() => onSwitchAlgorithm('original')}
             disabled={runningGds}
-            className={`px-2 py-3 rounded-lg text-[11px] font-medium transition-colors border text-center ${
+            className={`px-2 py-3 rounded-lg text-xs font-medium transition-colors border text-center ${
               gdsAlgorithm === 'original'
-                ? 'bg-primary/20 border-primary/50 text-primary'
+                ? 'bg-primary/15 border-primary/40 text-primary'
                 : 'bg-secondary/30 border-border/50 text-muted-foreground hover:border-border hover:text-foreground'
             } ${runningGds ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            <svg className="w-4 h-4 mx-auto mb-1.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
+            <Activity className="w-4 h-4 mx-auto mb-1.5" />
             原始分区
             {data && (
               <div className="text-[11px] mt-0.5 opacity-70">{originalCommunities} 域</div>
@@ -726,20 +934,16 @@ export function AlgorithmPanel({
           <button
             onClick={() => onSwitchAlgorithm('louvain')}
             disabled={runningGds}
-            className={`px-2 py-3 rounded-lg text-[11px] font-medium transition-colors border text-center ${
+            className={`px-2 py-3 rounded-lg text-xs font-medium transition-colors border text-center ${
               gdsAlgorithm === 'louvain'
-                ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-400'
+                ? 'bg-primary/15 border-primary/40 text-primary'
                 : 'bg-secondary/30 border-border/50 text-muted-foreground hover:border-border hover:text-foreground'
             } ${runningGds ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {runningGds && gdsAlgorithm === 'louvain' ? (
-              <svg className="w-4 h-4 mx-auto mb-1.5 animate-spin" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
+              <Loader2 className="w-4 h-4 mx-auto mb-1.5 animate-spin" />
             ) : (
-              <svg className="w-4 h-4 mx-auto mb-1.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
+              <Network className="w-4 h-4 mx-auto mb-1.5" />
             )}
             Louvain
             {gdsAlgorithm === 'louvain' && gdsData && (() => {
@@ -751,20 +955,16 @@ export function AlgorithmPanel({
           <button
             onClick={() => onSwitchAlgorithm('wcc')}
             disabled={runningGds}
-            className={`px-2 py-3 rounded-lg text-[11px] font-medium transition-colors border text-center ${
+            className={`px-2 py-3 rounded-lg text-xs font-medium transition-colors border text-center ${
               gdsAlgorithm === 'wcc'
-                ? 'bg-purple-500/20 border-purple-500/50 text-purple-400'
+                ? 'bg-primary/15 border-primary/40 text-primary'
                 : 'bg-secondary/30 border-border/50 text-muted-foreground hover:border-border hover:text-foreground'
             } ${runningGds ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {runningGds && gdsAlgorithm === 'wcc' ? (
-              <svg className="w-4 h-4 mx-auto mb-1.5 animate-spin" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
+              <Loader2 className="w-4 h-4 mx-auto mb-1.5 animate-spin" />
             ) : (
-              <svg className="w-4 h-4 mx-auto mb-1.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
+              <Layers className="w-4 h-4 mx-auto mb-1.5" />
             )}
             WCC
             {gdsAlgorithm === 'wcc' && gdsData && (() => {
@@ -774,26 +974,15 @@ export function AlgorithmPanel({
             })()}
           </button>
         </div>
-        <div className="rounded-lg border border-border/40 bg-secondary/40 px-2.5 py-2 mt-2 text-[10px] leading-relaxed text-muted-foreground">
-          <div className="flex items-center gap-1.5 mb-1 text-muted-foreground">
-            <ShieldCheck className="w-3 h-3" />
-            <span className="text-[11px] font-semibold uppercase tracking-wider">当前划分依据</span>
-          </div>
-          <div className="text-[10px] text-foreground/80">
-            {getPartitionBasisText({ gdsAlgorithm, clusteringStrategy, gdsRunInfo, originalCommunities, clusteringResult })}
-          </div>
-        </div>
       </div>
 
       <Separator />
 
       {/* GDS 图算法面板 */}
       <div>
-        <div className="flex items-center gap-1.5 mb-3">
-          <svg className="w-3.5 h-3.5 text-violet-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">GDS 图算法</span>
+        <div className="flex items-center gap-1.5 mb-2.5">
+          <Network className="w-3.5 h-3.5 text-muted-foreground" />
+          <span className="text-xs font-medium text-foreground">GDS 图算法</span>
         </div>
         <GDSPanel onAnalysisComplete={onGDSAnalysisComplete} />
       </div>
@@ -877,11 +1066,11 @@ export function SecurityPanel({
       <div>
         <button
           onClick={() => toggleSection('baseline')}
-          className="flex items-center justify-between w-full mb-3"
+          className="flex items-center justify-between w-full mb-2.5"
         >
           <div className="flex items-center gap-1.5">
-            <Shield className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-[11px] font-semibold text-foreground uppercase tracking-wider">安全基线规则</span>
+            <Shield className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-xs font-medium text-foreground">安全基线规则</span>
           </div>
           <div className="flex items-center gap-1.5">
             {violations.length > 0 && (
@@ -909,7 +1098,7 @@ export function SecurityPanel({
             {violations.length > 0 && (
               <>
                 <Separator className="my-3" />
-                <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                <div className="text-[11px] font-medium text-muted-foreground mb-2">
                   违规节点 ({violations.length})
                 </div>
                 <div className="space-y-1 max-h-[250px] overflow-y-auto">
@@ -970,13 +1159,13 @@ export function SecurityPanel({
       <div>
         <button
           onClick={() => toggleSection('whitelist')}
-          className="flex items-center justify-between w-full mb-3"
+          className="flex items-center justify-between w-full mb-2.5"
         >
           <div className="flex items-center gap-1.5">
-            <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-[11px] font-semibold text-foreground uppercase tracking-wider">白名单</span>
+            <CheckCircle className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-xs font-medium text-foreground">白名单</span>
             {whitelist.length > 0 && (
-              <span className="text-[11px] text-emerald-400/70">({whitelist.length})</span>
+              <span className="text-[11px] text-muted-foreground">({whitelist.length})</span>
             )}
           </div>
           <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${!expandedSections.whitelist ? '-rotate-90' : ''}`} />
@@ -1010,8 +1199,8 @@ export function SecurityPanel({
             {whitelist.length > 0 && (
               <div className="space-y-1 max-h-[200px] overflow-y-auto mt-2">
                 {whitelist.map(w => (
-                  <div key={w.id} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-secondary/20 text-[10px] border border-border/30">
-                    <CheckCircle className="w-3 h-3 text-emerald-400/70 shrink-0" />
+                  <div key={w.id} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-secondary/20 text-[11px] border border-border/30">
+                    <CheckCircle className="w-3 h-3 text-muted-foreground/70 shrink-0" />
                     <span className="font-mono truncate flex-1">{w.nodeId}</span>
                     <span className="text-muted-foreground text-[11px] shrink-0">{w.reason}</span>
                     <button onClick={() => onRemoveFromWhitelist(w.id)} className="text-destructive hover:text-destructive/80 shrink-0">
@@ -1105,14 +1294,35 @@ export function StatsPanel({
   }, [data]);
 
   // Domains
+  // 预计算"社区 → 节点 / 域内边"索引（一次性，供域列表 O(1) 查询，避免每行全量过滤 3738 节点导致卡顿）
+  const communityIndex = useMemo(() => {
+    const nodesBy = new Map<number, TopologyNode[]>();
+    const nodeById = new Map<string, TopologyNode>();
+    const nodeComm = new Map<string, number>();
+    for (const n of data?.nodes ?? []) {
+      nodeById.set(n.id, n);
+      nodeComm.set(n.id, n.community);
+      if (!nodesBy.has(n.community)) nodesBy.set(n.community, []);
+      nodesBy.get(n.community)!.push(n);
+    }
+    const linksBy = new Map<number, TopologyLink[]>();
+    for (const l of data?.links ?? []) {
+      const srcId = typeof l.source === 'string' ? l.source : (l.source as any)?.id;
+      const tgtId = typeof l.target === 'string' ? l.target : (l.target as any)?.id;
+      const sc = nodeComm.get(srcId);
+      const tc = nodeComm.get(tgtId);
+      if (sc != null && sc === tc) {
+        if (!linksBy.has(sc)) linksBy.set(sc, []);
+        linksBy.get(sc)!.push(l);
+      }
+    }
+    return { nodesBy, nodeById, linksBy };
+  }, [data]);
+
   const domains = useMemo<SecurityDomain[]>(() => {
     if (!data) return [];
-    const communityMap = new Map<number, TopologyNode[]>();
-    data.nodes.forEach(n => {
-      if (!communityMap.has(n.community)) communityMap.set(n.community, []);
-      communityMap.get(n.community)!.push(n);
-    });
-    const nodeById = new Map(data.nodes.map(n => [n.id, n]));
+    const communityMap = communityIndex.nodesBy;
+    const nodeById = communityIndex.nodeById;
     const linkCounts = new Map<number, number>();
     data.links.forEach(l => {
       const srcId = typeof l.source === 'string' ? l.source : l.source.id;
@@ -1137,14 +1347,14 @@ export function StatsPanel({
           return getDomainName(id, nodes);
         })(),
         description: getDomainDescription(nodes),
-        color: COMMUNITY_COLORS[id % COMMUNITY_COLORS.length],
+        color: communityColor(id),
         nodeCount: nodes.length,
         linkCount: linkCounts.get(id) || 0,
         avgAnomalyScore: nodes.reduce((s, n) => s + n.anomaly_score, 0) / nodes.length,
         totalBytes: nodes.reduce((s, n) => s + (n.bytes_sent || 0) + (n.bytes_received || 0), 0),
       }))
       .sort((a, b) => b.nodeCount - a.nodeCount);
-  }, [data, gdsAlgorithm]);
+  }, [data, gdsAlgorithm, communityIndex]);
 
   const zoneOverlapPct = useMemo(() => {
     if (!data || !clusteringResult?.zones?.length) return null;
@@ -1205,55 +1415,57 @@ export function StatsPanel({
 
       {/* Network Overview */}
       <div>
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-1.5">
-            <Activity className="w-3.5 h-3.5 text-primary" />
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">网络总览</span>
+            <Activity className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-xs font-medium text-foreground">网络总览</span>
           </div>
           {data && (
-            <span className="text-[11px] font-mono text-muted-foreground">{stats.totalNodes}N / {stats.totalLinks}L</span>
+            <span className="text-[11px] font-mono text-muted-foreground">{stats.totalNodes} 节点 · {stats.totalLinks} 连接</span>
           )}
         </div>
         <div className="grid grid-cols-3 gap-1.5">
-          <div className="stat-card relative overflow-hidden rounded-md px-2 py-1.5" style={{ background: 'color-mix(in srgb, var(--muted) 60%, transparent)', border: '1px solid var(--border)' }}>
-            <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, var(--primary), transparent)' }} />
+          <div className="rounded-md px-2 py-2 bg-secondary/40 border border-border/60">
             <div className="text-[11px] text-muted-foreground">节点</div>
-            <div className="text-xs font-semibold font-mono text-primary">{stats.totalNodes}</div>
+            <div className="text-base font-semibold font-mono text-foreground tabular-nums">{stats.totalNodes}</div>
           </div>
-          <div className="stat-card relative overflow-hidden rounded-md px-2 py-1.5" style={{ background: 'color-mix(in srgb, var(--muted) 60%, transparent)', border: '1px solid var(--border)' }}>
-            <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, var(--primary), transparent)' }} />
+          <div className="rounded-md px-2 py-2 bg-secondary/40 border border-border/60">
             <div className="text-[11px] text-muted-foreground">连接</div>
-            <div className="text-xs font-semibold font-mono text-primary">{stats.totalLinks}</div>
+            <div className="text-base font-semibold font-mono text-foreground tabular-nums">{stats.totalLinks}</div>
           </div>
-          <div className="stat-card relative overflow-hidden rounded-md px-2 py-1.5" style={{ background: 'color-mix(in srgb, var(--muted) 60%, transparent)', border: '1px solid var(--border)' }}>
-            <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, var(--success), transparent)' }} />
+          <div className="rounded-md px-2 py-2 bg-secondary/40 border border-border/60">
             <div className="text-[11px] text-muted-foreground">安全域</div>
-            <div className="text-xs font-semibold font-mono text-success">{stats.totalCommunities}</div>
+            <div className="text-base font-semibold font-mono text-foreground tabular-nums">{stats.totalCommunities}</div>
           </div>
         </div>
         {(stats.anomalyCount > 0 || stats.avgDegree > 0) && (
-          <div className="flex items-center gap-3 mt-1.5 px-1">
+          <div className="flex items-center gap-3 mt-2 px-1">
             {stats.anomalyCount > 0 && (
-              <span className="text-[11px] text-destructive flex items-center gap-1">
-                <AlertTriangle className="w-2.5 h-2.5" /> {stats.anomalyCount} 异常
+              <span className="text-xs text-destructive flex items-center gap-1">
+                <AlertTriangle className="w-3 h-3" /> {stats.anomalyCount} 异常
               </span>
             )}
-            <span className="text-[11px] text-muted-foreground">平均度 {stats.avgDegree}</span>
-            <span className="text-[11px] text-muted-foreground">流量 {formatBytes(stats.totalTraffic)}</span>
+            <span className="text-xs text-muted-foreground">平均度 {stats.avgDegree}</span>
+            <span className="text-xs text-muted-foreground">流量 {formatBytes(stats.totalTraffic)}</span>
           </div>
         )}
         {clusteringStrategy === 'security_v3' && clusteringResult?.metrics && (
-          <div className="mt-1.5 mx-1 rounded-md p-2.5 grid grid-cols-2 gap-x-3 gap-y-1.5" style={{ background: 'color-mix(in srgb, var(--muted) 60%, transparent)', border: '1px solid color-mix(in srgb, var(--success) 25%, var(--border))' }}>
-            <div className="col-span-2 text-[10px] font-semibold uppercase tracking-wider text-emerald-500/90 flex items-center gap-1">
-              <ShieldCheck className="w-3 h-3" />
-              三层安全域可信度
+          <div className="mt-2 rounded-lg bg-secondary/40 border border-border/60 p-3 space-y-2.5">
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-xs font-medium text-foreground">三层安全域可信度</span>
             </div>
-            <div className="text-[11px] text-muted-foreground">模块度 <span className="text-foreground font-mono float-right">{clusteringResult.metrics.modularity.toFixed(3)}</span></div>
-            <div className="text-[11px] text-muted-foreground">域内连接 <span className="text-foreground font-mono float-right">{clusteringResult.metrics.intraEdgePct}%</span></div>
-            <div className="text-[11px] text-muted-foreground">平均规模 <span className="text-foreground font-mono float-right">{clusteringResult.metrics.avgSize}</span></div>
-            <div className="text-[11px] text-muted-foreground">单节点域 <span className="text-foreground font-mono float-right">{clusteringResult.metrics.singletons}</span></div>
+            <div className="grid grid-cols-2 gap-1.5">
+              <MetricTile label="模块度" value={clusteringResult.metrics.modularity.toFixed(3)} />
+              <MetricTile label="域内连接" value={`${clusteringResult.metrics.intraEdgePct}%`} />
+              <MetricTile label="平均规模" value={String(clusteringResult.metrics.avgSize)} />
+              <MetricTile label="单节点域" value={String(clusteringResult.metrics.singletons)} />
+            </div>
             {zoneOverlapPct != null && (
-              <div className="col-span-2 text-[11px] text-muted-foreground">与 zone_id 重合度 <span className="text-foreground font-mono float-right">{zoneOverlapPct}%</span></div>
+              <div className="flex items-center justify-between text-xs pt-2 border-t border-border/50">
+                <span className="text-muted-foreground">与 zone_id 重合度</span>
+                <span className="font-mono font-semibold text-foreground tabular-nums">{zoneOverlapPct}%</span>
+              </div>
             )}
           </div>
         )}
@@ -1263,13 +1475,36 @@ export function StatsPanel({
 
       {/* Security Domains / Hub Nodes Tabs */}
       <div>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-medium text-foreground">安全域划分</span>
+          <div className="flex items-center gap-1.5">
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 px-2 text-[11px]"
+              onClick={() => exportSecurityZonesCSV(data, clusteringResult, clusteringStrategy)}
+              title="导出当前安全域划分为 CSV（含 IP/域/服务/异常，Excel 可直接打开）"
+            >
+              <Download className="w-3 h-3 mr-1" /> CSV
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 px-2 text-[11px]"
+              onClick={() => exportSecurityZonesJSON(data, clusteringResult, clusteringStrategy)}
+              title="导出当前安全域划分为 JSON（域 → 节点映射 + 指标）"
+            >
+              <Download className="w-3 h-3 mr-1" /> JSON
+            </Button>
+          </div>
+        </div>
         <Tabs defaultValue="domains" className="w-full">
-          <TabsList className="w-full h-7 bg-secondary/30 p-[2px] mb-2">
-            <TabsTrigger value="domains" className="flex-1 h-6 text-[11px] gap-1 data-[state=active]:bg-primary/15 data-[state=active]:text-primary">
+          <TabsList className="w-full h-8 bg-secondary/30 p-[2px] mb-2.5">
+            <TabsTrigger value="domains" className="flex-1 h-7 text-xs gap-1 data-[state=active]:bg-primary/15 data-[state=active]:text-primary">
               <Tags className="w-3 h-3" />
               安全域
             </TabsTrigger>
-            <TabsTrigger value="hubnodes" className="flex-1 h-6 text-[11px] gap-1 data-[state=active]:bg-orange-400/15 data-[state=active]:text-warning">
+            <TabsTrigger value="hubnodes" className="flex-1 h-7 text-xs gap-1 data-[state=active]:bg-primary/15 data-[state=active]:text-primary">
               <TrendingUp className="w-3 h-3" />
               关键节点
             </TabsTrigger>
@@ -1278,7 +1513,8 @@ export function StatsPanel({
           <TabsContent value="domains" className="mt-0">
             <VirtualizedDomainList
               domains={domains}
-              data={data}
+              communityNodes={communityIndex.nodesBy}
+              communityLinks={communityIndex.linksBy}
               focusedCommunity={focusedCommunity}
               onToggleFocus={onToggleFocus}
               onHighlightCommunity={onHighlightCommunity}
@@ -1288,29 +1524,26 @@ export function StatsPanel({
           <TabsContent value="hubnodes" className="mt-0">
             {hubNodes.length > 0 && gdsAlgorithm !== 'original' ? (
               <div className="space-y-1 max-h-[35vh] overflow-y-auto pr-1 scrollbar-thin [content-visibility:auto]">
-                <div className="text-[10px] text-warning/70 font-medium uppercase tracking-wider mb-1.5">
-                  PageRank Top {Math.min(hubNodes.length, 5)}
+                <div className="text-[11px] text-muted-foreground font-medium mb-1.5">
+                  PageRank 前 {Math.min(hubNodes.length, 5)} 名
                 </div>
                 {hubNodes.slice(0, 5).map((hub, i) => (
                   <div
                     key={hub.ip}
-                    className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-secondary/20 border border-border/30 hover:border-orange-400/30 transition-colors cursor-pointer"
+                    className="flex items-center gap-2 px-2 py-1.5 rounded-md bg-secondary/20 border border-border/30 hover:border-primary/40 transition-colors cursor-pointer"
                     onClick={() => onSearchNode(hub.ip)}
                   >
-                    <span className="text-[11px] font-mono text-warning w-4 text-right">{i + 1}.</span>
-                    <div className="w-2 h-2 rounded-full bg-orange-400/70 shrink-0" />
+                    <span className="text-[11px] font-mono text-muted-foreground w-4 text-right tabular-nums">{i + 1}.</span>
                     <span className="text-[11px] font-mono text-foreground truncate flex-1">{hub.ip}</span>
-                    <Badge className="text-[11px] h-4 bg-orange-400/10 text-orange-300 border-orange-400/20">
-                      {hub.score.toFixed(4)}
-                    </Badge>
+                    <span className="text-[11px] font-mono text-warning tabular-nums">{hub.score.toFixed(4)}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-[10px] text-muted-foreground text-center py-4 border border-dashed border-border/50 rounded-md">
+              <div className="text-[11px] text-muted-foreground text-center py-4 border border-dashed border-border/50 rounded-md">
                 {gdsAlgorithm === 'original'
-                  ? '请先在"算法工具箱"中运行 GDS 算法'
-                  : '暂无枢纽节点数据'}
+                  ? '请先在「算法工具箱」中运行图算法'
+                  : '暂无关键节点数据'}
               </div>
             )}
           </TabsContent>
@@ -1321,10 +1554,10 @@ export function StatsPanel({
 
       {/* Path Query */}
       <div>
-        <div className="flex items-center justify-between w-full mb-2">
+        <div className="flex items-center justify-between w-full mb-2.5">
           <button type="button" onClick={() => toggleSection('path')} className="flex items-center gap-1.5 cursor-pointer select-none">
-            <Route className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">最短路径</span>
+            <Route className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-xs font-medium text-foreground">最短路径</span>
             <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${!expandedSections.path ? '-rotate-90' : ''}`} />
           </button>
           {pathNodeIds && pathNodeIds.length > 0 && (
@@ -1338,10 +1571,10 @@ export function StatsPanel({
 
       {/* N-hop Expansion */}
       <div>
-        <div className="flex items-center justify-between w-full mb-2">
+        <div className="flex items-center justify-between w-full mb-2.5">
           <button type="button" onClick={() => toggleSection('expansion')} className="flex items-center gap-1.5 cursor-pointer select-none">
-            <Expand className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">N跳扩展</span>
+            <Expand className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-xs font-medium text-foreground">N 跳扩展</span>
             <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${!expandedSections.expansion ? '-rotate-90' : ''}`} />
           </button>
           {expansionNodeCount > 0 && (
@@ -1350,7 +1583,7 @@ export function StatsPanel({
         </div>
         {expandedSections.expansion && (
           <>
-          <div className="text-[10px] text-muted-foreground">双击图中节点，可快速展开其 1 跳邻居</div>
+          <div className="text-[11px] text-muted-foreground mb-2">双击图中节点，可快速展开其 1 跳邻居</div>
           <NeighborExpansion
             selectedNodeId={selectedNode?.id || null}
             onExpand={onExpandNeighbors}

@@ -106,10 +106,10 @@
   --sidebar-accent-foreground: #0C4A6E;
   --sidebar-border: #E2E8F0;
   --sidebar-ring: #0EA5E9;
-  --panel-bg: rgba(255, 255, 255, 0.80);
+  --panel-bg: rgba(255, 255, 255, 0.92);
   --panel-bg-strong: #FFFFFF;
-  --header-bg: rgba(255, 255, 255, 0.85);
-  --toolbar-bg: rgba(255, 255, 255, 0.80);
+  --header-bg: rgba(255, 255, 255, 0.94);
+  --toolbar-bg: rgba(255, 255, 255, 0.92);
   --toolbar-btn: #64748B;
   --tooltip-bg: rgba(15, 23, 42, 0.94);
   --tooltip-color: #E2E8F0;
@@ -125,7 +125,7 @@
   --topology-glow-2: rgba(148, 163, 184, 0.14);
   --topology-glow-3: rgba(225, 29, 72, 0.02);
   --topology-edge: rgba(100, 116, 139, 0.55);
-  --topology-edge-cross: rgba(2, 132, 199, 0.65);
+  --topology-edge-cross: rgba(217, 119, 6, 0.55);
   --topology-label: #334155;
 }
 
@@ -164,10 +164,10 @@
   --sidebar-accent-foreground: #e0e6f0;
   --sidebar-border: rgba(120, 140, 180, 0.08);
   --sidebar-ring: #00e5c7;
-  --panel-bg: rgba(12, 17, 32, 0.7);
+  --panel-bg: rgba(12, 17, 32, 0.88);
   --panel-bg-strong: #131a2e;
-  --header-bg: rgba(10, 15, 26, 0.8);
-  --toolbar-bg: rgba(15, 23, 42, 0.55);
+  --header-bg: rgba(10, 15, 26, 0.94);
+  --toolbar-bg: rgba(15, 23, 42, 0.92);
   --toolbar-btn: #5a6680;
   --tooltip-bg: rgba(12, 17, 32, 0.9);
   --tooltip-color: #e0e6f0;
@@ -183,7 +183,7 @@
   --topology-glow-2: rgba(42, 51, 84, 0.2);
   --topology-glow-3: rgba(255, 77, 106, 0.02);
   --topology-edge: rgba(90, 102, 128, 0.25);
-  --topology-edge-cross: rgba(0, 229, 199, 0.15);
+  --topology-edge-cross: rgba(240, 160, 48, 0.5);
   --topology-label: oklch(0.7 0.01 250);
 }
 
@@ -195,6 +195,7 @@
     @apply font-sans;
     background-color: var(--background);
     color: var(--foreground);
+    font-variant-numeric: tabular-nums;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -204,29 +205,27 @@
     min-height: 100vh;
     overflow-x: hidden;
   }
-  /* 顶部渐变光晕 — 指挥中心氛围 */
+  /* 顶部微光 — 收敛为一条很淡的顶部光带，不再大面积照亮画布 */
   body::before {
     content: '';
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    height: 60vh;
+    height: 22vh;
     pointer-events: none;
     z-index: 0;
     background:
-      radial-gradient(ellipse at 50% 0%, var(--topology-glow-1) 0%, transparent 60%),
-      radial-gradient(ellipse at 20% 10%, var(--topology-glow-2) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, var(--topology-glow-3) 0%, transparent 50%);
+      radial-gradient(ellipse at 50% 0%, var(--topology-glow-1) 0%, transparent 60%);
   }
-  /* 微噪点纹理覆盖 */
+  /* 微噪点纹理覆盖（降到不可察觉） */
   body::after {
     content: '';
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 1;
-    opacity: 0.035;
+    opacity: 0.012;
     mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   }
@@ -236,11 +235,11 @@
 /* VOID COMMAND Utility Classes                */
 /* =========================================== */
 
-/* 玻璃态面板 */
+/* 玻璃态面板（图上浮层收敛：低模糊 + 高不透明度，避免图被"脏化"） */
 .glass-panel {
   background: var(--panel-bg);
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  backdrop-filter: blur(8px) saturate(140%);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-panel);
 }
@@ -252,7 +251,7 @@
   box-shadow: var(--shadow-elevated);
 }
 
-/* Stat card 顶部发光线条 */
+/* Stat card 顶部高光线（收敛为几乎不可见的细线，避免每张卡都在"发光"） */
 .stat-card-glow {
   position: relative;
   overflow: hidden;
@@ -263,16 +262,16 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 2px;
+  height: 1px;
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(0, 229, 199, 0.1) 20%,
-    rgba(0, 229, 199, 0.8) 50%,
-    rgba(0, 229, 199, 0.1) 80%,
+    rgba(0, 229, 199, 0.04) 20%,
+    rgba(0, 229, 199, 0.28) 50%,
+    rgba(0, 229, 199, 0.04) 80%,
     transparent 100%
   );
-  opacity: 0.9;
+  opacity: 0.5;
   z-index: 1;
   pointer-events: none;
 }
@@ -418,8 +417,8 @@
   position: absolute;
   z-index: 50;
   background: var(--tooltip-bg);
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(10px) saturate(160%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
   border: 1px solid var(--tooltip-border);
   border-radius: 8px;
   padding: 12px 16px;
@@ -501,15 +500,12 @@
   animation: pulse-ring 3s ease-in-out infinite;
 }
 
-/* 按钮发光 hover 效果 */
+/* 按钮 hover（去掉大面积辉光，保留轻微位移反馈） */
 .btn-glow {
   position: relative;
   transition: all 0.25s ease;
 }
 .btn-glow:hover {
-  box-shadow:
-    0 0 24px color-mix(in srgb, var(--primary) 35%, transparent),
-    0 0 48px color-mix(in srgb, var(--primary) 15%, transparent);
   transform: translateY(-1px);
 }
 
@@ -540,9 +536,7 @@
 
 .fab-btn:hover {
   border-color: color-mix(in srgb, var(--primary) 40%, transparent);
-  box-shadow:
-    0 0 20px color-mix(in srgb, var(--primary) 22%, transparent),
-    0 4px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
   transform: translateY(-1px);
 }
 
@@ -554,20 +548,20 @@
 /* New Layout — Header + Icon Toolbar + Canvas */
 /* =========================================== */
 
-/* Top header bar — frosted glass */
+/* Top header bar — frosted glass (low blur) */
 .app-header {
   background: var(--header-bg);
-  backdrop-filter: blur(16px) saturate(150%);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(10px) saturate(150%);
+  -webkit-backdrop-filter: blur(10px) saturate(150%);
   border-bottom: 1px solid var(--border);
   box-shadow: var(--shadow-header);
 }
 
-/* Left icon toolbar — frosted glass */
+/* Left icon toolbar — frosted glass (low blur) */
 .icon-toolbar {
   background: var(--toolbar-bg);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
   border-right: 1px solid var(--border);
 }
 
@@ -589,14 +583,12 @@
   color: var(--primary);
   background: color-mix(in srgb, var(--primary) 10%, transparent);
   border-color: color-mix(in srgb, var(--primary) 18%, transparent);
-  box-shadow: 0 0 20px color-mix(in srgb, var(--primary) 14%, transparent), 0 0 40px color-mix(in srgb, var(--primary) 5%, transparent);
 }
 
 .icon-toolbar-btn.active {
   color: var(--primary);
   background: color-mix(in srgb, var(--primary) 14%, transparent);
   border-color: color-mix(in srgb, var(--primary) 35%, transparent);
-  box-shadow: 0 0 24px color-mix(in srgb, var(--primary) 20%, transparent);
 }
 
 /* Active indicator dot */
@@ -626,7 +618,8 @@
 }
 
 .empty-state-border {
-  animation: breathe-border 3s ease-in-out infinite;
+  /* 呼吸动画已移除：静态虚线框足够，避免与异常脉冲争夺注意力 */
+  animation: none;
 }
 
 @keyframes fade-in-up {
@@ -666,11 +659,11 @@
   box-shadow: 0 0 60px color-mix(in srgb, var(--primary) 14%, transparent), inset 0 0 40px color-mix(in srgb, var(--primary) 5%, transparent) !important;
 }
 
-/* Sheet drawer glass override */
+/* Sheet drawer glass override (low blur) */
 .sheet-drawer-glass {
   background: var(--panel-bg-strong) !important;
-  backdrop-filter: blur(20px) saturate(150%);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
   border-color: var(--border) !important;
 }
 
@@ -706,6 +699,10 @@
 .topology-svg text.node-label {
   fill: var(--topology-label);
   font-size: 11px;
+}
+.minimap {
+  cursor: pointer;
+  user-select: none;
 }
 
 /* Smooth theme transitions for major surfaces */
@@ -749,6 +746,24 @@ h3 {
 g.node-group:focus {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+/* 用户要求降低透明效果时，浮层改为实底，保证可读性 */
+@media (prefers-reduced-transparency: reduce) {
+  .glass-panel,
+  .app-header,
+  .icon-toolbar,
+  .sheet-drawer-glass,
+  .topology-tooltip,
+  .fab-btn {
+    backdrop-filter: none;
+  }
+  .glass-panel,
+  .app-header,
+  .icon-toolbar,
+  .sheet-drawer-glass {
+    background: var(--panel-bg-strong);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
