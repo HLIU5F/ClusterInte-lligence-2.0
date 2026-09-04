@@ -1,0 +1,6914 @@
+{
+ "metadata": {
+  "generated_at": "2026-07-29T17:25:21.045341",
+  "source": "raw_no_hubs",
+  "total_nodes": 212,
+  "total_links": 211,
+  "communities": 1,
+  "anomaly_count": 3,
+  "report": {
+   "input": "C:\\Users\\刘雅丽\\.codex\\worktrees\\508b\\Cluster-Intelligence\\scripts\\topology_data6.0.json",
+   "output": "C:\\Users\\刘雅丽\\.codex\\worktrees\\508b\\Cluster-Intelligence\\scripts\\topology_data_core.json",
+   "mode": "core",
+   "removedNodes": [
+    {
+     "id": "10.26.0.26",
+     "community": 19,
+     "originalDegree": 3736,
+     "originalUniqueNeighbors": 3736,
+     "originalLinkCount": 3736
+    },
+    {
+     "id": "10.20.3.25",
+     "community": 5,
+     "originalDegree": 2553,
+     "originalUniqueNeighbors": 2553,
+     "originalLinkCount": 2553
+    }
+   ],
+   "before": {
+    "nodes": 3738,
+    "links": 6499
+   },
+   "after": {
+    "nodes": 212,
+    "links": 211
+   },
+   "removedLinks": 6288,
+   "droppedIsolatedNodes": 3524,
+   "nodeSignal": {
+    "keptNodes": 212,
+    "withPorts": 212,
+    "withProtocols": 212,
+    "withAnomalySignal": 1,
+    "distinctPortSignatures": 8
+   },
+   "connectedComponents": 1,
+   "isolatedNodes": 0,
+   "largestComponent": 212,
+   "largestRemainingNodes": [
+    {
+     "id": "10.100.113.134",
+     "uniqueNeighbors": 213,
+     "linkCount": 213,
+     "weightedDegree": 229.0
+    },
+    {
+     "id": "10.100.2.158",
+     "uniqueNeighbors": 3,
+     "linkCount": 3,
+     "weightedDegree": 5588.0
+    },
+    {
+     "id": "10.100.2.152",
+     "uniqueNeighbors": 3,
+     "linkCount": 3,
+     "weightedDegree": 5588.0
+    },
+    {
+     "id": "10.100.0.42",
+     "uniqueNeighbors": 3,
+     "linkCount": 3,
+     "weightedDegree": 5587.0
+    },
+    {
+     "id": "10.100.2.171",
+     "uniqueNeighbors": 3,
+     "linkCount": 3,
+     "weightedDegree": 5586.0
+    },
+    {
+     "id": "10.100.0.14",
+     "uniqueNeighbors": 3,
+     "linkCount": 3,
+     "weightedDegree": 5583.0
+    },
+    {
+     "id": "10.100.5.18",
+     "uniqueNeighbors": 3,
+     "linkCount": 3,
+     "weightedDegree": 5583.0
+    },
+    {
+     "id": "10.100.3.42",
+     "uniqueNeighbors": 3,
+     "linkCount": 3,
+     "weightedDegree": 5583.0
+    },
+    {
+     "id": "10.100.0.49",
+     "uniqueNeighbors": 3,
+     "linkCount": 3,
+     "weightedDegree": 5582.0
+    },
+    {
+     "id": "10.100.2.149",
+     "uniqueNeighbors": 3,
+     "linkCount": 3,
+     "weightedDegree": 5582.0
+    }
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "10.100.113.134",
+   "community": 0,
+   "degree": 211,
+   "in_degree": 0,
+   "out_degree": 211,
+   "port_count": 11,
+   "protocols": [
+    "tcp",
+    "udp"
+   ],
+   "anomaly_score": 0.8705,
+   "anomaly_level": "High",
+   "is_anomaly": true,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.113.134",
+   "ports": [
+    22,
+    53,
+    443,
+    1514,
+    1515,
+    9092,
+    9200,
+    9201,
+    18060,
+    22003,
+    36000
+   ],
+   "business_degree": 211
+  },
+  {
+   "id": "10.100.3.39",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.39",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.20",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 8,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.3617,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.20",
+   "ports": [
+    443,
+    1514,
+    1515,
+    18060,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.161",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 6,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.2107,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.161",
+   "ports": [
+    443,
+    1514,
+    1515,
+    9200,
+    9201,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.137",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 7,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.2862,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.137",
+   "ports": [
+    443,
+    1514,
+    1515,
+    9092,
+    9200,
+    9201,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.49",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.49",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.13",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.13",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.11",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.11",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.138",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.138",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.5.12",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.5.12",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.9",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.9",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.40",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.40",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.170",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.170",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.43",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.43",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.38",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.38",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.163",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.163",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.169",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.169",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.169",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.169",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.171",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.171",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.32.160",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.32.160",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.164",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.164",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.32.36",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.32.36",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.28",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.28",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.32.5",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.32.5",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.113.5",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.113.5",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.14",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.14",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.23",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.23",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.31",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.31",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.158",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.158",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.29",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.29",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.145",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.145",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.8",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.8",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.135",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.135",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.7",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.7",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.26",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.26",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.15",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.15",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.5",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.5",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.16",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.16",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.141",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.141",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.5.14",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.5.14",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.144",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.144",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.5.18",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.5.18",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.14",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.14",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.142",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.142",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.5.16",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.5.16",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.21",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.21",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.13",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.13",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.137",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.137",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.150",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.150",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.7",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.7",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.25",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.25",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.24",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.24",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.5",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.5",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.24",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.24",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.15",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.15",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.135",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.135",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.25",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.25",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.11",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.11",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.8",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.8",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.139",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.139",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.150",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.150",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.11",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.11",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.134",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.134",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.24",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.24",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.16",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.16",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.32",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.32",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.14",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.14",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.16",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.16",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.32.162",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.32.162",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.34.6",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.34.6",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.32.135",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.32.135",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.34.134",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.34.134",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.33.133",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.33.133",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.32.177",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.32.177",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.32.7",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.32.7",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.34.133",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.34.133",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.113.6",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.113.6",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.114.5",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.114.5",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.33.134",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.33.134",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.114.6",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.114.6",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.32.34",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.32.34",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.34.5",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.34.5",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.32.133",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.32.133",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.32.179",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.32.179",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.18",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.18",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.8",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.8",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.17",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.17",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.151",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.151",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.143",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.143",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.5",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 5,
+   "protocols": [
+    "tcp",
+    "udp"
+   ],
+   "anomaly_score": 0.1353,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.5",
+   "ports": [
+    53,
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.30",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.30",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.22",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.22",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.148",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.148",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.149",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.149",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.157",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.157",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.27",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.27",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.21",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.21",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.31",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.31",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.158",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.158",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.32",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.32",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.156",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.156",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.22",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.22",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.149",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.149",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.32",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.32",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.157",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.157",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.28",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.28",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.133",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 5,
+   "protocols": [
+    "tcp",
+    "udp"
+   ],
+   "anomaly_score": 0.1353,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.133",
+   "ports": [
+    53,
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.148",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.148",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.31",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.31",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.138",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.138",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.139",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.139",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.140",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.140",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.15",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.15",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.11",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.11",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.12",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.12",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.12",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.12",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.33",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.33",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.140",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.140",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.159",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.159",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.10",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.10",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.155",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.155",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.145",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.145",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.18",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.18",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.136",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.136",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.154",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.154",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.21",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.21",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.28",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.28",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.10",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.10",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.10",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.10",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.9",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.9",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.155",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.155",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.154",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.154",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.27",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.27",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.26",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.26",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.17",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.17",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.152",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.152",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.143",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.143",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.27",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.27",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.7",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.7",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.153",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.153",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.134",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.134",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.152",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.152",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.19",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.19",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.12",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.12",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.20",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.20",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.18",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.18",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.9",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.9",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.159",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.159",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.23",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.23",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.144",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.144",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.34",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.34",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.37",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.37",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.34",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.34",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.162",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.162",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.37",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.37",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.164",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.164",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.34",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.34",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.165",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.165",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.38",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.38",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.36",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.36",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.165",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.165",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.35",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.35",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.46",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.46",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.46",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.46",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.172",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.172",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.43",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.43",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.167",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.167",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.45",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.45",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.167",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.167",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.43",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.43",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.45",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.45",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.41",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.41",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.171",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.171",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.41",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.41",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.166",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.166",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.168",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.168",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.44",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.44",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.42",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.42",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.40",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.40",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.44",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.44",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.170",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.170",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.42",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.42",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.44",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.44",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.166",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.166",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.42",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.42",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.5.9",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.5.9",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.5.11",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.5.11",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.5.10",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.5.10",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.5.8",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.5.8",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.5.7",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.5.7",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.8",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.8",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.139",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.139",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.137",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.137",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.135",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.135",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.136",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.136",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.10",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.10",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.113.139",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.113.139",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.134",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.134",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.6",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.6",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.29",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.29",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.30",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.30",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.22",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.22",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.147",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.147",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.5.6",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.5.6",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.3.13",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.3.13",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.161",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.161",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.30",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.30",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.1.13",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.1.13",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.4.133",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 5,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.1353,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.4.133",
+   "ports": [
+    22,
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.0.173",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.0.173",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.2.147",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 4,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.0598,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.2.147",
+   "ports": [
+    443,
+    1514,
+    1515,
+    36000
+   ],
+   "business_degree": 1
+  },
+  {
+   "id": "10.100.36.71",
+   "community": 0,
+   "degree": 1,
+   "in_degree": 1,
+   "out_degree": 0,
+   "port_count": 1,
+   "protocols": [
+    "tcp"
+   ],
+   "anomaly_score": 0.1706,
+   "anomaly_level": "Low",
+   "is_anomaly": false,
+   "is_whitelisted": false,
+   "whitelist_reason": "",
+   "label": "10.100.36.71",
+   "ports": [
+    22003
+   ],
+   "business_degree": 1
+  }
+ ],
+ "links": [
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.49",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.13",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.11",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.138",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.5.12",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.9",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.40",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.170",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.43",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.171",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.169",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.169",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.163",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.38",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.164",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.32.160",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.32.36",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.28",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.32.5",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.113.5",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.14",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.23",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.31",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.158",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.29",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.145",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.8",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.135",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.7",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.26",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.15",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.5",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.16",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.141",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.5.14",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.144",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.5.18",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.14",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.142",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.5.16",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.21",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.13",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.137",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.150",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.7",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.25",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.24",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.5",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.24",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.15",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.135",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.25",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.11",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.8",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.134",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.139",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.150",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.11",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.24",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.16",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.32",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.14",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.16",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.32.162",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.34.6",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.32.135",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.34.134",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.33.133",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.32.177",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.32.7",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.34.133",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.113.6",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.114.5",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.114.6",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.33.134",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.32.34",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.34.5",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.32.133",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.32.179",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.18",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.8",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.17",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.151",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.143",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.5",
+   "weight": 2,
+   "ports": [
+    36000,
+    53
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.30",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.22",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.148",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.149",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.157",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.27",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.21",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.31",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.32",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.158",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.156",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.22",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.149",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.32",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.157",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.28",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.133",
+   "weight": 2,
+   "ports": [
+    36000,
+    53
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.148",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.31",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.138",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.139",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.140",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.15",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.11",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.12",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.12",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.33",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.140",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.159",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.10",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.155",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.145",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.136",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.18",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.154",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.20",
+   "weight": 1,
+   "ports": [
+    18060
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.161",
+   "weight": 2,
+   "ports": [
+    9200,
+    9201
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.137",
+   "weight": 3,
+   "ports": [
+    9200,
+    9201,
+    9092
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.21",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.28",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.10",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.10",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.9",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.155",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.154",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.27",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.26",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.17",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.152",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.143",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.27",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.7",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.153",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.134",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.152",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.19",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.12",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.20",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.18",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.9",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.144",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.159",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.34",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.23",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.37",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.34",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.162",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.37",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.164",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.34",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.165",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.38",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.36",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.165",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.35",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.39",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.46",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.46",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.172",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.43",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.167",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.45",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.167",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.43",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.45",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.166",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.41",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.171",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.41",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.44",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.168",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.170",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.44",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.40",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.42",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.42",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.44",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.166",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.42",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.5.9",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.5.11",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.5.10",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.5.8",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.5.7",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.8",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.10",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.136",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.135",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.137",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.139",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.29",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.134",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.6",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.30",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.113.139",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.5.6",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.1.13",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.22",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.147",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.30",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.0.173",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.4.133",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.161",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.3.13",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.2.147",
+   "weight": 1,
+   "ports": [
+    36000
+   ]
+  },
+  {
+   "source": "10.100.113.134",
+   "target": "10.100.36.71",
+   "weight": 1,
+   "ports": [
+    22003
+   ]
+  }
+ ]
+}
