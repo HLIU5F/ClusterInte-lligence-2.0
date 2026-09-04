@@ -427,13 +427,13 @@ export default function Home() {
   const handleLoadPurified = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/topology_data_purified.json', { cache: 'no-store' });
+      const res = await fetch('/topology_data_security.json', { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       handleImportData(json as TopologyData);
     } catch (error) {
-      console.error('加载净化全量数据失败:', error);
-      alert('无法加载净化全量数据，请确认 public/topology_data_purified.json 存在');
+      console.error('加载安全域增强数据失败:', error);
+      alert('无法加载安全域增强数据，请确认 public/topology_data_security.json 存在');
     } finally {
       setLoading(false);
     }
