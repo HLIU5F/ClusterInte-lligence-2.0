@@ -533,12 +533,11 @@ interface DataSourcePanelProps {
   onImportData: (data: TopologyData) => void;
   onLoadFromNeo4j?: () => void;
   onLoadCoreGraph?: () => void;
-  onLoadPurified?: () => void;
   loading?: boolean;
   data: TopologyData | null;
 }
 
-export function DataSourcePanel({ onImportData, onLoadFromNeo4j, onLoadCoreGraph, onLoadPurified, loading, data }: DataSourcePanelProps) {
+export function DataSourcePanel({ onImportData, onLoadFromNeo4j, onLoadCoreGraph, loading, data }: DataSourcePanelProps) {
   const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -633,29 +632,6 @@ export function DataSourcePanel({ onImportData, onLoadFromNeo4j, onLoadCoreGraph
             <Activity className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
             {loading ? '加载中…' : '加载业务核心图'}
           </Button>
-        </div>
-      )}
-
-      {/* Purified full data (no collectors) */}
-      {onLoadPurified && (
-        <div>
-          <div className="flex items-center gap-1.5 mb-2.5">
-            <Server className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-xs font-medium text-foreground">安全域增强数据</span>
-          </div>
-          <Button
-            onClick={onLoadPurified}
-            disabled={loading}
-            size="sm"
-            variant="outline"
-            className="w-full h-9 text-xs font-medium"
-          >
-            <Server className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
-            {loading ? '加载中…' : '加载安全域增强数据（全量+服务类型+zone_label）'}
-          </Button>
-          <div className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
-            全量 3736 节点用于安全域划分（端口服务域可出 ~280 域）；画布只渲染有连接的节点，避免卡死
-          </div>
         </div>
       )}
 

@@ -424,20 +424,6 @@ export default function Home() {
     }
   }, [handleImportData]);
 
-  const handleLoadPurified = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/topology_data_security.json', { cache: 'no-store' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      handleImportData(json as TopologyData);
-    } catch (error) {
-      console.error('加载安全域增强数据失败:', error);
-      alert('无法加载安全域增强数据，请确认 public/topology_data_security.json 存在');
-    } finally {
-      setLoading(false);
-    }
-  }, [handleImportData]);
 
   const refreshGdsData = useCallback(async () => {
     try {
@@ -1048,7 +1034,7 @@ export default function Home() {
           <FolderOpen className="w-4 h-4 text-primary" /> 数据源管理</SheetTitle>
           </SheetHeader>
           <ScrollArea className="flex-1 min-h-0 px-4 py-4">
-            <DataSourcePanel onImportData={handleImportData} onLoadFromNeo4j={handleLoadFromNeo4j} onLoadCoreGraph={handleLoadCoreGraph} onLoadPurified={handleLoadPurified} loading={loading} data={clusteringAppliedData || data} />
+            <DataSourcePanel onImportData={handleImportData} onLoadFromNeo4j={handleLoadFromNeo4j} onLoadCoreGraph={handleLoadCoreGraph} loading={loading} data={clusteringAppliedData || data} />
           </ScrollArea>
         </SheetContent>
       </Sheet>
