@@ -348,8 +348,8 @@ function MetricTile({ label, value }: { label: string; value: string }) {
  * 安全域数据导出（CSV / JSON）
  * ============================================================ */
 
-function downloadBlob(name: string, content: string, mime: string) {
-  const blob = new Blob([content], { type: `${mime};charset=utf-8` });
+function downloadBlob(name: string, content: string | Blob, mime: string) {
+  const blob = content instanceof Blob ? content : new Blob([content], { type: `${mime};charset=utf-8` });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -424,40 +424,48 @@ function buildConnectionsCSVRows(data: TopologyData | null): string[] {
  *   文件2 连接明细（Edge：Source_IP/Dest_IP/Dest_Port/Protocol/Connection_Count）——原始连接数据，横向移动检测/访问控制审计用
  * 两份均为 UTF-8-SIG（BOM），Excel 直接打开。
  */
-export function exportSecurityZonesCSV(data: TopologyData | null, clusteringResult: any, strategy: string | null) {
-  if (!data) return;
-  const { zoneOf, labels, nodeMeta } = buildZoneMapping(clusteringResult);
-  const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-  const nodeRows: string[] = [
-    ['IP', '安全域ID', '安全域名称', '子网', '服务端口', '异常级别', '角色', '异常分', '方向类型', '调用方子网', '对端子网']
-      .map(esc).join(','),
-  ];
-  for (const n of data.nodes) {
-    const zid = zoneOf.get(n.id) ?? `community_${n.community ?? -1}`;
-    const meta = nodeMeta.get(n.id);
-    const direction = meta?.direction === 'service' ? '服务提供'
-      : meta?.direction === 'client' ? '客户端'
-      : meta?.direction === 'terminal' ? '监控终端' : '';
-    nodeRows.push([
-      n.id,
-      zid,
-      labels.get(zid) ?? `域 ${zid}`,
-      n.subnet_24 ?? '',
-      Array.isArray(n.ports) ? n.ports.join('|') : '',
-      n.anomaly_level ?? '',
-      n.role_guess ?? '',
-      String(Number(n.anomaly_score || 0).toFixed(4)),
-      direction,
-      meta?.callers ?? '',
-      meta?.peers ?? '',
-    ].map(esc).join(','));
+export async function exportSecurityZonesCSV(data: TopologyData | null, clusteringResult: any, strategy: string | null) {
+  // Delegate to backend merge script via API for complete topology data (12 columns)
+  try {
+    const resp = await fetch('/api/export/panorama');
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ detail: resp.statusText }));
+      throw new Error(err.detail || `HTTP ${resp.status}`);
+    }
+    const blob = await resp.blob();
+    const filename = `资产全景_merged_${strategy ?? 'current'}.csv`;
+    downloadBlob(filename, blob, 'text/csv');
+  } catch (e) {
+    console.error('Backend export failed, falling back to client-side:', e);
+    // Fallback to original client-side generation
+    if (!data) return;
+    const { zoneOf, labels, nodeMeta } = buildZoneMapping(clusteringResult);
+    const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const nodeRows: string[] = [
+      ['IP', '安全域ID', '安全域名称', '子网', '服务端口', '异常级别', '角色', '异常分', '方向类型', '调用方子网', '对端子网']
+        .map(esc).join(','),
+    ];
+    for (const n of data.nodes) {
+      const zid = zoneOf.get(n.id) ?? `community_${n.community ?? -1}`;
+      const meta = nodeMeta.get(n.id);
+      const direction = meta?.direction === 'service' ? '服务提供'
+        : meta?.direction === 'client' ? '客户端'
+        : meta?.direction === 'terminal' ? '监控终端' : '';
+      nodeRows.push([
+        n.id, zid, labels.get(zid) ?? `域 ${zid}`, n.subnet_24 ?? '',
+        Array.isArray(n.ports) ? n.ports.join('|') : '', n.anomaly_level ?? '',
+        n.role_guess ?? '', String(Number(n.anomaly_score || 0).toFixed(4)),
+        direction, meta?.callers ?? '', meta?.peers ?? '',
+      ].map(esc).join(','));
+    }
+    downloadBlob(`资产全景_${strategy ?? 'current'}.csv`, '\uFEFF' + nodeRows.join('\r\n'), 'text/csv');
   }
-  // 文件1：资产全景（方案二）
-  downloadBlob(`资产全景_${strategy ?? 'current'}.csv`, '\uFEFF' + nodeRows.join('\r\n'), 'text/csv');
-  // 文件2：原始连接明细（Edge，逐端口展开）
-  const edgeRows = buildConnectionsCSVRows(data);
-  if (edgeRows.length > 0) {
-    downloadBlob('连接明细_edges.csv', '\uFEFF' + edgeRows.join('\r\n'), 'text/csv');
+  // File 2: Edge details (unchanged)
+  if (data) {
+    const edgeRows = buildConnectionsCSVRows(data);
+    if (edgeRows.length > 0) {
+      downloadBlob('连接明细_edges.csv', '\uFEFF' + edgeRows.join('\r\n'), 'text/csv');
+    }
   }
 }
 
