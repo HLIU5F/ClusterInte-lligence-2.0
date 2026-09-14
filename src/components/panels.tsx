@@ -427,7 +427,19 @@ function buildConnectionsCSVRows(data: TopologyData | null): string[] {
 export async function exportSecurityZonesCSV(data: TopologyData | null, clusteringResult: any, strategy: string | null) {
   // Delegate to backend merge script via API for complete topology data (12 columns)
   try {
-    const resp = await fetch('/api/export/panorama');
+    const resp = await fetch('/api/export/panorama', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify((() => {
+        const { zoneOf, labels } = buildZoneMapping(clusteringResult);
+        const enrichedNodes = (data?.nodes || []).map((n: any) => ({
+          ...n,
+          zone_id: n.zone_id || zoneOf.get(n.id) || '',
+          zone_label: n.zone_label || labels.get(zoneOf.get(n.id) || '') || '',
+        }));
+        return { nodes: enrichedNodes, links: data?.links || [] };
+      })()),
+    });
     if (!resp.ok) {
       const err = await resp.json().catch(() => ({ detail: resp.statusText }));
       throw new Error(err.detail || `HTTP ${resp.status}`);
@@ -435,6 +447,7 @@ export async function exportSecurityZonesCSV(data: TopologyData | null, clusteri
     const blob = await resp.blob();
     const filename = `资产全景_merged_${strategy ?? 'current'}.csv`;
     downloadBlob(filename, blob, 'text/csv');
+    return; // Success: only merged file
   } catch (e) {
     console.error('Backend export failed, falling back to client-side:', e);
     // Fallback to original client-side generation
@@ -459,9 +472,7 @@ export async function exportSecurityZonesCSV(data: TopologyData | null, clusteri
       ].map(esc).join(','));
     }
     downloadBlob(`资产全景_${strategy ?? 'current'}.csv`, '\uFEFF' + nodeRows.join('\r\n'), 'text/csv');
-  }
-  // File 2: Edge details (unchanged)
-  if (data) {
+    // Only download edge details in fallback mode
     const edgeRows = buildConnectionsCSVRows(data);
     if (edgeRows.length > 0) {
       downloadBlob('连接明细_edges.csv', '\uFEFF' + edgeRows.join('\r\n'), 'text/csv');
