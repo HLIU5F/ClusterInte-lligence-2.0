@@ -1,19 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-/** 精简 zone_label：过长时截取关键部分，保留可读性 */
-function simplifyZoneLabel(label: string | undefined | null): string {
-  if (!label || label === 'Unassigned' || label === 'default') return label || '';
-  // 如果已经是简短格式（<=30字符），直接返回
-  if (label.length <= 30) return label;
-  // 尝试提取核心名称：取第一个有意义的片段
-  const parts = label.split(/[|;,]/).map(s => s.trim()).filter(Boolean);
-  if (parts.length > 1) {
-    const short = parts.slice(0, 2).join(' | ');
-    if (short.length <= 30) return short;
-  }
-  // 截断并加省略号
-  return label.substring(0, 28) + '..';
-}
+import { readFile } from 'fs/promises';
+import path from 'path';
 
 interface TopoNode {
   id: string;
@@ -23,6 +10,7 @@ interface TopoNode {
   anomaly_score?: number;
   anomaly_level?: string;
   role_guess?: string;
+  base_role?: string;
   zone_id?: string;
   zone_label?: string;
   service_type?: string;
@@ -31,9 +19,7 @@ interface TopoNode {
   degree?: number;
   in_degree?: number;
   out_degree?: number;
-  is_anomaly?: boolean;
-  geo_country?: string;
-  business_group?: string;
+  port_count?: number;
   [key: string]: any;
 }
 
@@ -49,75 +35,118 @@ function getNodeId(n: string | { id: string }): string {
   return typeof n === 'string' ? n : n.id;
 }
 
+// CSV column definitions ordered by priority
+// header format: "English / 中文"
+const CSV_COLUMNS: Array<{ key: string; header: string }> = [
+  // === Core Identity / 核心标识 ===
+  { key: 'id',             header: 'IP Address / IP地址' },
+  { key: 'label',          header: 'Label / 名称' },
+  { key: 'service_type',   header: 'Service Type / 服务类型' },
+  { key: 'base_role',      header: 'Base Role / 基础角色' },
+  { key: 'role_guess',     header: 'Guessed Role / 推测角色' },
+  // === Security Zone & Topology / 安全域与拓扑 ===
+  { key: 'zone_id',        header: 'Zone ID / 安全域ID' },
+  { key: 'zone_label',     header: 'Zone Label / 安全域名称' },
+  { key: 'community',      header: 'Community / 社区编号' },
+  { key: 'subnet_24',      header: 'Subnet(/24) / 子网' },
+  { key: 'port_count',     header: 'Open Ports Count / 开放端口数' },
+  { key: 'ports',          header: 'Port List / 端口列表' },
+  { key: 'degree',         header: 'Degree / 总连接度' },
+  { key: 'in_degree',      header: 'In-Degree / 入度' },
+  { key: 'out_degree',     header: 'Out-Degree / 出度' },
+  // === Anomaly / 异常 ===
+  { key: 'anomaly_level',  header: 'Anomaly Level / 异常级别' },
+  { key: 'anomaly_score',  header: 'Anomaly Score / 异常评分' },
+  // === Connection Summary (aggregated from links) / 连接摘要 ===
+  { key: 'inbound_summary',  header: 'Inbound Summary / 入向连接摘要' },
+  { key: 'outbound_summary', header: 'Outbound Summary / 出向连接摘要' },
+  { key: 'inbound_count',    header: 'Inbound Count / 入向连接数' },
+  { key: 'outbound_count',   header: 'Outbound Count / 出向连接数' },
+];
+
+function buildConnectionMaps(links: TopoLink[]) {
+  const inboundMap = new Map<string, Array<{ peer: string; ports: string; proto: string }>>();
+  const outboundMap = new Map<string, Array<{ peer: string; ports: string; proto: string }>>();
+  for (const link of links) {
+    const src = getNodeId(link.source);
+    const dst = getNodeId(link.target);
+    const ports = (link.ports || []).join(';') || '*';
+    const proto = link.protocol || 'tcp';
+    if (!outboundMap.has(src)) outboundMap.set(src, []);
+    outboundMap.get(src)!.push({ peer: dst, ports, proto });
+    if (!inboundMap.has(dst)) inboundMap.set(dst, []);
+    inboundMap.get(dst)!.push({ peer: src, ports, proto });
+  }
+  return { inboundMap, outboundMap };
+}
+
+function summarize(conns: Array<{ peer: string; ports: string; proto: string }> | undefined, maxItems = 5): string {
+  if (!conns || conns.length === 0) return '';
+  const items = conns.slice(0, maxItems).map(c => `${c.peer}(${c.proto}:${c.ports})`);
+  const suffix = conns.length > maxItems ? `+${conns.length - maxItems}more` : '';
+  return items.join(';') + suffix;
+}
+
+function generateCSV(nodes: TopoNode[], links: TopoLink[]): { csvContent: string; rowCount: number } {
+  const { inboundMap, outboundMap } = buildConnectionMaps(links);
+  const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  // Pre-compute all row values
+  const allValues: string[][] = [];
+  for (const node of nodes) {
+    const inbound = inboundMap.get(node.id);
+    const outbound = outboundMap.get(node.id);
+    const values = CSV_COLUMNS.map(col => {
+      switch (col.key) {
+        case 'anomaly_score':    return String(Number(node.anomaly_score ?? 0).toFixed(4));
+        case 'ports':            return Array.isArray(node.ports) ? node.ports.join('|') : '';
+        case 'port_count':       return String(node.port_count ?? (Array.isArray(node.ports) ? node.ports.length : 0));
+        case 'community':        return String(node.community ?? '');
+        case 'degree':           return String(node.degree ?? 0);
+        case 'in_degree':        return String(node.in_degree ?? 0);
+        case 'out_degree':       return String(node.out_degree ?? 0);
+        case 'inbound_summary':  return summarize(inbound);
+        case 'outbound_summary': return summarize(outbound);
+        case 'inbound_count':    return String(inbound?.length ?? 0);
+        case 'outbound_count':   return String(outbound?.length ?? 0);
+        default:                 return String((node as any)[col.key] ?? '');
+      }
+    });
+    allValues.push(values);
+  }
+  // Filter out columns where every row is empty or zero
+  const nonEmptyColIndices = CSV_COLUMNS.map((_, i) => i).filter(i =>
+    allValues.some(row => row[i] !== '')
+  );
+  const header = nonEmptyColIndices.map(i => esc(CSV_COLUMNS[i].header)).join(',');
+  const rows: string[] = [header];
+  for (const values of allValues) {
+    rows.push(nonEmptyColIndices.map(i => values[i]).map(esc).join(','));
+  }
+  return { csvContent: '\uFEFF' + rows.join('\r\n'), rowCount: rows.length };
+}
+
+const TOPOLOGY_FILE = path.resolve(process.cwd(), 'public', 'topology_data_security.json');
+
+// POST: accept nodes/links from frontend
 export async function POST(request: NextRequest) {
   console.log('[EXPORT] POST /api/export/panorama called');
   try {
     const body = await request.json();
-    const nodes: TopoNode[] = body.nodes || [];
+    let nodes: TopoNode[] = body.nodes || [];
     const links: TopoLink[] = body.links || [];
     console.log(`[EXPORT] Received ${nodes.length} nodes, ${links.length} links`);
 
+    // If frontend sends empty or minimal nodes, fallback to static file
     if (nodes.length === 0) {
-      console.error('[EXPORT] No nodes provided');
-      return NextResponse.json({ error: 'No topology data provided' }, { status: 400 });
+      console.log('[EXPORT] No nodes in POST body, falling back to static file');
+      const raw = await readFile(TOPOLOGY_FILE, 'utf-8');
+      const data = JSON.parse(raw);
+      nodes = data.nodes || [];
     }
 
-    // Aggregate connections per node
-    const inboundMap = new Map<string, Array<{ peer: string; ports: string; proto: string }>>();
-    const outboundMap = new Map<string, Array<{ peer: string; ports: string; proto: string }>>();
-
-    for (const link of links) {
-      const src = getNodeId(link.source);
-      const dst = getNodeId(link.target);
-      const ports = (link.ports || []).join(';') || '*';
-      const proto = link.protocol || 'tcp';
-
-      if (!outboundMap.has(src)) outboundMap.set(src, []);
-      outboundMap.get(src)!.push({ peer: dst, ports, proto });
-
-      if (!inboundMap.has(dst)) inboundMap.set(dst, []);
-      inboundMap.get(dst)!.push({ peer: src, ports, proto });
-    }
-
-    function summarize(conns: Array<{ peer: string; ports: string; proto: string }> | undefined, maxItems = 5): string {
-      if (!conns || conns.length === 0) return '';
-      const items = conns.slice(0, maxItems).map(c => `${c.peer}(${c.proto}:${c.ports})`);
-      const suffix = conns.length > maxItems ? `+${conns.length - maxItems}more` : '';
-      return items.join(';') + suffix;
-    }
-
-    const header = 'IP地址,名称,服务类型,推测角色,安全域ID,安全域名称,聚类社区编号,子网(/24),总连接度,入度(被访问),出度(主动访问),异常级别,异常评分,发送流量,接收流量,是否异常,是否白名单,协议,安全域分组,服务置信度,节点类型';
-    const rows: string[] = [header];
-
-    for (const node of nodes) {
-      const inbound = inboundMap.get(node.id);
-      const outbound = outboundMap.get(node.id);
-      const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-
-      rows.push([
-        node.id,
-        node.label || node.id,
-        node.service_type || 'Host',
-        node.business_group || 'Internal',
-        node.subnet_24 || '',
-        node.role_guess || '',
-        node.zone_id || '',
-        simplifyZoneLabel(node.zone_label),
-        summarize(inbound),
-        summarize(outbound),
-        inbound?.length ?? 0,
-        outbound?.length ?? 0,
-      ].map(esc).join(','));
-    }
-
-    const csvContent = '\uFEFF' + rows.join('\r\n');
-    const filename = `asset_panorama_merged_${new Date().toISOString().slice(0, 10)}.csv`;
-    console.log(`[EXPORT] Generated CSV: ${rows.length} rows, ${csvContent.length} bytes`);
-
-    // Log sample row for debugging
-    if (rows.length > 1) {
-      console.log(`[EXPORT] Sample row: ${rows[1].substring(0, 200)}`);
-    }
+    const { csvContent, rowCount } = generateCSV(nodes, links);
+    const filename = `Asset_Panorama_${new Date().toISOString().slice(0, 10)}.csv`;
+    console.log(`[EXPORT] Generated CSV: ${rowCount} rows, ${csvContent.length} bytes`);
 
     return new NextResponse(csvContent, {
       status: 200,
@@ -136,57 +165,16 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET fallback
-import { readFile } from 'fs/promises';
-import path from 'path';
-const TOPOLOGY_FILE = path.resolve(process.cwd(), 'public', 'topology_data_security.json');
-
+// GET: read from static file directly
 export async function GET(_request: NextRequest) {
-  console.log('[EXPORT] GET /api/export/panorama called (fallback)');
+  console.log('[EXPORT] GET /api/export/panorama called');
   try {
     const raw = await readFile(TOPOLOGY_FILE, 'utf-8');
     const data = JSON.parse(raw);
     const nodes: TopoNode[] = data.nodes || [];
     const links: TopoLink[] = data.links || [];
-
-    const inboundMap = new Map<string, Array<{ peer: string; ports: string; proto: string }>>();
-    const outboundMap = new Map<string, Array<{ peer: string; ports: string; proto: string }>>();
-
-    for (const link of links) {
-      const src = getNodeId(link.source);
-      const dst = getNodeId(link.target);
-      const ports = (link.ports || []).join(';') || '*';
-      const proto = link.protocol || 'tcp';
-      if (!outboundMap.has(src)) outboundMap.set(src, []);
-      outboundMap.get(src)!.push({ peer: dst, ports, proto });
-      if (!inboundMap.has(dst)) inboundMap.set(dst, []);
-      inboundMap.get(dst)!.push({ peer: src, ports, proto });
-    }
-
-    function summarize(conns: Array<{ peer: string; ports: string; proto: string }> | undefined, maxItems = 5): string {
-      if (!conns || conns.length === 0) return '';
-      const items = conns.slice(0, maxItems).map(c => `${c.peer}(${c.proto}:${c.ports})`);
-      const suffix = conns.length > maxItems ? `+${conns.length - maxItems}more` : '';
-      return items.join(';') + suffix;
-    }
-
-    const header = 'IP地址,名称,服务类型,推测角色,安全域ID,安全域名称,聚类社区编号,子网(/24),总连接度,入度(被访问),出度(主动访问),异常级别,异常评分,发送流量,接收流量,是否异常,是否白名单,协议,安全域分组,服务置信度,节点类型';
-    const rows: string[] = [header];
-    for (const node of nodes) {
-      const inbound = inboundMap.get(node.id);
-      const outbound = outboundMap.get(node.id);
-      const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-      rows.push([
-        node.id, node.label || node.id, node.service_type || 'Host',
-        node.business_group || 'Internal', node.subnet_24 || '',
-        node.role_guess || '', node.zone_id || '', simplifyZoneLabel(node.zone_label),
-        summarize(inbound), summarize(outbound),
-        inbound?.length ?? 0, outbound?.length ?? 0,
-      ].map(esc).join(','));
-    }
-
-    const csvContent = '\uFEFF' + rows.join('\r\n');
-    const filename = `asset_panorama_merged_${new Date().toISOString().slice(0, 10)}.csv`;
+    const { csvContent } = generateCSV(nodes, links);
+    const filename = `Asset_Panorama_${new Date().toISOString().slice(0, 10)}.csv`;
     return new NextResponse(csvContent, {
       status: 200,
       headers: {
@@ -196,7 +184,7 @@ export async function GET(_request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[EXPORT] GET fallback error:', error);
+    console.error('[EXPORT] GET error:', error);
     return NextResponse.json({ error: 'Failed to generate CSV' }, { status: 500 });
   }
 }

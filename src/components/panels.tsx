@@ -177,9 +177,9 @@ function VirtualizedDomainList({ domains, communityNodes, communityLinks, focuse
                 style={{ backgroundColor: domain.color }}
               />
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium truncate">{domain.name}{domain.subnet ? ` (${domain.subnet})` : ''}</div>
+                <div className="text-xs font-medium truncate">{domain.name}</div>
                 <div className="text-[11px] text-muted-foreground">
-                  节点: {domain.nodeCount} · {domain.linkCount} 连接
+                  {domain.nodeCount} 节点 · {domain.linkCount} 连接
                 </div>
               </div>
               <DomainTopologyPreview nodes={domainNodes} links={domainLinks} color={domain.color} />
@@ -437,22 +437,6 @@ export async function exportSecurityZonesCSV(data: TopologyData | null, clusteri
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify((() => {
         const { zoneOf, labels } = buildZoneMapping(clusteringResult);
-        // Issue #3: sync exported labels with frontend-edited domainNames
-        if (data?.domainNames && clusteringResult?.zones) {
-          // Build community -> zone_id reverse mapping
-          const commToZoneId = new Map<number, string>();
-          for (const z of clusteringResult.zones) {
-            if (z.zone_id !== undefined && z.community !== undefined) {
-              commToZoneId.set(z.community, z.zone_id);
-            }
-          }
-          for (const [cid, name] of Object.entries(data.domainNames)) {
-            if (name && name !== 'Unassigned') {
-              const zoneId = commToZoneId.get(Number(cid));
-              if (zoneId) labels.set(zoneId, name);
-            }
-          }
-        }
         const enrichedNodes = (data?.nodes || []).map((n: any) => ({
           ...n,
           zone_id: n.zone_id || zoneOf.get(n.id) || '',
@@ -476,26 +460,23 @@ export async function exportSecurityZonesCSV(data: TopologyData | null, clusteri
     const { zoneOf, labels, nodeMeta } = buildZoneMapping(clusteringResult);
     const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
     const nodeRows: string[] = [
-      ['IP地址', '名称', '服务类型', '推测角色', '安全域ID', '安全域名称', '聚类社区编号', '子网(/24)', '总连接度', '入度(被访问)', '出度(主动访问)', '异常级别', '异常评分', '发送流量', '接收流量', '是否异常', '是否白名单', '协议', '安全域分组', '服务置信度', '节点类型']
+      ['IP', '安全域ID', '安全域名称', '子网', '服务端口', '异常级别', '角色', '异常分', '方向类型', '调用方子网', '对端子网']
         .map(esc).join(','),
     ];
     for (const n of data.nodes) {
       const zid = zoneOf.get(n.id) ?? `community_${n.community ?? -1}`;
+      const meta = nodeMeta.get(n.id);
+      const direction = meta?.direction === 'service' ? '服务提供'
+        : meta?.direction === 'client' ? '客户端'
+        : meta?.direction === 'terminal' ? '监控终端' : '';
       nodeRows.push([
-        n.id, n.id, n.service_type || 'Host',
-        n.role_guess ?? '', zid, labels.get(zid) ?? `域 ${zid}`,
-        n.community ?? 0, (n.subnet_24 ?? '').replace(/\/\d+$/, ''),
-        n.degree ?? 0, n.in_degree ?? 0, n.out_degree ?? 0,
-        n.anomaly_level ?? 'None', String(Number(n.anomaly_score || 0).toFixed(4)),
-        n.bytes_sent ?? 0, n.bytes_received ?? 0,
-        n.is_anomaly ? '是' : '否', n.is_whitelisted ? '是' : '否',
-        Array.isArray(n.protocols) ? n.protocols.join('|') : (n.protocols || ''),
-        n.business_group || 'Internal', n.service_confidence ?? 0,
-        n.service_type || 'Host',
+        n.id, zid, labels.get(zid) ?? `域 ${zid}`, n.subnet_24 ?? '',
+        Array.isArray(n.ports) ? n.ports.join('|') : '', n.anomaly_level ?? '',
+        n.role_guess ?? '', String(Number(n.anomaly_score || 0).toFixed(4)),
+        direction, meta?.callers ?? '', meta?.peers ?? '',
       ].map(esc).join(','));
     }
     downloadBlob(`资产全景_${strategy ?? 'current'}.csv`, '\uFEFF' + nodeRows.join('\r\n'), 'text/csv');
-    console.warn("Backend export failed, client-side fallback used. Some columns may be missing.");
     // Only download edge details in fallback mode
     const edgeRows = buildConnectionsCSVRows(data);
     if (edgeRows.length > 0) {
@@ -508,22 +489,6 @@ export async function exportSecurityZonesCSV(data: TopologyData | null, clusteri
 export function exportSecurityZonesJSON(data: TopologyData | null, clusteringResult: any, strategy: string | null) {
   if (!data) return;
   const { zoneOf, labels } = buildZoneMapping(clusteringResult);
-  // Issue #3: sync exported labels with frontend-edited domainNames
-  if (data?.domainNames && clusteringResult?.zones) {
-    // Build community -> zone_id reverse mapping
-    const commToZoneId = new Map<number, string>();
-    for (const z of clusteringResult.zones) {
-      if (z.zone_id !== undefined && z.community !== undefined) {
-        commToZoneId.set(z.community, z.zone_id);
-      }
-    }
-    for (const [cid, name] of Object.entries(data.domainNames)) {
-      if (name && name !== 'Unassigned') {
-        const zoneId = commToZoneId.get(Number(cid));
-        if (zoneId) labels.set(zoneId, name);
-      }
-    }
-  }
   const zones: Record<string, { label: string; nodes: string[] }> = {};
   for (const n of data.nodes) {
     const zid = zoneOf.get(n.id) ?? `community_${n.community ?? -1}`;
@@ -1387,26 +1352,7 @@ export function StatsPanel({
         linkCount: linkCounts.get(id) || 0,
         avgAnomalyScore: nodes.reduce((s, n) => s + n.anomaly_score, 0) / nodes.length,
         totalBytes: nodes.reduce((s, n) => s + (n.bytes_sent || 0) + (n.bytes_received || 0), 0),
-          subnet: (() => {
-            const subnetCounts = new Map<string, number>();
-            nodes.forEach(n => { const s = n.subnet_24 || ''; if (s && s !== '0.0.0.0/0') subnetCounts.set(s, (subnetCounts.get(s) || 0) + 1); });
-            if (subnetCounts.size === 0) return '';
-            return Array.from(subnetCounts.entries()).sort((a, b) => b[1] - a[1])[0][0].replace(/\/\d+$/, '');
-          })(),
       }))
-      // Merge domains with identical names (issue #2: duplicate cards)
-      .reduce((acc, card) => {
-        const existing = acc.find(c => c.name === card.name);
-        if (existing) {
-          existing.nodeCount += card.nodeCount;
-          existing.linkCount += card.linkCount;
-          existing.totalBytes += card.totalBytes;
-          existing.avgAnomalyScore = (existing.avgAnomalyScore * (existing.nodeCount - card.nodeCount) + card.avgAnomalyScore * card.nodeCount) / existing.nodeCount;
-        } else {
-          acc.push({ ...card });
-        }
-        return acc;
-      }, [] as Array<{id:number;name:string;description:string;color:string;nodeCount:number;linkCount:number;avgAnomalyScore:number;totalBytes:number;subnet:string}>)
       .sort((a, b) => b.nodeCount - a.nodeCount);
   }, [data, gdsAlgorithm, communityIndex]);
 
@@ -1544,10 +1490,10 @@ export function StatsPanel({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem onClick={() => exportSecurityZonesCSV(data, clusteringResult, clusteringStrategy)}>
-                资产全景
+                资产全景概览
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => exportConnectionsCSV(data)}>
-                连接明细
+                连接关系明细
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => {
                 exportSecurityZonesCSV(data, clusteringResult, clusteringStrategy);
