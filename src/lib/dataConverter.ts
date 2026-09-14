@@ -15,14 +15,29 @@ const PORT_ROLE_MAP: Record<string, string> = {
   '6380': 'Cache', '16380': 'Cache', '53': 'DNS', '22': 'SSH',
 };
 
-// IP range → category
-function getCategory(ip: string): string {
+// IP → fine-grained security domain (subnet + function)
+function getCategory(ip: string, role?: string, direction?: string): string {
   const parts = ip.split('.').map(Number);
-  if (parts[0] === 10) {
-    if (parts[1] >= 10 && parts[1] <= 19) return 'App';
-    if (parts[1] >= 20 && parts[1] <= 29) return 'Biz';
+  if (parts.length < 4) return 'Unknown';
+  const subnet = `${parts[0]}.${parts[1]}`;
+  // Subnet-level functional zones
+  const SUBNET_ZONES: Record<string, string> = {
+    '10.10': 'Core-Infra',
+    '10.16': 'App-Tier',
+    '10.20': 'Biz-Tier',
+    '10.26': 'Monitor-Security',
+    '10.30': 'DMZ',
+    '10.100': 'Management',
+  };
+  const zone = SUBNET_ZONES[subnet] || `Zone-${subnet}`;
+  // Further refine by role if available
+  if (role && role !== 'Unknown') {
+    return `${zone}-${role}`;
   }
-  return 'Infra';
+  if (direction) {
+    return `${zone}-${direction}`;
+  }
+  return zone;
 }
 
 function getRoleFromPort(port: number): string {
@@ -75,10 +90,49 @@ function getDominantPort(nodeIp: string, logs: RawLog[]): number {
   return maxPort;
 }
 
-// Guess role from dominant port
+// Guess role from ports + direction + traffic pattern
 function guessRole(nodeIp: string, logs: RawLog[]): string {
   const port = getDominantPort(nodeIp, logs);
-  return getRoleFromPort(port);
+  const portRole = getRoleFromPort(port);
+  
+  // Collect all ports for this node
+  const allPorts = new Set<number>();
+  let outCount = 0, inCount = 0;
+  for (const log of logs) {
+    if (log.src === nodeIp) { outCount++; allPorts.add(log.dport); }
+    if (log.dst === nodeIp) { inCount++; allPorts.add(log.dport); }
+  }
+  
+  // If port-based role is specific enough, use it
+  if (portRole !== 'Unknown') return portRole;
+  
+  // Infer from port combination
+  const hasWeb = [...allPorts].some(p => [80,443,8080,8443,3000,5000].includes(p));
+  const hasDB = [...allPorts].some(p => [3306,5432,1521,1433,27017].includes(p));
+  const hasCache = [...allPorts].some(p => [6379,11211,6380].includes(p));
+  const hasMQ = [...allPorts].some(p => [9092,9093,5672,61616].includes(p));
+  const hasMonitor = [...allPorts].some(p => [36000,9100,9090,8086,9200].includes(p));
+  const hasSSH = allPorts.has(22);
+  const hasDNS = allPorts.has(53);
+  
+  if (hasDB) return 'Database';
+  if (hasCache) return 'Cache';
+  if (hasMQ) return 'MQ';
+  if (hasWeb) return 'WebTier';
+  if (hasMonitor) return 'Monitor';
+  if (hasSSH && hasDNS) return 'Infra';
+  if (hasSSH) return 'SSH-Gateway';
+  
+  // Infer from direction pattern
+  const total = outCount + inCount;
+  if (total > 0) {
+    const outRatio = outCount / total;
+    if (outRatio > 0.8 && allPorts.size <= 3) return 'Client';
+    if (outRatio < 0.2 && allPorts.size >= 3) return 'Server';
+    if (allPorts.size === 1 && inCount > outCount * 3) return 'Service-Endpoint';
+  }
+  
+  return 'Generic-Host';
 }
 
 export function convertRawLogsToTopology(logs: RawLog[]): TopologyData {
@@ -98,6 +152,8 @@ export function convertRawLogsToTopology(logs: RawLog[]): TopologyData {
     target: string;
     weight: number;
     bytes: number;
+    ports: Set<number>;
+    protocols: Set<string>;
   }>();
 
   for (const log of logs) {
@@ -125,11 +181,15 @@ export function convertRawLogsToTopology(logs: RawLog[]): TopologyData {
     // Update link stats
     const linkKey = `${src}->${dst}`;
     if (!linkMap.has(linkKey)) {
-      linkMap.set(linkKey, { source: src, target: dst, weight: 0, bytes: 0 });
+      linkMap.set(linkKey, { source: src, target: dst, weight: 0, bytes: 0, ports: new Set(), protocols: new Set() });
     }
     const link = linkMap.get(linkKey)!;
     link.weight++;
     link.bytes += 1024; // estimate
+    link.ports.add(log.dport);
+    link.protocols.add(log.proto);
+    link.ports.add(log.dport);
+    link.protocols.add(log.proto);
   }
 
   // Step 3: Build graph and run Louvain community detection
@@ -341,7 +401,7 @@ export function convertRawLogsToTopology(logs: RawLog[]): TopologyData {
       
       for (const nId of communityNodes) {
         const nodeId = nId as string;
-        const cat = getCategory(nodeId);
+        const cat = getCategory(nodeId, guessRole(nodeId, logs), analyzeDirection(nodeId, logs));
         const role = guessRole(nodeId, logs);
         const dir = analyzeDirection(nodeId, logs);
         const parts = nodeId.split('.');
@@ -413,6 +473,11 @@ export function convertRawLogsToTopology(logs: RawLog[]): TopologyData {
     const prediction = predictions[index];
     const role = guessRole(node.id, logs);
 
+    const dir = analyzeDirection(node.id, logs);
+    const parts = node.id.split('.');
+    const subnet24 = parts.length >= 3 ? `${parts[0]}.${parts[1]}.${parts[2]}` : '';
+    const zoneId = `community_${communityId}`;
+    const zoneLabel = domainNames.get(communityId) || zoneId;
     return {
       id: node.id,
       community: communityId,
@@ -425,6 +490,11 @@ export function convertRawLogsToTopology(logs: RawLog[]): TopologyData {
       anomaly_score: Math.round(prediction.score * 1000) / 1000,
       anomaly_level: getAnomalyLevel(prediction.score),
       role_guess: role,
+      subnet_24: subnet24,
+      zone_id: zoneId,
+      zone_label: zoneLabel,
+      service_type: role,
+      business_group: getCategory(node.id, role, dir),
     };
   });
 
@@ -433,6 +503,8 @@ export function convertRawLogsToTopology(logs: RawLog[]): TopologyData {
     target: link.target,
     weight: link.weight,
     bytes: link.bytes,
+    ports: Array.from(link.ports),
+    protocols: Array.from(link.protocols),
   }));
 
   // Get unique community count

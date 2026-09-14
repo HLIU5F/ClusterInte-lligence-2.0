@@ -1,18 +1,22 @@
 import type { NextConfig } from 'next';
-
 const nextConfig: NextConfig = {
-  // outputFileTracingRoot: path.resolve(__dirname, '../../'),  // Uncomment and add 'import path from "path"' if needed
-  /* config options here */
-  allowedDevOrigins: ['*.dev.coze.site'],
+  allowedDevOrigins: ['*.dev.coze.site', 'http://139.196.6.20'],
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '*',
-        pathname: '/**',
-      },
+      { protocol: 'https', hostname: '*', pathname: '/**' },
     ],
   },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+          { key: 'Pragma', value: 'no-cache' },
+          { key: 'Expires', value: '0' },
+        ],
+      },
+    ];
+  },
 };
-
 export default nextConfig;
