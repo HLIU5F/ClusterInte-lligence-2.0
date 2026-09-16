@@ -477,11 +477,6 @@ export async function exportSecurityZonesCSV(data: TopologyData | null, clusteri
       ].map(esc).join(','));
     }
     downloadBlob(`资产全景_${strategy ?? 'current'}.csv`, '\uFEFF' + nodeRows.join('\r\n'), 'text/csv');
-    // Only download edge details in fallback mode
-    const edgeRows = buildConnectionsCSVRows(data);
-    if (edgeRows.length > 0) {
-      downloadBlob('连接明细_edges.csv', '\uFEFF' + edgeRows.join('\r\n'), 'text/csv');
-    }
   }
 }
 
