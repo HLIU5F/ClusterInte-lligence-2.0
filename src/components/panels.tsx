@@ -438,15 +438,19 @@ export async function exportSecurityZonesCSV(data: TopologyData | null, clusteri
       body: JSON.stringify((() => {
         const { zoneOf, labels } = buildZoneMapping(clusteringResult);
         // Issue #3: sync exported labels with frontend-edited domainNames
-        if (data?.domainNames) {
-          for (const [cid, name] of Object.entries(data.domainNames)) {
-            if (name && name !== 'Unassigned') labels.set(cid, name);
+        if (data?.domainNames && clusteringResult?.zones) {
+          // Build community -> zone_id reverse mapping
+          const commToZoneId = new Map<number, string>();
+          for (const z of clusteringResult.zones) {
+            if (z.zone_id !== undefined && z.community !== undefined) {
+              commToZoneId.set(z.community, z.zone_id);
+            }
           }
-        }
-        // Issue #3: sync exported labels with frontend-edited domainNames
-        if (data?.domainNames) {
           for (const [cid, name] of Object.entries(data.domainNames)) {
-            if (name && name !== 'Unassigned') labels.set(cid, name);
+            if (name && name !== 'Unassigned') {
+              const zoneId = commToZoneId.get(Number(cid));
+              if (zoneId) labels.set(zoneId, name);
+            }
           }
         }
         const enrichedNodes = (data?.nodes || []).map((n: any) => ({
@@ -503,15 +507,19 @@ export function exportSecurityZonesJSON(data: TopologyData | null, clusteringRes
   if (!data) return;
   const { zoneOf, labels } = buildZoneMapping(clusteringResult);
   // Issue #3: sync exported labels with frontend-edited domainNames
-  if (data?.domainNames) {
-    for (const [cid, name] of Object.entries(data.domainNames)) {
-      if (name && name !== 'Unassigned') labels.set(cid, name);
+  if (data?.domainNames && clusteringResult?.zones) {
+    // Build community -> zone_id reverse mapping
+    const commToZoneId = new Map<number, string>();
+    for (const z of clusteringResult.zones) {
+      if (z.zone_id !== undefined && z.community !== undefined) {
+        commToZoneId.set(z.community, z.zone_id);
+      }
     }
-  }
-  // Issue #3: sync exported labels with frontend-edited domainNames
-  if (data?.domainNames) {
     for (const [cid, name] of Object.entries(data.domainNames)) {
-      if (name && name !== 'Unassigned') labels.set(cid, name);
+      if (name && name !== 'Unassigned') {
+        const zoneId = commToZoneId.get(Number(cid));
+        if (zoneId) labels.set(zoneId, name);
+      }
     }
   }
   const zones: Record<string, { label: string; nodes: string[] }> = {};
