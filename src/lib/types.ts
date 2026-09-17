@@ -98,6 +98,7 @@ export interface SecurityDomain {
   linkCount: number;
   avgAnomalyScore: number;
   totalBytes: number;
+  subnets?: string[];
 }
 
 export interface BaselineRule {

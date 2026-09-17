@@ -728,6 +728,34 @@ export default function Home() {
 
     const communityCount = new Set(nodes.map(n => n.community)).size;
 
+    // Rebuild domainNames based on new community assignments + clusteringResult.zoneLabels
+    const newDomainNames: Record<number, string> = {};
+    if (clusteringResult?.zoneLabels && clusteringResult?.zones) {
+      const zoneIndex = new Map<string, number>();
+      for (const z of clusteringResult.zones) {
+        let idx = zoneIndex.get(z.zone_id);
+        if (idx === undefined) {
+          idx = zoneIndex.size;
+          zoneIndex.set(z.zone_id, idx);
+        }
+      }
+      // For each new community index, find the majority zone_label
+      const commZoneLabels = new Map<number, Map<string, number>>();
+      for (const z of clusteringResult.zones) {
+        const commIdx = zoneIndex.get(z.zone_id);
+        if (commIdx === undefined) continue;
+        const label = clusteringResult.zoneLabels[z.zone_id];
+        if (!label) continue;
+        if (!commZoneLabels.has(commIdx)) commZoneLabels.set(commIdx, new Map());
+        const counts = commZoneLabels.get(commIdx)!;
+        counts.set(label, (counts.get(label) || 0) + 1);
+      }
+      for (const [commIdx, labelCounts] of commZoneLabels) {
+        const topLabel = Array.from(labelCounts.entries()).sort((a, b) => b[1] - a[1])[0];
+        if (topLabel) newDomainNames[commIdx] = topLabel[0];
+      }
+    }
+
     return {
       ...whitelistAdjustedData,
       metadata: {
@@ -735,6 +763,7 @@ export default function Home() {
         communities: communityCount,
       },
       nodes,
+      domainNames: Object.keys(newDomainNames).length > 0 ? newDomainNames : whitelistAdjustedData.domainNames,
     };
   }, [whitelistAdjustedData, clusteringStrategy, clusteringResult, gdsAlgorithm]);
 

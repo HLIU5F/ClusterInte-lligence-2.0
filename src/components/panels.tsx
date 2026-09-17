@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import {
   Search, Network, Tags, AlertTriangle, Activity, Eye,
@@ -391,8 +392,12 @@ function buildZoneMapping(clusteringResult: any): {
 function buildConnectionsCSVRows(data: TopologyData | null): string[] {
   if (!data || data.links.length === 0) return [];
   const subnetOf = (ip: string) => {
+    if (!ip || typeof ip !== 'string') return 'UNKNOWN';
+    // IPv6 or non-IPv4: preserve original as-is for auditability
+    if (ip.includes(':') || ip.includes('/')) return ip;
     const p = ip.split('.');
-    return p.length === 4 ? `${p[0]}.${p[1]}.${p[2]}.0/24` : '0.0.0.0/0';
+    if (p.length !== 4 || p.some(octet => isNaN(Number(octet)) || Number(octet) < 0 || Number(octet) > 255)) return 'INVALID_IP';
+    return `${p[0]}.${p[1]}.${p[2]}.0/24`;
   };
   const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
   const rows: string[] = [
@@ -403,7 +408,7 @@ function buildConnectionsCSVRows(data: TopologyData | null): string[] {
     const s = typeof link.source === 'string' ? link.source : link.source?.id ?? String(link.source);
     const t = typeof link.target === 'string' ? link.target : link.target?.id ?? String(link.target);
     const weight = Number((link as any).weight) || 1;
-    const ports: number[] = Array.isArray((link as any).ports) ? (link as any).ports.map(Number) : [];
+    const ports: number[] = Array.isArray((link as any).ports) ? (link as any).ports.map(Number).filter((p: number) => !isNaN(p) && p >= 0 && p <= 65535) : [];
     const protocols: string[] = Array.isArray((link as any).protocols) ? (link as any).protocols : [];
     const proto = protocols.length > 0 ? [...new Set(protocols)].join('+') : '';
     const cross = subnetOf(s) !== subnetOf(t);
@@ -432,6 +437,18 @@ export async function exportSecurityZonesCSV(data: TopologyData | null, clusteri
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify((() => {
         const { zoneOf, labels } = buildZoneMapping(clusteringResult);
+        // Issue #3: sync exported labels with frontend-edited domainNames
+        if (data?.domainNames) {
+          for (const [cid, name] of Object.entries(data.domainNames)) {
+            if (name && name !== 'Unassigned') labels.set(cid, name);
+          }
+        }
+        // Issue #3: sync exported labels with frontend-edited domainNames
+        if (data?.domainNames) {
+          for (const [cid, name] of Object.entries(data.domainNames)) {
+            if (name && name !== 'Unassigned') labels.set(cid, name);
+          }
+        }
         const enrichedNodes = (data?.nodes || []).map((n: any) => ({
           ...n,
           zone_id: n.zone_id || zoneOf.get(n.id) || '',
@@ -472,6 +489,7 @@ export async function exportSecurityZonesCSV(data: TopologyData | null, clusteri
       ].map(esc).join(','));
     }
     downloadBlob(`资产全景_${strategy ?? 'current'}.csv`, '\uFEFF' + nodeRows.join('\r\n'), 'text/csv');
+    console.warn("Backend export failed, client-side fallback used. Some columns may be missing.");
     // Only download edge details in fallback mode
     const edgeRows = buildConnectionsCSVRows(data);
     if (edgeRows.length > 0) {
@@ -484,6 +502,18 @@ export async function exportSecurityZonesCSV(data: TopologyData | null, clusteri
 export function exportSecurityZonesJSON(data: TopologyData | null, clusteringResult: any, strategy: string | null) {
   if (!data) return;
   const { zoneOf, labels } = buildZoneMapping(clusteringResult);
+  // Issue #3: sync exported labels with frontend-edited domainNames
+  if (data?.domainNames) {
+    for (const [cid, name] of Object.entries(data.domainNames)) {
+      if (name && name !== 'Unassigned') labels.set(cid, name);
+    }
+  }
+  // Issue #3: sync exported labels with frontend-edited domainNames
+  if (data?.domainNames) {
+    for (const [cid, name] of Object.entries(data.domainNames)) {
+      if (name && name !== 'Unassigned') labels.set(cid, name);
+    }
+  }
   const zones: Record<string, { label: string; nodes: string[] }> = {};
   for (const n of data.nodes) {
     const zid = zoneOf.get(n.id) ?? `community_${n.community ?? -1}`;
@@ -1348,6 +1378,19 @@ export function StatsPanel({
         avgAnomalyScore: nodes.reduce((s, n) => s + n.anomaly_score, 0) / nodes.length,
         totalBytes: nodes.reduce((s, n) => s + (n.bytes_sent || 0) + (n.bytes_received || 0), 0),
       }))
+      // Merge domains with identical names (issue #2: duplicate cards)
+      .reduce((acc, card) => {
+        const existing = acc.find(c => c.name === card.name);
+        if (existing) {
+          existing.nodeCount += card.nodeCount;
+          existing.linkCount += card.linkCount;
+          existing.totalBytes += card.totalBytes;
+          existing.avgAnomalyScore = (existing.avgAnomalyScore * (existing.nodeCount - card.nodeCount) + card.avgAnomalyScore * card.nodeCount) / existing.nodeCount;
+        } else {
+          acc.push({ ...card });
+        }
+        return acc;
+      }, [] as Array<{id:number;name:string;description:string;color:string;nodeCount:number;linkCount:number;avgAnomalyScore:number;totalBytes:number}>)
       .sort((a, b) => b.nodeCount - a.nodeCount);
   }, [data, gdsAlgorithm, communityIndex]);
 
@@ -1472,26 +1515,33 @@ export function StatsPanel({
       <div>
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-medium text-foreground">安全域划分</span>
-          <div className="flex items-center gap-1.5">
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2 text-[11px]"
-              onClick={() => exportSecurityZonesCSV(data, clusteringResult, clusteringStrategy)}
-              title="导出当前安全域划分为 CSV（含 IP/域/服务/异常，Excel 可直接打开）"
-            >
-              <Download className="w-3 h-3 mr-1" /> CSV
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2 text-[11px]"
-              onClick={() => exportSecurityZonesJSON(data, clusteringResult, clusteringStrategy)}
-              title="导出当前安全域划分为 JSON（域 → 节点映射 + 指标）"
-            >
-              <Download className="w-3 h-3 mr-1" /> JSON
-            </Button>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 px-2 text-[11px]"
+                title="导出数据"
+              >
+                <Download className="w-3 h-3 mr-1" /> 导出 <ChevronDown className="w-3 h-3 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => exportSecurityZonesCSV(data, clusteringResult, clusteringStrategy)}>
+                📊 资产全景（汇总）
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => exportConnectionsCSV(data)}>
+                🔗 连接明细（完整）
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => {
+                exportSecurityZonesCSV(data, clusteringResult, clusteringStrategy);
+                exportConnectionsCSV(data);
+                exportSecurityZonesJSON(data, clusteringResult, clusteringStrategy);
+              }}>
+                📦 完整数据包
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <Tabs defaultValue="domains" className="w-full">
           <TabsList className="w-full h-8 bg-secondary/30 p-[2px] mb-2.5">
