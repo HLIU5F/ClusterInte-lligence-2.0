@@ -720,9 +720,15 @@ export default function Home() {
           }
           zoneMap.set(z.node_id, idx);
         }
+        // Build node_id -> zone_id reverse lookup for label assignment
+        const nodeZoneId = new Map<string, string>();
+        for (const z of clusteringResult.zones) {
+          nodeZoneId.set(z.node_id, z.zone_id);
+        }
         return whitelistAdjustedData.nodes.map(n => ({
           ...n,
           community: zoneMap.has(n.id) ? zoneMap.get(n.id)! : n.community,
+          zone_label: n.zone_label || clusteringResult.zoneLabels?.[nodeZoneId.get(n.id) || ''] || n.zone_label,
         }));
       })();
 
