@@ -290,12 +290,19 @@ export function TopologyGraph({
     // Degree scale for node size - adaptive for large graphs
     const degreeExtent = d3.extent(nodes, d => d.degree) as [number, number];
     const isLargeGraph = nodes.length > 1000;
-    // 星型中心节点（度数最大）用最鲜艳的主青色突出
+    // 星型中心节点：服务端角色优先，同角色时按度数最大选取
     const HUB_COLOR = '#00e5c7';
-    const hubNodeId = nodes.reduce<SimNode | null>(
-      (best, n) => (best == null || (n.degree ?? 0) > (best.degree ?? 0) ? n : best),
-      null
-    )?.id;
+    const SERVER_ROLES = new Set(['web_server','database','cache','message_queue',
+      'dns_server','ldap_server','file_server','data_platform','mail_server',
+      'rpc_service','admin_server','bastion_host','monitoring']);
+    const hubNodeId = nodes.reduce<SimNode | null>((best, n) => {
+      const nIsServer = SERVER_ROLES.has(n.role_guess);
+      const bIsServer = best ? SERVER_ROLES.has(best.role_guess) : false;
+      if (best == null) return n;
+      if (nIsServer && !bIsServer) return n;
+      if (!nIsServer && bIsServer) return best;
+      return (n.degree ?? 0) > (best.degree ?? 0) ? n : best;
+    }, null)?.id;
     const nodeSizeScale = d3.scaleLinear()
       .domain(degreeExtent[0] === degreeExtent[1] ? [0, degreeExtent[1]] : degreeExtent)
       .range(isLargeGraph ? [2, 8] : [4, 16]);
