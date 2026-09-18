@@ -25,7 +25,7 @@ const get = (flag, def) => {
 const JSON_PATH = get('--input', path.join(__dirname, '..', 'scripts', 'topology_data_core.json'));
 const URI = get('--uri', 'bolt://127.0.0.1:7687');
 const USER = get('--user', 'neo4j');
-const PASSWORD = get('--password', 'REDACTED');
+const PASSWORD = get('--password', require('./env').password) || require('./env').requirePassword();
 const BATCH = 300;
 
 const ZONE_COLORS = ['#00d4ff', '#ff6b35', '#a855f7', '#10b981', '#f59e0b', '#ec4899', '#22d3ee', '#84cc16', '#f43f5e', '#8b5cf6', '#fb923c', '#06b6d4'];

@@ -1,9 +1,15 @@
+import os
+import sys
+
 from neo4j import GraphDatabase
 
+# 凭据统一从项目根目录 .env.local 读取（见 scripts/env.py），不再硬编码
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from env import get_password, get_user  # noqa: E402
+
 # --- 配置信息 ---
-# 请根据实际情况修改 URI、用户名和密码
-URI = "bolt://localhost:7687"
-AUTH = ("neo4j", "REDACTED")
+URI = os.environ.get("NEO4J_URI", "bolt://localhost:7687")
+AUTH = (get_user(), get_password())
 
 def test_connection():
     try:

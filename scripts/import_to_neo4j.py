@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Cluster-Intelligence v2 importer
 
@@ -27,9 +27,12 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from enrichers import Pipeline, Config
 
+from env import get_user, get_password  # 凭据统一从 .env.local 读取（见 scripts/env.py）
+
 URI = "bolt://127.0.0.1:7687"
-USER = "neo4j"
-PASSWORD = "REDACTED"
+USER = get_user()
+# dry-run 不连接数据库，允许为空；实际连接前在 __main__ 中校验
+PASSWORD = get_password(required=False)
 JSON_PATH = "scripts/topology_data_enriched.json"
 CONFIG_PATH = "config/enrichers.yaml"
 
@@ -408,6 +411,12 @@ if __name__ == "__main__":
     ap.add_argument("--dry-run", action="store_true", help="plan only, do not connect to Neo4j")
     ap.add_argument("--no-clear", action="store_true", help="do not DETACH DELETE before importing")
     args = ap.parse_args()
+
+    if not args.dry_run and not args.password:
+        ap.error(
+            "缺少 Neo4j 密码：请在项目根目录 .env.local 中设置 NEO4J_PASSWORD=<你的密码>，"
+            "或使用 --password 传入"
+        )
 
     run_pipeline = args.pipeline or not args.no_pipeline
     importer = ClusterImporter(

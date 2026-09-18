@@ -19,12 +19,13 @@ function toNum(value: any): number {
 
 function getDriver(): Driver {
   if (!driver) {
+    const password = process.env.NEO4J_PASSWORD;
+    if (!password) {
+      throw new Error('缺少 NEO4J_PASSWORD：请在项目根目录 .env.local 中配置 Neo4j 密码');
+    }
     driver = neo4j.driver(
       process.env.NEO4J_URI || 'bolt://localhost:7687',
-      neo4j.auth.basic(
-        process.env.NEO4J_USER || 'neo4j',
-        process.env.NEO4J_PASSWORD || 'password'
-      )
+      neo4j.auth.basic(process.env.NEO4J_USER || 'neo4j', password)
     );
   }
   return driver;

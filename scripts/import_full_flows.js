@@ -22,7 +22,7 @@ const neo4j = require('neo4j-driver');
 const JSON_PATH = path.join(__dirname, '..', 'scripts', 'topology_data6.0.json');
 const URI = 'bolt://127.0.0.1:7687';
 const USER = 'neo4j';
-const PASSWORD = 'REDACTED';
+const PASSWORD = require('./env').requirePassword();
 const BATCH = 500;
 
 const nid = x => (typeof x === 'string' ? x : x && x.id);

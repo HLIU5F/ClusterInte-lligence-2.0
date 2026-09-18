@@ -16,7 +16,7 @@ const neo4j = require('neo4j-driver');
 const JSON_PATH = path.join(__dirname, '..', 'public', 'topology_data_purified.json');
 const URI = 'bolt://127.0.0.1:7687';
 const USER = 'neo4j';
-const PASSWORD = 'REDACTED';
+const PASSWORD = require('./env').requirePassword();
 const BATCH = 300;
 
 const ZONE_COLORS = ['#00d4ff', '#ff6b35', '#a855f7', '#10b981', '#f59e0b', '#ec4899', '#22d3ee', '#84cc16', '#f43f5e', '#8b5cf6', '#fb923c', '#06b6d4'];

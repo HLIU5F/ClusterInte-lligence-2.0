@@ -11,10 +11,13 @@
 
 const NEO4J_HTTP = process.env.NEO4J_HTTP_URL || 'http://localhost:7474';
 const NEO4J_USER = process.env.NEO4J_USER || 'neo4j';
-const NEO4J_PASSWORD = process.env.NEO4J_PASSWORD || 'neo4j';
+const NEO4J_PASSWORD = process.env.NEO4J_PASSWORD || '';
 const NEO4J_DB = process.env.NEO4J_DB || 'neo4j';
 
 function authHeader(): string {
+  if (!NEO4J_PASSWORD) {
+    throw new Error('缺少 NEO4J_PASSWORD：请在项目根目录 .env.local 中配置 Neo4j 密码');
+  }
   const token = Buffer.from(`${NEO4J_USER}:${NEO4J_PASSWORD}`).toString('base64');
   return `Basic ${token}`;
 }

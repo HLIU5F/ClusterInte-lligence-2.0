@@ -9,7 +9,8 @@
  *
  * 用法：
  *   node scripts/import_nodes_csv.js
- *   node scripts/import_nodes_csv.js --csv nodes.csv --password REDACTED
+ *   node scripts/import_nodes_csv.js --csv nodes.csv --password <你的密码>
+ *   （省略 --password 时自动从项目根目录 .env.local 的 NEO4J_PASSWORD 读取）
  */
 const fs = require('fs');
 const path = require('path');
@@ -24,7 +25,7 @@ const get = (flag, def) => {
 const CSV_PATH = get('--csv', path.join(__dirname, '..', 'nodes.csv'));
 const URI = get('--uri', 'bolt://127.0.0.1:7687');
 const USER = get('--user', 'neo4j');
-const PASSWORD = get('--password', 'REDACTED');
+const PASSWORD = get('--password', require('./env').password) || require('./env').requirePassword();
 const BATCH = 500;
 
 function subnetOf(ip) {

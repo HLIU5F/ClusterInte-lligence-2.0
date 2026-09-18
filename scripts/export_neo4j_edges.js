@@ -11,7 +11,8 @@
  * 用法：node scripts/export_neo4j_edges.js [输出路径]
  */
 const HTTP = 'http://localhost:7474/db/neo4j/tx/commit';
-const AUTH = 'Basic ' + Buffer.from('neo4j:REDACTED').toString('base64');
+const _env = require('./env');
+const AUTH = _env.basicAuth();
 const fs = require('fs');
 
 const OUT = process.argv[2] || 'D:\\Downloads\\连接关系表_neo4j.csv';

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // 预演：flow_anchor 叠加不同标签的效果对比（决定 enrich 用哪种标签）
 const HTTP = 'http://localhost:7474/db/neo4j/tx/commit';
-const AUTH = 'Basic ' + Buffer.from('neo4j:REDACTED').toString('base64');
+const _env = require('./env');
+const AUTH = _env.basicAuth();
 async function run(statement) {
   const res = await fetch(HTTP, {
     method: 'POST',

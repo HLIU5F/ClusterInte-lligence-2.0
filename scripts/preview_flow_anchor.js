@@ -5,7 +5,8 @@
  * 用法：node scripts/preview_flow_anchor.js
  */
 const HTTP = 'http://localhost:7474/db/neo4j/tx/commit';
-const AUTH = 'Basic ' + Buffer.from('neo4j:REDACTED').toString('base64');
+const _env = require('./env');
+const AUTH = _env.basicAuth();
 async function run(statement) {
   const res = await fetch(HTTP, {
     method: 'POST',

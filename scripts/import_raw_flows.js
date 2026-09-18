@@ -22,7 +22,7 @@ const neo4j = require('neo4j-driver');
 const FILE = 'D:\\桌面\\日志-网络访问关系导出数据.csv';
 const URI = 'bolt://127.0.0.1:7687';
 const USER = 'neo4j';
-const PASSWORD = 'REDACTED';
+const PASSWORD = require('./env').requirePassword();
 const BATCH = 500;
 
 function parseLine(line) {
