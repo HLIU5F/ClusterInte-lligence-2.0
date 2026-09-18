@@ -476,7 +476,7 @@ export async function exportSecurityZonesCSV(data: TopologyData | null, clusteri
     const { zoneOf, labels, nodeMeta } = buildZoneMapping(clusteringResult);
     const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
     const nodeRows: string[] = [
-      ['IP地址', '名称', '服务类型', '推测角色', '安全域ID', '安全域名称', '聚类社区编号', '子网', '总连接度', '入度', '出度', '异常级别', '异常评分', '发送流量', '接收流量', '是否异常', '是否白名单', '协议', '安全域分组', '服务置信度', '节点类型']
+      ['IP地址', '名称', '服务类型', '推测角色', '安全域ID', '安全域名称', '聚类社区编号', '子网(/24)', '总连接度', '入度(被访问)', '出度(主动访问)', '异常级别', '异常评分', '发送流量', '接收流量', '是否异常', '是否白名单', '协议', '安全域分组', '服务置信度', '节点类型']
         .map(esc).join(','),
     ];
     for (const n of data.nodes) {
