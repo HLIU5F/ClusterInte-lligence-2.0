@@ -476,20 +476,22 @@ export async function exportSecurityZonesCSV(data: TopologyData | null, clusteri
     const { zoneOf, labels, nodeMeta } = buildZoneMapping(clusteringResult);
     const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
     const nodeRows: string[] = [
-      ['IP', '安全域ID', '安全域名称', '子网', '服务端口', '异常级别', '角色', '异常分', '方向类型', '调用方子网', '对端子网']
+      ['IP地址', '名称', '服务类型', '推测角色', '安全域ID', '安全域名称', '聚类社区编号', '子网', '总连接度', '入度', '出度', '异常级别', '异常评分', '发送流量', '接收流量', '是否异常', '是否白名单', '协议', '安全域分组', '服务置信度', '节点类型']
         .map(esc).join(','),
     ];
     for (const n of data.nodes) {
       const zid = zoneOf.get(n.id) ?? `community_${n.community ?? -1}`;
-      const meta = nodeMeta.get(n.id);
-      const direction = meta?.direction === 'service' ? '服务提供'
-        : meta?.direction === 'client' ? '客户端'
-        : meta?.direction === 'terminal' ? '监控终端' : '';
       nodeRows.push([
-        n.id, zid, labels.get(zid) ?? `域 ${zid}`, n.subnet_24 ?? '',
-        Array.isArray(n.ports) ? n.ports.join('|') : '', n.anomaly_level ?? '',
-        n.role_guess ?? '', String(Number(n.anomaly_score || 0).toFixed(4)),
-        direction, meta?.callers ?? '', meta?.peers ?? '',
+        n.id, n.id, n.service_type || 'Host',
+        n.role_guess ?? '', zid, labels.get(zid) ?? `域 ${zid}`,
+        n.community ?? 0, (n.subnet_24 ?? '').replace(/\/\d+$/, ''),
+        n.degree ?? 0, n.in_degree ?? 0, n.out_degree ?? 0,
+        n.anomaly_level ?? 'None', String(Number(n.anomaly_score || 0).toFixed(4)),
+        n.bytes_sent ?? 0, n.bytes_received ?? 0,
+        n.is_anomaly ? '是' : '否', n.is_whitelisted ? '是' : '否',
+        Array.isArray(n.protocols) ? n.protocols.join('|') : (n.protocols || ''),
+        n.business_group || 'Internal', n.service_confidence ?? 0,
+        n.service_type || 'Host',
       ].map(esc).join(','));
     }
     downloadBlob(`资产全景_${strategy ?? 'current'}.csv`, '\uFEFF' + nodeRows.join('\r\n'), 'text/csv');
@@ -1542,17 +1544,17 @@ export function StatsPanel({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem onClick={() => exportSecurityZonesCSV(data, clusteringResult, clusteringStrategy)}>
-                📊 资产全景（汇总）
+                资产全景
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => exportConnectionsCSV(data)}>
-                🔗 连接明细（完整）
+                连接明细
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => {
                 exportSecurityZonesCSV(data, clusteringResult, clusteringStrategy);
                 exportConnectionsCSV(data);
                 exportSecurityZonesJSON(data, clusteringResult, clusteringStrategy);
               }}>
-                📦 完整数据包
+                完整数据包
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

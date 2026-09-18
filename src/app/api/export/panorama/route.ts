@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
       return items.join(';') + suffix;
     }
 
-    const header = 'id:ID,name,type,security_domain,subnet,role_guess,zone_id,zone_label,inbound_summary,outbound_summary,inbound_count,outbound_count';
+    const header = 'IP地址,名称,服务类型,推测角色,安全域ID,安全域名称,聚类社区编号,子网,总连接度,入度,出度,异常级别,异常评分,发送流量,接收流量,是否异常,是否白名单,协议,安全域分组,服务置信度,节点类型';
     const rows: string[] = [header];
 
     for (const node of nodes) {
@@ -170,7 +170,7 @@ export async function GET(_request: NextRequest) {
       return items.join(';') + suffix;
     }
 
-    const header = 'id:ID,name,type,security_domain,subnet,role_guess,zone_id,zone_label,inbound_summary,outbound_summary,inbound_count,outbound_count';
+    const header = 'IP地址,名称,服务类型,推测角色,安全域ID,安全域名称,聚类社区编号,子网,总连接度,入度,出度,异常级别,异常评分,发送流量,接收流量,是否异常,是否白名单,协议,安全域分组,服务置信度,节点类型';
     const rows: string[] = [header];
     for (const node of nodes) {
       const inbound = inboundMap.get(node.id);
