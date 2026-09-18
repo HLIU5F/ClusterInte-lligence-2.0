@@ -1,4 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+/** 精简 zone_label：过长时截取关键部分，保留可读性 */
+function simplifyZoneLabel(label: string | undefined | null): string {
+  if (!label || label === 'Unassigned' || label === 'default') return label || '';
+  if (label.length <= 30) return label;
+  const parts = label.split(/[|;,]/).map(s => s.trim()).filter(Boolean);
+  if (parts.length > 1) {
+    const short = parts.slice(0, 2).join(' | ');
+    if (short.length <= 30) return short;
+  }
+  return label.substring(0, 28) + '..';
+}
 
 // Known field → Chinese header mapping (covers common topology fields)
 const FIELD_HEADER_MAP: Record<string, string> = {
@@ -74,7 +85,8 @@ function generateCSV(nodes: Record<string, any>[], _links: any[]): { csvContent:
   const rows: string[] = [header];
   for (const node of nodes) {
     const values = columns.map(col => {
-      const v = node[col.key];
+      const rawV = node[col.key];
+      const v = col.key === 'zone_label' ? simplifyZoneLabel(rawV) : rawV;
       if (Array.isArray(v)) return v.join('|');
       if (typeof v === 'boolean') return v ? '是' : '否';
       if (typeof v === 'number') return String(Number.isInteger(v) ? v : Number(v).toFixed(4));
