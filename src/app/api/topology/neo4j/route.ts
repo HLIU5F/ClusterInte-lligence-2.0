@@ -123,8 +123,14 @@ function deriveRole(portCount: Map<number, number>, nodeId: string): string {
 /** 监控/采集端口：主导端口落在这些端口的资产视为监控资产，不计入异常（与聚类层 MONITOR_PORTS 一致） */
 const MONITOR_DOMINANT_PORTS = new Set([36000, 9100, 9101, 6514, 1514, 1515, 1516, 1517, 7070, 9000]);
 
-/** 已知采集 / 汇聚 / 安全设备（与聚类层 KNOWN_COLLECTOR_IPS 保持一致） */
-const KNOWN_COLLECTOR_IPS = new Set(['10.255.0.1', '10.255.0.2', '10.255.0.3']);
+/** 已知采集 / 汇聚 / 安全设备（与聚类层 KNOWN_COLLECTOR_IPS 保持一致）
+ *  仓库内只保留匿名占位；真实 IP 由本地 .env.local 的 MONITOR_IPS 注入（逗号分隔） */
+const KNOWN_COLLECTOR_IPS = new Set(
+  (process.env.MONITOR_IPS || process.env.NEXT_PUBLIC_MONITOR_IPS || '10.255.0.1,10.255.0.2,10.255.0.3')
+    .split(',')
+    .map(ip => ip.trim())
+    .filter(Boolean)
+);
 
 /**
  * 风险分（连续、可解释、可校准）——端口 + 图特征双维度，只把"异常行为/暴露风险"计分：

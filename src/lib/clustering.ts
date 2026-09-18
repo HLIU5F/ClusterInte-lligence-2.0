@@ -318,8 +318,14 @@ const SERVICE_CLASS_LABELS: Record<string, string> = {
 /** 监控/采集端口：不参与业务服务签名，避免把业务主机全部吸进"监控域" */
 const MONITOR_PORTS = new Set([36000, 9100, 9101, 1514, 1515, 6514]);
 
-/** 已确认的采集 / 汇聚 / 安全设备（来自原始日志的 dvchost/dvc 字段） */
-const KNOWN_COLLECTOR_IPS = new Set(['10.255.0.1', '10.255.0.2', '10.255.0.3']);
+/** 已确认的采集 / 汇聚 / 安全设备（来自原始日志的 dvchost/dvc 字段）
+ *  仓库内只保留匿名占位；真实 IP 由本地 .env.local 的 NEXT_PUBLIC_MONITOR_IPS 注入（逗号分隔） */
+const KNOWN_COLLECTOR_IPS = new Set(
+  (process.env.NEXT_PUBLIC_MONITOR_IPS || '10.255.0.1,10.255.0.2,10.255.0.3')
+    .split(',')
+    .map(ip => ip.trim())
+    .filter(Boolean)
+);
 
 /**
  * 识别采集/汇聚节点：已知采集 IP，或邻居数 ≥ max(50, 30% 总节点)。

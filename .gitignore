@@ -190,3 +190,30 @@ scripts/remove_large_nodes_report.json
 scripts/remove_large_nodes_all_report.json
 scripts/security_v3_domains_212.csv
 scripts/security_v3_domains_212.json
+
+# ============================================================
+# 真实网络数据（严禁入库 —— 含真实内网 IP / 访问关系 / 资产台账）
+# 2026-09-18 安全整改：这些文件此前被强制加入跟踪，现已全部移出
+# 本地文件保留在磁盘上供应用读取，但不再进入任何提交
+# ============================================================
+public/topology_data*.json
+public/topology_data*.json.bak
+public/topology_data*.json.v1.bak
+public/topology_for_frontend*.json
+public/security_zones_export.csv
+asset_panorama_merged*.csv
+资产全景_*.csv
+连接关系表*.csv
+网络连接关系*.csv
+网络访问关系*.csv
+
+# 本地 IP 匿名化映射表（含真实 IP，只在本机使用）
+config/*.local.json
+
+# 个人简历（仅本地保留，严禁入库）
+docs/*简历*
+*简历*.docx
+
+# 不应入库的备份与虚拟环境
+src/**/*.bak.*
+scripts/.venv/
