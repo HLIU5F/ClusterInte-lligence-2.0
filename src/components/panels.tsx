@@ -177,9 +177,9 @@ function VirtualizedDomainList({ domains, communityNodes, communityLinks, focuse
                 style={{ backgroundColor: domain.color }}
               />
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-medium truncate">{domain.name}</div>
+                <div className="text-xs font-medium truncate">{domain.name}{domain.subnet ? ` (${domain.subnet})` : ''}</div>
                 <div className="text-[11px] text-muted-foreground">
-                  {domain.nodeCount} 节点 · {domain.linkCount} 连接
+                  节点: {domain.nodeCount} · {domain.linkCount} 连接
                 </div>
               </div>
               <DomainTopologyPreview nodes={domainNodes} links={domainLinks} color={domain.color} />
@@ -1385,6 +1385,12 @@ export function StatsPanel({
         linkCount: linkCounts.get(id) || 0,
         avgAnomalyScore: nodes.reduce((s, n) => s + n.anomaly_score, 0) / nodes.length,
         totalBytes: nodes.reduce((s, n) => s + (n.bytes_sent || 0) + (n.bytes_received || 0), 0),
+          subnet: (() => {
+            const subnetCounts = new Map<string, number>();
+            nodes.forEach(n => { const s = n.subnet_24 || ''; if (s && s !== '0.0.0.0/0') subnetCounts.set(s, (subnetCounts.get(s) || 0) + 1); });
+            if (subnetCounts.size === 0) return '';
+            return Array.from(subnetCounts.entries()).sort((a, b) => b[1] - a[1])[0][0].replace(/\/\d+$/, '');
+          })(),
       }))
       // Merge domains with identical names (issue #2: duplicate cards)
       .reduce((acc, card) => {
@@ -1398,7 +1404,7 @@ export function StatsPanel({
           acc.push({ ...card });
         }
         return acc;
-      }, [] as Array<{id:number;name:string;description:string;color:string;nodeCount:number;linkCount:number;avgAnomalyScore:number;totalBytes:number}>)
+      }, [] as Array<{id:number;name:string;description:string;color:string;nodeCount:number;linkCount:number;avgAnomalyScore:number;totalBytes:number;subnet:string}>)
       .sort((a, b) => b.nodeCount - a.nodeCount);
   }, [data, gdsAlgorithm, communityIndex]);
 

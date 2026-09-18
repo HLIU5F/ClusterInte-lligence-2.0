@@ -1,5 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+/** 精简 zone_label：过长时截取关键部分，保留可读性 */
+function simplifyZoneLabel(label: string | undefined | null): string {
+  if (!label || label === 'Unassigned' || label === 'default') return label || '';
+  // 如果已经是简短格式（<=30字符），直接返回
+  if (label.length <= 30) return label;
+  // 尝试提取核心名称：取第一个有意义的片段
+  const parts = label.split(/[|;,]/).map(s => s.trim()).filter(Boolean);
+  if (parts.length > 1) {
+    const short = parts.slice(0, 2).join(' | ');
+    if (short.length <= 30) return short;
+  }
+  // 截断并加省略号
+  return label.substring(0, 28) + '..';
+}
+
 interface TopoNode {
   id: string;
   community?: number;
@@ -87,7 +102,7 @@ export async function POST(request: NextRequest) {
         node.subnet_24 || '',
         node.role_guess || '',
         node.zone_id || '',
-        node.zone_label || '',
+        simplifyZoneLabel(node.zone_label),
         summarize(inbound),
         summarize(outbound),
         inbound?.length ?? 0,
@@ -164,7 +179,7 @@ export async function GET(_request: NextRequest) {
       rows.push([
         node.id, node.label || node.id, node.service_type || 'Host',
         node.business_group || 'Internal', node.subnet_24 || '',
-        node.role_guess || '', node.zone_id || '', node.zone_label || '',
+        node.role_guess || '', node.zone_id || '', simplifyZoneLabel(node.zone_label),
         summarize(inbound), summarize(outbound),
         inbound?.length ?? 0, outbound?.length ?? 0,
       ].map(esc).join(','));

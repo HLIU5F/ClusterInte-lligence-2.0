@@ -99,6 +99,7 @@ export interface SecurityDomain {
   avgAnomalyScore: number;
   totalBytes: number;
   subnets?: string[];
+  subnet?: string;
 }
 
 export interface BaselineRule {
