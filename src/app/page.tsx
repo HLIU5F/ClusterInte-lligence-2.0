@@ -412,13 +412,23 @@ export default function Home() {
   const handleLoadCoreGraph = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/topology_data_core.json', { cache: 'no-store' });
+      // 优先加载本地真实核心图（已从仓库移除，仅本机存在）；
+      // 不存在时回退到可公开的合成演示数据 public/topology_demo.json
+      let res = await fetch('/topology_data_core.json', { cache: 'no-store' });
+      let demo = false;
+      if (!res.ok) {
+        res = await fetch('/topology_demo.json', { cache: 'no-store' });
+        demo = true;
+      }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       handleImportData(json as TopologyData);
+      if (demo) {
+        alert('未找到本地真实核心图 public/topology_data_core.json，已加载合成演示数据（RFC 5737 测试网段，不含任何真实网络信息）。');
+      }
     } catch (error) {
       console.error('加载业务核心图失败:', error);
-      alert('无法加载业务核心图，请确认 public/topology_data_core.json 存在');
+      alert('无法加载业务核心图：本机缺少 public/topology_data_core.json，且演示数据 public/topology_demo.json 也缺失');
     } finally {
       setLoading(false);
     }
