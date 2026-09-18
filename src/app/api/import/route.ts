@@ -2,16 +2,50 @@ import { NextRequest, NextResponse } from 'next/server';
 import * as XLSX from 'xlsx';
 import { convertRawLogsToTopology } from '@/lib/dataConverter';
 
+// Set body size limit for this route handler (Next.js App Router)
+// This tells Next.js to allow larger request bodies for this endpoint
+export const config = {
+  api: {
+    bodyParser: false, // Disable default body parser to handle large files
+  },
+};
+
+// For App Router, we can also set maxDuration if needed
+export const maxDuration = 60; // seconds
+
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
-
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+    const contentType = request.headers.get('content-type') || '';
+    
+    let buffer: Buffer;
+    
+    if (contentType.includes('multipart/form-data')) {
+      // Handle multipart form data (file upload)
+      const formData = await request.formData();
+      const file = formData.get('file') as File;
+      
+      if (!file) {
+        return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+      }
+      
+      buffer = Buffer.from(await file.arrayBuffer());
+    } else if (contentType.includes('application/octet-stream') || 
+               contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
+      // Handle raw binary upload - bypasses formData parsing limits
+      const arrayBuffer = await request.arrayBuffer();
+      buffer = Buffer.from(arrayBuffer);
+    } else {
+      // Try formData as fallback
+      const formData = await request.formData();
+      const file = formData.get('file') as File;
+      
+      if (!file) {
+        return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+      }
+      
+      buffer = Buffer.from(await file.arrayBuffer());
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
     const workbook = XLSX.read(buffer, { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];

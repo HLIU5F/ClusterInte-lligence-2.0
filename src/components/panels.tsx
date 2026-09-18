@@ -470,7 +470,7 @@ export async function exportSecurityZonesCSV(data: TopologyData | null, clusteri
         : meta?.direction === 'client' ? '客户端'
         : meta?.direction === 'terminal' ? '监控终端' : '';
       nodeRows.push([
-        n.id, zid, labels.get(zid) ?? `域 ${zid}`, n.subnet_24 ?? '',
+        n.id, zid, data.domainNames?.[n.community] ?? labels.get(zid) ?? `域 ${zid}`, n.subnet_24 ?? '',
         Array.isArray(n.ports) ? n.ports.join('|') : '', n.anomaly_level ?? '',
         n.role_guess ?? '', String(Number(n.anomaly_score || 0).toFixed(4)),
         direction, meta?.callers ?? '', meta?.peers ?? '',
@@ -487,7 +487,11 @@ export function exportSecurityZonesJSON(data: TopologyData | null, clusteringRes
   const zones: Record<string, { label: string; nodes: string[] }> = {};
   for (const n of data.nodes) {
     const zid = zoneOf.get(n.id) ?? `community_${n.community ?? -1}`;
-    if (!zones[zid]) zones[zid] = { label: labels.get(zid) ?? `域 ${zid}`, nodes: [] };
+    if (!zones[zid]) {
+      // Priority: data.domainNames > clusteringResult labels > fallback
+      const domainLabel = data.domainNames?.[n.community] ?? labels.get(zid) ?? `域 ${zid}`;
+      zones[zid] = { label: domainLabel, nodes: [] };
+    }
     zones[zid].nodes.push(n.id);
   }
   const payload = {

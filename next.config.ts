@@ -1,22 +1,22 @@
 import type { NextConfig } from 'next';
+
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['*.dev.coze.site', 'http://139.196.6.20'],
+  output: 'standalone',
+  allowedDevOrigins: ['*.dev.coze.site'],
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: '*', pathname: '/**' },
+      {
+        protocol: 'https',
+        hostname: '*',
+        pathname: '/**',
+      },
     ],
   },
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
-          { key: 'Pragma', value: 'no-cache' },
-          { key: 'Expires', value: '0' },
-        ],
-      },
-    ];
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '50mb',
+    },
   },
 };
+
 export default nextConfig;

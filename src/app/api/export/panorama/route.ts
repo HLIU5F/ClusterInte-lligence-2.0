@@ -88,7 +88,8 @@ function generateCSV(nodes: Record<string, any>[], _links: any[]): { csvContent:
 export async function POST(request: NextRequest) {
   console.log('[EXPORT] POST /api/export/panorama called');
   try {
-    const body = await request.json();
+    const rawBody = await request.arrayBuffer();
+    const body = JSON.parse(Buffer.from(rawBody).toString("utf-8"));
     const nodes: Record<string, any>[] = body.nodes || [];
     const links: any[] = body.links || [];
     console.log(`[EXPORT] Received ${nodes.length} nodes, ${links.length} links`);
@@ -146,3 +147,8 @@ export async function GET(_request: NextRequest) {
     return NextResponse.json({ error: 'Failed to generate CSV' }, { status: 500 });
   }
 }
+
+
+// Next.js App Router segment config
+export const runtime = 'nodejs';
+export const maxDuration = 60;
