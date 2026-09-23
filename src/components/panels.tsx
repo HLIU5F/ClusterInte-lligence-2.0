@@ -20,7 +20,6 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { GDSPanel } from '@/components/gds-panel';
 import { useVirtualRows } from '@/lib/useVirtualRows';
-import { CORE_DATASETS } from '@/lib/topology-api';
 
 /* ============================================================
  * SHARED HELPER FUNCTIONS (Domain Naming)
@@ -555,17 +554,13 @@ function processImportedJSON(json: any, fileName: string): any {
 
 interface DataSourcePanelProps {
   onImportData: (data: TopologyData) => void;
-  /** limit = 只取前 N 个节点（服务端会优先保住异常节点）；不传则用服务端默认 */
-  onLoadFromNeo4j?: (limit?: number) => void;
-  onLoadCoreGraph?: (file?: string) => void;
+  onLoadFromNeo4j?: () => void;
+  onLoadCoreGraph?: () => void;
   loading?: boolean;
   data: TopologyData | null;
 }
 
 export function DataSourcePanel({ onImportData, onLoadFromNeo4j, onLoadCoreGraph, loading, data }: DataSourcePanelProps) {
-  const [selectedDataset, setSelectedDataset] = useState(CORE_DATASETS[0].file);
-  // 从 Neo4j 载入的节点上限：默认 300，避免一次性渲染数千节点卡死；0 = 全量
-  const [neo4jLimit, setNeo4jLimit] = useState<number>(300);
 
   const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -631,70 +626,36 @@ export function DataSourcePanel({ onImportData, onLoadFromNeo4j, onLoadCoreGraph
           <span className="text-xs font-medium text-foreground">Neo4j 数据库</span>
         </div>
         {onLoadFromNeo4j && (
-          <>
-            <select
-              value={neo4jLimit}
-              onChange={(ev) => setNeo4jLimit(Number(ev.target.value))}
-              disabled={loading}
-              aria-label="选择从 Neo4j 载入的节点数"
-              className="w-full h-9 mb-2 px-2 rounded-md text-xs bg-secondary/40 border border-border/60 text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-50"
-            >
-              <option value={100}>载入 100 个节点（最快）</option>
-              <option value={300}>载入 300 个节点（默认）</option>
-              <option value={800}>载入 800 个节点</option>
-              <option value={2000}>载入 2000 个节点（较卡）</option>
-              <option value={0}>载入全部（很卡）</option>
-            </select>
-            <Button
-              onClick={() => onLoadFromNeo4j(neo4jLimit > 0 ? neo4jLimit : undefined)}
-              disabled={loading}
-              size="sm"
-              variant="outline"
-              className="w-full h-9 text-xs font-medium"
-            >
-              <Database className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
-              {loading ? '连接中…' : '从 Neo4j 加载数据'}
-            </Button>
-            <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground/70">
-              截断时优先保住<strong className="text-foreground/80">异常节点</strong>与枢纽，再按资产价值 / 连接度补齐。
-            </p>
-          </>
+          <Button
+            onClick={onLoadFromNeo4j}
+            disabled={loading}
+            size="sm"
+            variant="outline"
+            className="w-full h-9 text-xs font-medium"
+          >
+            <Database className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
+            {loading ? '连接中…' : '从 Neo4j 加载数据'}
+          </Button>
         )}
       </div>
 
-      {/* 静态数据集：真实核心图 / 合成演示 / 全量导出 */}
+      {/* Core graph (212 nodes) */}
       {onLoadCoreGraph && (
         <div>
           <div className="flex items-center gap-1.5 mb-2.5">
             <Activity className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-xs font-medium text-foreground">静态数据集</span>
+            <span className="text-xs font-medium text-foreground">业务核心图</span>
           </div>
-          <select
-            value={selectedDataset}
-            onChange={(e) => setSelectedDataset(e.target.value)}
-            disabled={loading}
-            aria-label="选择静态数据集"
-            className="w-full h-9 mb-2 px-2 rounded-md text-xs bg-secondary/40 border border-border/60 text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-50"
-          >
-            {CORE_DATASETS.map((d) => (
-              <option key={d.file} value={d.file}>
-                {d.label}
-              </option>
-            ))}
-          </select>
           <Button
-            onClick={() => onLoadCoreGraph(selectedDataset)}
+            onClick={onLoadCoreGraph}
             disabled={loading}
             size="sm"
             variant="outline"
             className="w-full h-9 text-xs font-medium"
           >
             <Activity className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
-            {loading ? '加载中…' : '加载所选数据'}
+            {loading ? '加载中…' : '加载业务核心图'}
           </Button>
-          <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground/70">
-            只有合成演示数据在 git 里；真实数据需放在 public/ 或由 server_migrate.sh 回填，缺失时会明确报错。
-          </p>
         </div>
       )}
 

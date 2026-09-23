@@ -1,4 +1,4 @@
-export interface TopologyNode {
+export interface TopologyNode extends StoredNodeExtras {
   id: string;
   community: number;
   degree: number;
@@ -188,6 +188,19 @@ export function communityColor(community: number): string {
   const color = hslToHex(hue, sat, light);
   _communityColorCache.set(community, color);
   return color;
+}
+
+/** 外部数据源（Neo4j / new2.0 JSON）附带的附加字段 */
+export interface StoredNodeExtras {
+  /** 资产价值分（new2.0 数据自带） */
+  asset_value?: number | null;
+  /** 数据自带的安全域：App / DMZ / DB / Internal / Management / External */
+  security_domain?: string | null;
+  flow_zone_id?: string | null;
+  flow_zone_label?: string | null;
+  flow_direction?: 'service' | 'client' | 'terminal' | 'collector' | null;
+  flow_callers?: string | null;
+  flow_peers?: string | null;
 }
 
 export const ROLE_LABELS: Record<string, string> = {

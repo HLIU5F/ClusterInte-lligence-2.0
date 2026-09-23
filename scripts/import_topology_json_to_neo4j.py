@@ -111,7 +111,9 @@ def inspect(data, path):
     log(f"community 数 = {len(comm)}（最大社区 {max(comm.values()) if comm else 0} 台）")
 
     idset = {n.get("id") for n in ip_nodes}
-    pair_counter = Counter()
+    # 每条边都要把 ports / protocols / bytes 带上 —— 方案二（通信锚点域）与端口服务域
+    # 完全依赖边上的端口签名；丢了它，锚点域会退化成「一个子网一个域」。
+    pair_map = {}
     dangling = self_loops = 0
     for l in links:
         s, t = endpoint(l.get("source")), endpoint(l.get("target"))
@@ -121,10 +123,26 @@ def inspect(data, path):
         if s == t:
             self_loops += 1
             continue
-        pair_counter[(s, t)] += 1
-    dup_pairs = sum(1 for v in pair_counter.values() if v > 1)
+        rec = pair_map.get((s, t))
+        if rec is None:
+            rec = {"count": 0, "ports": set(), "protocols": set(), "bytes": 0}
+            pair_map[(s, t)] = rec
+        rec["count"] += 1
+        for raw_port in (l.get("ports") or []):
+            try:
+                rec["ports"].add(int(float(raw_port)))
+            except (TypeError, ValueError):
+                pass
+        for proto in (l.get("protocols") or []):
+            rec["protocols"].add(str(proto))
+        try:
+            rec["bytes"] += int(l.get("bytes") or 0)
+        except (TypeError, ValueError):
+            pass
+    dup_pairs = sum(1 for v in pair_map.values() if v["count"] > 1)
+    with_ports = sum(1 for v in pair_map.values() if v["ports"])
     log(f"边的 (src,dst) 重复对数 = {dup_pairs}；悬空边 = {dangling}；自环 = {self_loops}")
-    log(f"去重后的唯一边数 = {len(pair_counter)}")
+    log(f"去重后的唯一边数 = {len(pair_map)}；其中带端口的 = {with_ports}")
 
     # 字段覆盖
     nfields = Counter()
@@ -135,10 +153,10 @@ def inspect(data, path):
         cov = nfields.get(key, 0)
         log(f"    字段 {key:<18} 覆盖 {cov}/{len(ip_nodes)}")
 
-    return ip_nodes, links, pair_counter, dup_pairs
+    return ip_nodes, links, pair_map, dup_pairs
 
 
-def build_rows(ip_nodes, pair_counter):
+def build_rows(ip_nodes, pair_map):
     now = datetime.now(timezone.utc).isoformat()
     src = "import_topology_json"
 
@@ -173,8 +191,15 @@ def build_rows(ip_nodes, pair_counter):
         subnet_votes[cidr].append(zone_id)
 
     link_rows = [
-        {"src": s, "dst": t, "occurrences": c}
-        for (s, t), c in pair_counter.items()
+        {
+            "src": s,
+            "dst": t,
+            "occurrences": rec["count"],
+            "ports": sorted(rec["ports"]),
+            "protocols": sorted(rec["protocols"]),
+            "bytes": rec["bytes"],
+        }
+        for (s, t), rec in pair_map.items()
     ]
 
     # Zone 记录：按 zone_id 汇总，颜色按出现顺序固定
@@ -269,6 +294,9 @@ def import_all(session, ip_rows, link_rows, zone_rows, subnet_rows, gds_rows,
             MERGE (a)-[rel:CONNECTS_TO]->(b)
             SET rel.occurrences = r.occurrences,
                 rel.weight = coalesce(rel.weight, r.occurrences),
+                rel.ports = r.ports,
+                rel.protocols = r.protocols,
+                rel.bytes = r.bytes,
                 rel.updated_at = $now
             """,
             rows=batch, now=now,
@@ -332,6 +360,7 @@ def verify(session):
         ("Zone", "MATCH (n:Zone) RETURN count(n) AS c"),
         ("GDSZone", "MATCH (n:GDSZone) RETURN count(n) AS c"),
         ("CONNECTS_TO", "MATCH ()-[r:CONNECTS_TO]->() RETURN count(r) AS c"),
+        ("带端口的 CONNECTS_TO", "MATCH ()-[r:CONNECTS_TO]->() WHERE r.ports IS NOT NULL AND size(r.ports) > 0 RETURN count(r) AS c"),
         ("BELONGS_TO", "MATCH ()-[r:BELONGS_TO]->() RETURN count(r) AS c"),
         ("IN_ZONE", "MATCH ()-[r:IN_ZONE]->() RETURN count(r) AS c"),
         ("IN_GDS_ZONE", "MATCH ()-[r:IN_GDS_ZONE]->() RETURN count(r) AS c"),
@@ -379,14 +408,14 @@ def main() -> int:
         return 1
 
     data = load_json(args.input)
-    ip_nodes, links, pair_counter, dup_pairs = inspect(data, args.input)
+    ip_nodes, links, pair_map, dup_pairs = inspect(data, args.input)
 
     if not ip_nodes:
         log("没有可导入的主机节点（检查 type 字段），中止。")
         return 1
 
     ip_rows, link_rows, zone_rows, subnet_rows, gds_rows, now, src = build_rows(
-        ip_nodes, pair_counter
+        ip_nodes, pair_map
     )
     log(f"\n计划写入：IP {len(ip_rows)} / 边 {len(link_rows)} / "
         f"Zone {len(zone_rows)} / Subnet {len(subnet_rows)} / GDSZone {len(gds_rows)}")

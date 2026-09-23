@@ -29,8 +29,8 @@ export interface ClusteringZone {
   node_id: string;
   zone_id: string;
   algorithm: string;
-  /** flow_anchor 附加元数据：节点方向角色（服务提供 / 客户端 / 监控终端） */
-  direction?: 'service' | 'client' | 'terminal';
+  /** flow_anchor 附加元数据：节点方向角色（服务提供 / 客户端 / 监控终端 / 采集节点） */
+  direction?: 'service' | 'client' | 'terminal' | 'collector';
   /** flow_anchor：服务提供者被哪些调用方子网访问 */
   callers?: string;
   /** flow_anchor：客户端访问哪些对端子网 */
@@ -460,6 +460,12 @@ function clusterByServicePort(nodes: TopologyNode[], links: any[], enrichLabels 
  * 本实现保留 src 维度（源IP 已包含在锚点里），未来数据含 sport 时可在锚点中追加源端口。
  */
 function clusterByFlowAnchor(nodes: TopologyNode[], links: any[], enrichLabels = false): ClusteringResult {
+  // 库里已用 Cypher 算好时（scripts/compute_flow_zones.py 写入 :FlowZone + ip.flow_zone_*），
+  // 直接采用，不再在浏览器里重算 —— 这样「从 Neo4j 加载」的结果可持久、可共享，
+  // 且与导出 CSV 里的 zone_label 完全一致。本地文件没有这些字段，走下面的前端计算。
+  if (nodes.length > 0 && nodes.every(n => (n as TopologyNode & { flow_zone_id?: string | null }).flow_zone_id)) {
+    return flowAnchorFromStored(nodes);
+  }
   const svcAnchors = new Map<string, Set<string>>(); // 节点 → 服务锚点 key "dst|port"
   const conAnchors = new Map<string, Set<string>>(); // 节点 → 消费锚点 key "src|port"
   const anchorCallers = new Map<string, Set<string>>(); // 服务锚点 → 调用方子网
@@ -564,6 +570,58 @@ function clusterByFlowAnchor(nodes: TopologyNode[], links: any[], enrichLabels =
   for (const z of zones) zoneSizes.set(z.zone_id, (zoneSizes.get(z.zone_id) || 0) + 1);
   const sizes = [...zoneSizes.values()].sort((a, b) => b - a);
 
+  return {
+    zones,
+    zoneCount: zoneOrder.length,
+    strategy: 'flow_anchor',
+    zoneLabels,
+    metrics: {
+      modularity: 0,
+      intraEdgePct: 0,
+      avgSize: sizes.length ? Number((nodes.length / sizes.length).toFixed(2)) : 0,
+      singletons: sizes.filter(s => s === 1).length,
+    },
+  };
+}
+
+/**
+ * 直接采用库里算好的通信锚点域（方案2）。
+ *
+ * 数据来源：scripts/compute_flow_zones.py —— Cypher 全图遍历每条边的每个非监控端口，
+ * 按「服务类别 × 自身子网 × 调用方子网（+ 角色）」聚合后写入 :FlowZone。
+ * 这里只做投影，不重算，保证与库内结果、导出 CSV 三者一致。
+ */
+function flowAnchorFromStored(nodes: TopologyNode[]): ClusteringResult {
+  type StoredFlow = TopologyNode & {
+    flow_zone_id?: string | null;
+    flow_zone_label?: string | null;
+    flow_direction?: ClusteringZone['direction'] | null;
+    flow_callers?: string | null;
+    flow_peers?: string | null;
+  };
+
+  const zones: ClusteringZone[] = [];
+  const zoneLabels: Record<string, string> = {};
+  const zoneOrder: string[] = [];
+  const zoneSizes = new Map<string, number>();
+
+  for (const node of nodes) {
+    const ext = node as StoredFlow;
+    const zoneId = ext.flow_zone_id as string;
+    zones.push({
+      node_id: node.id,
+      zone_id: zoneId,
+      algorithm: 'flow_anchor',
+      direction: ext.flow_direction ?? undefined,
+      callers: ext.flow_callers ?? undefined,
+      peers: ext.flow_peers ?? undefined,
+    });
+    if (!zoneLabels[zoneId]) zoneLabels[zoneId] = ext.flow_zone_label || zoneId;
+    if (!zoneOrder.includes(zoneId)) zoneOrder.push(zoneId);
+    zoneSizes.set(zoneId, (zoneSizes.get(zoneId) || 0) + 1);
+  }
+
+  const sizes = [...zoneSizes.values()].sort((a, b) => b - a);
   return {
     zones,
     zoneCount: zoneOrder.length,

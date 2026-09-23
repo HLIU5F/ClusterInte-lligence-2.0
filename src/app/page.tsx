@@ -68,6 +68,9 @@ const DEFAULT_BASELINE_RULES: BaselineRule[] = [
   },
 ];
 
+/** 画布最多渲染多少节点（聚类/统计仍用全量）。实测 D3 力导向在数百节点以上开始明显卡顿。 */
+const RENDER_NODE_CAP = 300;
+
 function buildGdsRunInfo(algorithm: 'louvain' | 'wcc', runResult: any): GdsRunInfo {
   const info = algorithm === 'louvain' ? runResult?.louvain : runResult?.wcc;
   if (algorithm === 'louvain') {
@@ -546,10 +549,11 @@ export default function Home() {
     return true;
   }, [handleImportData]);
 
-  const handleLoadFromNeo4j = useCallback(async (limit?: number) => {
+  const handleLoadFromNeo4j = useCallback(async () => {
     setLoading(true);
     try {
-      const neo4jData = await loadFromNeo4j(true, limit ? { limit } : {});
+      // 取全量：聚类 / 统计 / 导出都要用全量，卡顿由画布的 RENDER_NODE_CAP 负责。
+      const neo4jData = await loadFromNeo4j(true);
       if (!applyNeo4jTopology(neo4jData)) return;
 
       // 服务端有节点上限保护：优先保住「异常节点 + 枢纽」，再按资产价值 / 连接度补齐。
@@ -970,30 +974,26 @@ export default function Home() {
         return { ...clusteringAppliedData, nodes: nodesWithFocusFlag, links: [...linksWithCrossFlag] };
       }
     }
-    // 大图渲染保护：节点 > 1500 时画布只渲染核心节点，避免卡死。
-    // 全量数据仍用于聚类/统计（安全域划分不受影响）。
-    if (clusteringAppliedData.nodes.length > 1500) {
-      const linkedIds = new Set<string>();
-      clusteringAppliedData.links.forEach(l => {
+    // 画布渲染上限：全量数据仍用于聚类 / 统计 / 面板 / 导出（安全域划分不受影响），
+    // 只在**渲染时**收敛到最大的前 RENDER_NODE_CAP 个 —— 优先异常节点（必须可见），
+    // 其次按度数（枢纽 + 繁忙主机）。
+    // 注意：必须同步过滤边，否则会留下指向未渲染节点的悬空边。
+    if (clusteringAppliedData.nodes.length > RENDER_NODE_CAP) {
+      const isAnomalyNode = (n: TopologyNode) =>
+        n.is_anomaly || n.anomaly_level === 'Critical' || n.anomaly_level === 'High' || (n.anomaly_score ?? 0) >= 0.45;
+      const anomalyNodes = clusteringAppliedData.nodes.filter(isAnomalyNode);
+      const rest = clusteringAppliedData.nodes
+        .filter(n => !isAnomalyNode(n))
+        .sort((a, b) => (b.degree ?? 0) - (a.degree ?? 0));
+      const budget = Math.max(RENDER_NODE_CAP - anomalyNodes.length, 0);
+      const renderNodes = [...anomalyNodes, ...rest.slice(0, budget)];
+      const keep = new Set(renderNodes.map(n => n.id));
+      const renderLinks = clusteringAppliedData.links.filter(l => {
         const srcId = typeof l.source === 'string' ? l.source : (l.source as any)?.id;
         const tgtId = typeof l.target === 'string' ? l.target : (l.target as any)?.id;
-        if (srcId) linkedIds.add(srcId);
-        if (tgtId) linkedIds.add(tgtId);
+        return keep.has(srcId) && keep.has(tgtId);
       });
-      let renderNodes = clusteringAppliedData.nodes.filter(n => linkedIds.has(n.id));
-      if (renderNodes.length > 1500) {
-        // 全星型/超大连通图：异常节点优先保留（必须可见，否则行为导向后的低度异常节点会被挤出画布），
-        // 其余按度数取前 600（枢纽 + 繁忙主机）。
-        const isAnomalyNode = (n: TopologyNode) =>
-          n.is_anomaly || n.anomaly_level === 'Critical' || n.anomaly_level === 'High' || (n.anomaly_score ?? 0) >= 0.45;
-        const anomalyNodes = renderNodes.filter(isAnomalyNode);
-        const rest = renderNodes
-          .filter(n => !isAnomalyNode(n))
-          .sort((a, b) => (b.degree ?? 0) - (a.degree ?? 0));
-        const budget = Math.max(600 - anomalyNodes.length, 0);
-        renderNodes = [...anomalyNodes, ...rest.slice(0, budget)];
-      }
-      return { ...clusteringAppliedData, nodes: renderNodes };
+      return { ...clusteringAppliedData, nodes: renderNodes, links: renderLinks };
     }
     return clusteringAppliedData;
   }, [clusteringAppliedData, focusedCommunity]);
@@ -1062,6 +1062,7 @@ export default function Home() {
               <span className="text-[10px] font-mono tabular-nums text-muted-foreground uppercase tracking-wider">安全域 {clusteringAppliedData.metadata.communities}</span>
             </div>
           )}
+
           <div className="flex items-center gap-2 mr-2" title={darkMode ? '切换到亮色模式' : '切换到暗黑模式'}>
             <Sun className="w-3.5 h-3.5 text-muted-foreground" />
             <Switch checked={darkMode} onCheckedChange={setDarkMode} aria-label="主题切换" />
@@ -1191,7 +1192,7 @@ export default function Home() {
                       本地文件导入
                       <input ref={fileInputRef} type="file" accept=".json,.xlsx,.xls" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) await handleFileImport(f); e.target.value = ''; }} />
                     </label>
-                    <button onClick={() => handleLoadFromNeo4j()} disabled={loading} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'var(--panel-bg-strong)', border: '1px solid color-mix(in srgb, var(--warning) 45%, transparent)', color: 'var(--warning)' }}
+                    <button onClick={handleLoadFromNeo4j} disabled={loading} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'var(--panel-bg-strong)', border: '1px solid color-mix(in srgb, var(--warning) 45%, transparent)', color: 'var(--warning)' }}
                       onMouseEnter={e => { e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--warning) 70%, transparent)'; e.currentTarget.style.boxShadow = '0 0 24px rgba(240,160,48,0.15)'; }}
                       onMouseLeave={e => { e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--warning) 45%, transparent)'; e.currentTarget.style.boxShadow = 'none'; }}
                     >

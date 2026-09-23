@@ -14,8 +14,13 @@ import { NextResponse } from 'next/server';
 import { neo4jErrorResponse } from '@/lib/apiErrors';
 import { runCypher } from '@/lib/neo4j';
 
-/** 默认返回的 IP 节点上限：实测数千节点全量交给 D3 力导向会明显卡顿 */
-const DEFAULT_IP_LIMIT = 300;
+/**
+ * 默认节点上限：0 = 不限制，把全量交给前端。
+ * 由前端在**渲染时**只画最大的前 N 个节点；聚类 / 统计 / 导出仍基于全量，
+ * 否则安全域数量会随截断一起缩水（实测全量 1692 域 → 截到 300 只剩 187 域）。
+ * 需要服务端截断时显式传 ?limit=N。
+ */
+const DEFAULT_IP_LIMIT = 0;
 /** 硬上限，避免 ?limit=999999 之类的请求把服务打挂 */
 const MAX_IP_LIMIT = 20000;
 
@@ -50,6 +55,12 @@ interface IpRecord {
   role_guess: string | null;
   // 数据自带的异常标注 —— 权威事实，优先于启发式重算（anomaly_score 见上方声明）
   has_anomaly_score: boolean | null;
+  // 库里预先算好的通信锚点域（方案2）
+  flow_zone_id: string | null;
+  flow_zone_label: string | null;
+  flow_direction: string | null;
+  flow_callers: string | null;
+  flow_peers: string | null;
   is_anomaly: boolean | null;
   anomaly_level: string | null;
   asset_value: number | null;
@@ -206,6 +217,8 @@ export async function GET(request: Request) {
         OPTIONAL MATCH (sn)-[:IN_ZONE]->(z:Zone)
         // IP 自身挂的域（数据作者按 IP 标注，最准确）
         OPTIONAL MATCH (ip)-[:IN_ZONE]->(iz:Zone)
+        // 通信锚点域（方案2，由 scripts/compute_flow_zones.py 预先算好）
+        OPTIONAL MATCH (ip)-[:IN_FLOW_ZONE]->(fz:FlowZone)
         OPTIONAL MATCH (ip)-[:BELONGS_TO_GROUP]->(bg:BusinessGroup)
         OPTIONAL MATCH (ip)-[:RUNS_ON]->(os:OS)
         OPTIONAL MATCH (ip)-[:RUNS_APP]->(app:Application)
@@ -237,6 +250,11 @@ export async function GET(request: Request) {
           ip.anomaly_level              AS anomaly_level,
           ip.anomaly_score IS NOT NULL  AS has_anomaly_score,
           ip.asset_value                AS asset_value,
+          fz.id                         AS flow_zone_id,
+          coalesce(fz.label, ip.flow_zone_label) AS flow_zone_label,
+          coalesce(fz.direction, ip.flow_direction) AS flow_direction,
+          ip.flow_callers               AS flow_callers,
+          ip.flow_peers                 AS flow_peers,
           head(collect(DISTINCT env.name)) AS environment,
           coalesce(ip.cmdb_tags, [])    AS cmdb_tags,
           coalesce(ip.ports, [])        AS ports,
@@ -453,6 +471,12 @@ export async function GET(request: Request) {
             anomalyScore >= 0.45 ? 'Medium' : 'Low'),
         anomaly_source: r.has_anomaly_score === true ? 'stored' : 'heuristic',
         asset_value: r.asset_value == null ? null : Number(r.asset_value),
+        // 库里算好的通信锚点域（方案2）：有则前端直接采用，不再重算
+        flow_zone_id: r.flow_zone_id,
+        flow_zone_label: r.flow_zone_label,
+        flow_direction: r.flow_direction,
+        flow_callers: r.flow_callers,
+        flow_peers: r.flow_peers,
         is_hub: st.isHub,
         is_critical: st.isCritical,
         service_type: r.service_type,
@@ -479,7 +503,7 @@ export async function GET(request: Request) {
     // 全量：?all=1；自定义：?limit=N。
     const totalIps = nodes.length;
     const totalAnomaliesInDb = nodes.filter(n => n.is_anomaly).length;
-    const limitValue = includeAll ? totalIps : requestedLimit;
+    const limitValue = includeAll || requestedLimit <= 0 ? totalIps : requestedLimit;
     const truncated = totalIps > limitValue;
     const rankOf = (n: { is_anomaly: boolean; is_hub: boolean; is_critical: boolean }) =>
       (n.is_anomaly ? 4 : 0) + (n.is_hub ? 2 : 0) + (n.is_critical ? 1 : 0);
@@ -520,7 +544,7 @@ export async function GET(request: Request) {
         // 截断溯源：前端据此提示「只加载了前 N 个」
         truncated,
         total_ips_in_db: totalIps,
-        node_limit: includeAll ? null : requestedLimit,
+        node_limit: includeAll || requestedLimit <= 0 ? null : requestedLimit,
         // 异常保全：截断后实际带回的异常数 / 全库异常总数
         total_anomalies_in_db: totalAnomaliesInDb,
         anomalies_included: keptNodes.filter(n => n.is_anomaly).length,
