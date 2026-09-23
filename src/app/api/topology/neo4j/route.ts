@@ -14,8 +14,8 @@ import { NextResponse } from 'next/server';
 import { neo4jErrorResponse } from '@/lib/apiErrors';
 import { runCypher } from '@/lib/neo4j';
 
-/** 默认返回的 IP 节点上限：实测本库 3738 节点全量交给 D3 力导向会卡死浏览器 */
-const DEFAULT_IP_LIMIT = 2000;
+/** 默认返回的 IP 节点上限：实测数千节点全量交给 D3 力导向会明显卡顿 */
+const DEFAULT_IP_LIMIT = 300;
 /** 硬上限，避免 ?limit=999999 之类的请求把服务打挂 */
 const MAX_IP_LIMIT = 20000;
 
@@ -33,7 +33,7 @@ interface IpRecord {
   degree: number;
   in_degree: number;
   out_degree: number;
-  anomaly_score: number;
+  anomaly_score: number | null;
   is_hub: boolean;
   service_type: string | null;
   geo_country: string | null;
@@ -48,6 +48,11 @@ interface IpRecord {
   protocols: string[];
   // 数据自带的服务角色（client/server/hybrid…），端口推导不出时作为兜底
   role_guess: string | null;
+  // 数据自带的异常标注 —— 权威事实，优先于启发式重算（anomaly_score 见上方声明）
+  has_anomaly_score: boolean | null;
+  is_anomaly: boolean | null;
+  anomaly_level: string | null;
+  asset_value: number | null;
 }
 
 interface LinkRecord {
@@ -228,6 +233,10 @@ export async function GET(request: Request) {
           head(collect(DISTINCT app.name)) AS application,
           ip.owner                      AS owner,
           ip.role_guess                 AS role_guess,
+          ip.is_anomaly                 AS is_anomaly,
+          ip.anomaly_level              AS anomaly_level,
+          ip.anomaly_score IS NOT NULL  AS has_anomaly_score,
+          ip.asset_value                AS asset_value,
           head(collect(DISTINCT env.name)) AS environment,
           coalesce(ip.cmdb_tags, [])    AS cmdb_tags,
           coalesce(ip.ports, [])        AS ports,
@@ -303,6 +312,21 @@ export async function GET(request: Request) {
       if (KNOWN_COLLECTOR_IPS.has(r.id) || isCollectorLike(deg, ipRecords.length)) collectorIds.add(r.id);
     }
 
+    // 全图平均度 / 平均端口数：启发式风险分用它做**相对**阈值。
+    // 旧代码把 deg>=8/15、端口>=6 写死，那是为 avgDeg≈4.8 的老数据调的，
+    // 换到 avgDeg≈14 的新数据上几乎全员命中，于是满屏红色光圈。
+    let totalDegAll = 0;
+    let totalPortsAll = 0;
+    for (const r of ipRecords) {
+      totalDegAll += (inDeg.get(r.id) || 0) + (outDeg.get(r.id) || 0);
+      const pc = new Set<number>();
+      for (const q of toNumberList(r.ports)) pc.add(q);
+      for (const q of linkPorts.get(r.id) || []) pc.add(q);
+      totalPortsAll += pc.size;
+    }
+    const avgDeg = ipRecords.length > 0 ? totalDegAll / ipRecords.length : 0;
+    const avgPortCount = ipRecords.length > 0 ? totalPortsAll / ipRecords.length : 0;
+
     // 每个节点的派生统计：角色（组合端口规则）+ 风险分（连续因子）+ 入出度
     const nodeStats = new Map<string, {
       inD: number; outD: number; deg: number; totalW: number;
@@ -323,8 +347,12 @@ export async function GET(request: Request) {
       const role = deriveRole(portCount, r.id);
       const isCritical = CRITICAL_ROLES.has(role);
 
-      let aScore = 0.15;
-      if (!collectorIds.has(r.id)) {
+      // ---- 异常分来源优先级 ----
+      // 数据自带的异常标注是权威事实，必须优先采用；只有数据**没有**该字段时才跑启发式。
+      // 否则会出现「同一份数据：本地 JSON 导入一个都不亮、从库加载满屏红色」的矛盾。
+      const storedAnomaly = r.has_anomaly_score === true ? Number(r.anomaly_score ?? 0) : null;
+      let aScore = storedAnomaly ?? 0.15;
+      if (storedAnomaly === null && !collectorIds.has(r.id)) {
         if (domPort && MONITOR_DOMINANT_PORTS.has(domPort)) {
           aScore = 0.05; // 监控资产不标异常
         } else {
@@ -347,8 +375,11 @@ export async function GET(request: Request) {
               aScore = Math.max(aScore, 0.1);
               if (nbrSubnetCount >= 3) aScore = Math.max(aScore, 0.18);
             } else {
-              // A. 暴露面：6 端口起跳 +0.18，每多 1 端口 +0.05，上限 +0.4
-              aScore += Math.min(0.4, Math.max(0, portCount.size - 5) * 0.05 + (portCount.size >= 6 ? 0.18 : 0));
+              // A. 暴露面：以「全图平均端口数」为基准起跳，而不是写死 6 个端口
+              const portThreshold = Math.max(6, avgPortCount * 1.5);
+              if (portCount.size >= portThreshold) {
+                aScore += Math.min(0.4, (portCount.size - 5) * 0.05 + 0.18);
+              }
               // B. 数据库端口暴露（非关键资产）：1 类 +0.15，≥2 类 +0.25
               const dbHits = DB_PORTS.filter(p => portCount.has(p)).length;
               if (dbHits >= 2) aScore += 0.25;
@@ -376,18 +407,18 @@ export async function GET(request: Request) {
                 else if (lowCnt >= 3 && nEdges >= 4) aScore += 0.08;
                 // H. 跨子网边占比：广泛跨域通信（横向扩散特征，需高连接数才触发）
                 const crossShare = (crossSubnetEdges.get(r.id) || 0) / nEdges;
-                if (deg >= 8 && crossShare >= 0.8) aScore += 0.12;
+                if (deg >= avgDeg * 1.5 && crossShare >= 0.8) aScore += 0.12;
               }
-              // G. 节点度（连接数）：多目标通信规模（主机间流量接入后更有区分度）
-              if (deg >= 15) aScore += 0.15;
-              else if (deg >= 8) aScore += 0.08;
+              // G. 节点度：相对全图平均度，而不是写死 8/15
+              if (deg >= avgDeg * 3) aScore += 0.15;
+              else if (deg >= avgDeg * 1.5) aScore += 0.08;
             }
           }
         }
-      } else {
+      } else if (storedAnomaly === null) {
         aScore = 0.05; // 采集/汇聚 hub 不标异常
       }
-      aScore = Math.min(aScore, 0.95);
+      aScore = storedAnomaly === null ? Math.min(aScore, 0.95) : Math.max(0, Math.min(aScore, 1));
       nodeStats.set(r.id, {
         inD, outD, deg, totalW, role,
         anomaly: aScore,
@@ -413,11 +444,15 @@ export async function GET(request: Request) {
         in_degree: st.inD,
         out_degree: st.outD,
         anomaly_score: anomalyScore,
-        is_anomaly: anomalyScore >= 0.6,
+        // 有自带标注时以标注为准（本地导入走的就是这个字段），否则按分数阈值判
+        is_anomaly: r.is_anomaly ?? anomalyScore >= 0.6,
         anomaly_level:
-          anomalyScore >= 0.75 ? 'Critical' :
-          anomalyScore >= 0.60 ? 'High' :
-          anomalyScore >= 0.45 ? 'Medium' : 'Low',
+          (r.anomaly_level as 'Critical' | 'High' | 'Medium' | 'Low' | 'None' | null) ??
+          (anomalyScore >= 0.75 ? 'Critical' :
+            anomalyScore >= 0.60 ? 'High' :
+            anomalyScore >= 0.45 ? 'Medium' : 'Low'),
+        anomaly_source: r.has_anomaly_score === true ? 'stored' : 'heuristic',
+        asset_value: r.asset_value == null ? null : Number(r.asset_value),
         is_hub: st.isHub,
         is_critical: st.isCritical,
         service_type: r.service_type,
@@ -437,14 +472,25 @@ export async function GET(request: Request) {
     });
 
     // ---- 节点上限保护 ----
-    // 默认只保留连通度最高的一部分；截断时同时过滤边，
-    // 否则会出现指向被裁掉节点的悬空边，D3 渲染会出错。
-    // 需要全量：?all=1；自定义：?limit=N。
+    // 一次渲染数千节点会卡死浏览器，所以默认只保留一小部分。
+    // 选取优先级：① 异常节点（必须保住，否则风险被截断隐藏）
+    //              ② 枢纽 / hub ③ 资产价值 ④ 连接度。
+    // 截断时同步过滤边，否则会出现指向被裁掉节点的悬空边，D3 渲染会出错。
+    // 全量：?all=1；自定义：?limit=N。
     const totalIps = nodes.length;
+    const totalAnomaliesInDb = nodes.filter(n => n.is_anomaly).length;
     const limitValue = includeAll ? totalIps : requestedLimit;
     const truncated = totalIps > limitValue;
+    const rankOf = (n: { is_anomaly: boolean; is_hub: boolean; is_critical: boolean }) =>
+      (n.is_anomaly ? 4 : 0) + (n.is_hub ? 2 : 0) + (n.is_critical ? 1 : 0);
     const keptNodes = truncated
-      ? [...nodes].sort((a, b) => Number(b.degree) - Number(a.degree)).slice(0, limitValue)
+      ? [...nodes]
+          .sort((a, b) =>
+            rankOf(b) - rankOf(a) ||
+            Number(b.asset_value ?? 0) - Number(a.asset_value ?? 0) ||
+            Number(b.degree) - Number(a.degree)
+          )
+          .slice(0, limitValue)
       : nodes;
 
     const keptIds = new Set(keptNodes.map(n => n.id));
@@ -475,6 +521,9 @@ export async function GET(request: Request) {
         truncated,
         total_ips_in_db: totalIps,
         node_limit: includeAll ? null : requestedLimit,
+        // 异常保全：截断后实际带回的异常数 / 全库异常总数
+        total_anomalies_in_db: totalAnomaliesInDb,
+        anomalies_included: keptNodes.filter(n => n.is_anomaly).length,
       },
       nodes: keptNodes,
       links,

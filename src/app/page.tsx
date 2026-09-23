@@ -546,20 +546,27 @@ export default function Home() {
     return true;
   }, [handleImportData]);
 
-  const handleLoadFromNeo4j = useCallback(async () => {
+  const handleLoadFromNeo4j = useCallback(async (limit?: number) => {
     setLoading(true);
     try {
-      const neo4jData = await loadFromNeo4j(true);
+      const neo4jData = await loadFromNeo4j(true, limit ? { limit } : {});
       if (!applyNeo4jTopology(neo4jData)) return;
 
-      // 服务端有节点上限保护（默认只保留连通度最高的 2000 个）。被截断时问用户要不要全量。
+      // 服务端有节点上限保护：优先保住「异常节点 + 枢纽」，再按资产价值 / 连接度补齐。
       const meta = neo4jData.metadata;
       if (meta?.truncated) {
         const total = meta.total_ips_in_db ?? 0;
         const loaded = neo4jData.nodes.length;
+        const totalAnomalies = meta.total_anomalies_in_db ?? 0;
+        const keptAnomalies = meta.anomalies_included ?? 0;
+        const anomalyNote =
+          totalAnomalies > 0
+            ? `\n异常节点已优先保全：${keptAnomalies} / ${totalAnomalies} 个。`
+            : `\n这批数据没有标注异常节点（anomaly_score 全为 0）。`;
         const goAll = window.confirm(
-          `库中共有 ${total} 个 IP，为避免浏览器卡死，只按连通度降序加载了前 ${loaded} 个。\n\n` +
-            `是否改为加载全部 ${total} 个？（力导向布局会明显变慢，可能卡顿）`
+          `库中共有 ${total} 个 IP，为避免卡死当前只加载了 ${loaded} 个。` +
+            anomalyNote +
+            `\n\n是否改为加载全部 ${total} 个？（力导向布局会明显变慢，可能卡顿）`
         );
         if (goAll) {
           const full = await loadFromNeo4j(true, { all: true });
@@ -1184,7 +1191,7 @@ export default function Home() {
                       本地文件导入
                       <input ref={fileInputRef} type="file" accept=".json,.xlsx,.xls" className="hidden" onChange={async (e) => { const f = e.target.files?.[0]; if (f) await handleFileImport(f); e.target.value = ''; }} />
                     </label>
-                    <button onClick={handleLoadFromNeo4j} disabled={loading} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'var(--panel-bg-strong)', border: '1px solid color-mix(in srgb, var(--warning) 45%, transparent)', color: 'var(--warning)' }}
+                    <button onClick={() => handleLoadFromNeo4j()} disabled={loading} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed" style={{ background: 'var(--panel-bg-strong)', border: '1px solid color-mix(in srgb, var(--warning) 45%, transparent)', color: 'var(--warning)' }}
                       onMouseEnter={e => { e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--warning) 70%, transparent)'; e.currentTarget.style.boxShadow = '0 0 24px rgba(240,160,48,0.15)'; }}
                       onMouseLeave={e => { e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--warning) 45%, transparent)'; e.currentTarget.style.boxShadow = 'none'; }}
                     >

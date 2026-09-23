@@ -18,6 +18,10 @@ export interface Neo4jTopologyResponse {
     total_ips_in_db?: number;
     /** 生效的节点上限；null = 未限制（?all=1） */
     node_limit?: number | null;
+    /** 全库异常节点总数（数据自带标注） */
+    total_anomalies_in_db?: number;
+    /** 截断后实际带回的异常节点数 —— 截断会优先保住异常 */
+    anomalies_included?: number;
   };
   nodes: Array<{
     id: string;
