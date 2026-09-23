@@ -20,6 +20,7 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { GDSPanel } from '@/components/gds-panel';
 import { useVirtualRows } from '@/lib/useVirtualRows';
+import { CORE_DATASETS } from '@/lib/topology-api';
 
 /* ============================================================
  * SHARED HELPER FUNCTIONS (Domain Naming)
@@ -555,12 +556,14 @@ function processImportedJSON(json: any, fileName: string): any {
 interface DataSourcePanelProps {
   onImportData: (data: TopologyData) => void;
   onLoadFromNeo4j?: () => void;
-  onLoadCoreGraph?: () => void;
+  onLoadCoreGraph?: (file?: string) => void;
   loading?: boolean;
   data: TopologyData | null;
 }
 
 export function DataSourcePanel({ onImportData, onLoadFromNeo4j, onLoadCoreGraph, loading, data }: DataSourcePanelProps) {
+  const [selectedDataset, setSelectedDataset] = useState(CORE_DATASETS[0].file);
+
   const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -638,23 +641,39 @@ export function DataSourcePanel({ onImportData, onLoadFromNeo4j, onLoadCoreGraph
         )}
       </div>
 
-      {/* Core graph (212 nodes) */}
+      {/* 静态数据集：真实核心图 / 合成演示 / 全量导出 */}
       {onLoadCoreGraph && (
         <div>
           <div className="flex items-center gap-1.5 mb-2.5">
             <Activity className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-xs font-medium text-foreground">业务核心图</span>
+            <span className="text-xs font-medium text-foreground">静态数据集</span>
           </div>
+          <select
+            value={selectedDataset}
+            onChange={(e) => setSelectedDataset(e.target.value)}
+            disabled={loading}
+            aria-label="选择静态数据集"
+            className="w-full h-9 mb-2 px-2 rounded-md text-xs bg-secondary/40 border border-border/60 text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-50"
+          >
+            {CORE_DATASETS.map((d) => (
+              <option key={d.file} value={d.file}>
+                {d.label}
+              </option>
+            ))}
+          </select>
           <Button
-            onClick={onLoadCoreGraph}
+            onClick={() => onLoadCoreGraph(selectedDataset)}
             disabled={loading}
             size="sm"
             variant="outline"
             className="w-full h-9 text-xs font-medium"
           >
             <Activity className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
-            {loading ? '加载中…' : '加载业务核心图'}
+            {loading ? '加载中…' : '加载所选数据'}
           </Button>
+          <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground/70">
+            只有合成演示数据在 git 里；真实数据需放在 public/ 或由 server_migrate.sh 回填，缺失时会明确报错。
+          </p>
         </div>
       )}
 
@@ -893,7 +912,7 @@ export function AlgorithmPanel({
                       当前使用「通信锚点域（方案2）」策略，共 {clusteringResult.zoneCount} 个安全域。
                     </div>
                     <div className="font-mono text-muted-foreground">
-                      (源IP, 目的IP, 固定目的端口) 三元组锚点：域 = 服务类别 × 服务子网 × 调用方子网；接入主机间流量后自动细分"谁调用我的哪个服务"。
+                      (源IP, 目的IP, 固定目的端口) 三元组锚点：域 = 服务类别 × 服务子网 × 调用方子网；接入主机间流量后自动细分“谁调用我的哪个服务”。
                     </div>
                   </>
                 ) : clusteringStrategy === 'policy_domain' && clusteringResult ? (

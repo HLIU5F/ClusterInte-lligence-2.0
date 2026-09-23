@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { TopologyGraph } from '@/components/topology-graph';
 import type { TopologyData, TopologyNode, TopologyLink, BaselineRule, WhitelistRule, GDSHubNode, GdsRunInfo, GraphLayoutPreset, GraphPhysics } from '@/lib/types';
 import { communityColor, getAnomalyLevel } from '@/lib/types';
-import { loadFromNeo4j } from "@/lib/topology-api";
+import { CORE_DATASET_CHAIN, describeApiError, loadFromNeo4j, type Neo4jTopologyResponse } from "@/lib/topology-api";
 import { computeClustering, ClusteringStrategy, deriveZoneLabel, SecurityV3Granularity } from '@/lib/clustering';
 import { buildLocalGdsData, buildAttrSubZoneIndex } from '@/lib/localGds';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -161,6 +161,86 @@ function expandLocally(nodes: TopologyNode[], links: TopologyLink[], nodeId: str
       return acc;
     }, {}),
   };
+}
+
+/**
+ * 本地最短路径（无权重 BFS）。
+ *
+ * Neo4j 不可用时的降级实现，与 handleExpandNeighbors 的 expandLocally 兜底对称，
+ * 保证「攻击链 / 最短路径」在纯前端（无图数据库）模式下依然可用。
+ */
+function findPathLocally(
+  nodes: TopologyNode[],
+  links: TopologyLink[],
+  source: string,
+  target: string,
+  maxHops: number
+): {
+  found: boolean;
+  nodeIds: string[];
+  edges: Array<{ source: string; target: string; weight: number }>;
+  pathLength: number;
+} {
+  const empty = {
+    found: false,
+    nodeIds: [] as string[],
+    edges: [] as Array<{ source: string; target: string; weight: number }>,
+    pathLength: 0,
+  };
+  if (source === target) return { ...empty, found: true, nodeIds: [source] };
+
+  const known = new Set(nodes.map(n => n.id));
+  if (!known.has(source) || !known.has(target)) return empty;
+
+  // 无向邻接表：D3 运行时会把 link.source / link.target 换成节点对象，这里两种形态都兼容
+  const adj = new Map<string, Array<{ id: string; link: TopologyLink }>>();
+  const add = (from: string, to: string, link: TopologyLink) => {
+    const list = adj.get(from);
+    if (list) list.push({ id: to, link });
+    else adj.set(from, [{ id: to, link }]);
+  };
+  for (const link of links) {
+    const s = typeof link.source === 'string' ? link.source : link.source.id;
+    const t = typeof link.target === 'string' ? link.target : link.target.id;
+    if (!known.has(s) || !known.has(t)) continue;
+    add(s, t, link);
+    add(t, s, link);
+  }
+
+  const prev = new Map<string, { from: string; link: TopologyLink }>();
+  const seen = new Set<string>([source]);
+  let frontier: string[] = [source];
+
+  for (let hop = 0; hop < maxHops && frontier.length > 0; hop++) {
+    const next: string[] = [];
+    for (const cur of frontier) {
+      for (const { id, link } of adj.get(cur) ?? []) {
+        if (seen.has(id)) continue;
+        seen.add(id);
+        prev.set(id, { from: cur, link });
+        if (id === target) {
+          const nodeIds = [target];
+          const edges: Array<{ source: string; target: string; weight: number }> = [];
+          let cursor = target;
+          while (cursor !== source) {
+            const step = prev.get(cursor)!;
+            const s = typeof step.link.source === 'string' ? step.link.source : step.link.source.id;
+            const t = typeof step.link.target === 'string' ? step.link.target : step.link.target.id;
+            edges.push({ source: s, target: t, weight: step.link.weight });
+            nodeIds.push(step.from);
+            cursor = step.from;
+          }
+          nodeIds.reverse();
+          edges.reverse();
+          return { found: true, nodeIds, edges, pathLength: nodeIds.length - 1 };
+        }
+        next.push(id);
+      }
+    }
+    frontier = next;
+  }
+
+  return empty;
 }
 
 export default function Home() {
@@ -361,78 +441,147 @@ export default function Home() {
 
   const [loading, setLoading] = useState(false);
 
-  const handleLoadFromNeo4j = useCallback(async () => {
+  /**
+   * 加载静态数据集。
+   *
+   * 不传参时按 CORE_DATASET_CHAIN 依次回退；传参时只加载指定文件。
+   * 每一步的失败原因都会被记录并回显 —— 旧实现里任何异常都报「两个文件都缺失」，
+   * 掩盖了 404 / JSON 截断 / 网络错误等真实原因。
+   */
+  const handleLoadCoreGraph = useCallback(async (file?: string) => {
     setLoading(true);
     try {
-      const neo4jData = await loadFromNeo4j(true);
-      if (!neo4jData.nodes || neo4jData.nodes.length === 0) {
-        alert('Neo4j 中暂无拓扑数据，请先用脚本向 Neo4j 导入数据');
+      const candidates = file ? [file] : [...CORE_DATASET_CHAIN];
+      const attempts: string[] = [];
+
+      for (const candidate of candidates) {
+        let res: Response;
+        try {
+          res = await fetch(candidate, { cache: 'no-store' });
+        } catch (e) {
+          attempts.push(`${candidate} → 网络错误（${e instanceof Error ? e.message : String(e)}）`);
+          continue;
+        }
+        if (!res.ok) {
+          attempts.push(`${candidate} → HTTP ${res.status}`);
+          continue;
+        }
+        let json: TopologyData;
+        try {
+          json = (await res.json()) as TopologyData;
+        } catch {
+          attempts.push(`${candidate} → 返回内容不是合法 JSON（文件可能被截断）`);
+          continue;
+        }
+        if (!json?.nodes?.length) {
+          attempts.push(`${candidate} → 缺少 nodes 数组`);
+          continue;
+        }
+        try {
+          handleImportData(json);
+        } catch (e) {
+          attempts.push(`${candidate} → 数据已下载但导入失败（${e instanceof Error ? e.message : String(e)}）`);
+          continue;
+        }
+        // 只有回退到非首选数据源时才打扰用户，顺带说明首选为什么不可用
+        if (candidate !== candidates[0]) {
+          alert(
+            `已加载 ${candidate}（${json.nodes.length} 个节点）。\n\n` +
+              `首选数据源不可用：\n${attempts.join('\n')}`
+          );
+        }
         return;
       }
-      // 只加载有连接关系的节点（≈ 核心图规模），避免一次性渲染数千个孤立节点卡死；
-      // Neo4j 里的全量数据保留，供 APOC / Cypher 查询使用。
-      const linkNodeIds = new Set<string>();
-      neo4jData.links.forEach(l => {
-        linkNodeIds.add(l.source);
-        linkNodeIds.add(l.target);
-      });
-      const connectedNodes = neo4jData.nodes.filter(n => linkNodeIds.has(n.id));
-      if (connectedNodes.length === 0) {
-        alert('Neo4j 中暂无有连接关系的拓扑数据');
-        return;
-      }
-      const topologyData: TopologyData = {
-        nodes: connectedNodes.map(n => ({
-          ...n,
-          zone: n.zone_id,
-          bytes_sent: 0,
-          bytes_received: 0,
-        })) as TopologyNode[],
-        links: neo4jData.links.map(l => ({
-          ...l,
-          isCrossDomain: l.is_cross_domain,
-        })),
-        metadata: {
-          ...neo4jData.metadata,
-          ...({ zones: neo4jData.zones } as any),
-          domainNames: Object.fromEntries(
-            neo4jData.zones.map(z => [Number(z.id), z.label])
-          ),
-        },
-      };
-      handleImportData(topologyData);
-    } catch (error) {
-      console.error("Neo4j 连接失败:", error);
-      alert("无法连接到 Neo4j API，请检查 Neo4j 服务是否正常");
+
+      alert(
+        `所有候选数据源都加载失败：\n\n${attempts.join('\n')}\n\n` +
+          '可用数据文件应放在 public/ 下：\n' +
+          '  • public/topology_data_core.json —— 真实业务核心图（不在 git 里，仅本机或回填后存在）\n' +
+          '  • public/topology_demo.json —— 仓库自带的合成演示数据\n\n' +
+          '服务器上回填真实数据：bash scripts/server_migrate.sh prepare'
+      );
     } finally {
       setLoading(false);
     }
   }, [handleImportData]);
 
-  const handleLoadCoreGraph = useCallback(async () => {
+  /** 把 Neo4j 返回的拓扑装进页面状态；返回 false 表示没有可用数据 */
+  const applyNeo4jTopology = useCallback((neo4jData: Neo4jTopologyResponse): boolean => {
+    if (!neo4jData.nodes || neo4jData.nodes.length === 0) {
+      alert('Neo4j 中暂无拓扑数据，请先用脚本向 Neo4j 导入数据');
+      return false;
+    }
+    // 只保留出现在边上的节点，避免渲染孤立点。
+    // 服务端已按 limit 截断并同步过滤过边，这里再兜一层。
+    const linkNodeIds = new Set<string>();
+    neo4jData.links.forEach(l => {
+      linkNodeIds.add(l.source);
+      linkNodeIds.add(l.target);
+    });
+    const connectedNodes = neo4jData.nodes.filter(n => linkNodeIds.has(n.id));
+    if (connectedNodes.length === 0) {
+      alert('Neo4j 中暂无有连接关系的拓扑数据');
+      return false;
+    }
+    const topologyData: TopologyData = {
+      nodes: connectedNodes.map(n => ({
+        ...n,
+        zone: n.zone_id,
+        bytes_sent: 0,
+        bytes_received: 0,
+      })) as TopologyNode[],
+      links: neo4jData.links.map(l => ({
+        ...l,
+        isCrossDomain: l.is_cross_domain,
+      })),
+      metadata: {
+        ...neo4jData.metadata,
+        ...({ zones: neo4jData.zones } as any),
+        domainNames: Object.fromEntries(
+          neo4jData.zones.map(z => [Number(z.id), z.label])
+        ),
+      },
+    };
+    handleImportData(topologyData);
+    return true;
+  }, [handleImportData]);
+
+  const handleLoadFromNeo4j = useCallback(async () => {
     setLoading(true);
     try {
-      // 优先加载本地真实核心图（已从仓库移除，仅本机存在）；
-      // 不存在时回退到可公开的合成演示数据 public/topology_demo.json
-      let res = await fetch('/topology_data_core.json', { cache: 'no-store' });
-      let demo = false;
-      if (!res.ok) {
-        res = await fetch('/topology_demo.json', { cache: 'no-store' });
-        demo = true;
-      }
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      handleImportData(json as TopologyData);
-      if (demo) {
-        alert('未找到本地真实核心图 public/topology_data_core.json，已加载合成演示数据（RFC 5737 测试网段，不含任何真实网络信息）。');
+      const neo4jData = await loadFromNeo4j(true);
+      if (!applyNeo4jTopology(neo4jData)) return;
+
+      // 服务端有节点上限保护（默认只保留连通度最高的 2000 个）。被截断时问用户要不要全量。
+      const meta = neo4jData.metadata;
+      if (meta?.truncated) {
+        const total = meta.total_ips_in_db ?? 0;
+        const loaded = neo4jData.nodes.length;
+        const goAll = window.confirm(
+          `库中共有 ${total} 个 IP，为避免浏览器卡死，只按连通度降序加载了前 ${loaded} 个。\n\n` +
+            `是否改为加载全部 ${total} 个？（力导向布局会明显变慢，可能卡顿）`
+        );
+        if (goAll) {
+          const full = await loadFromNeo4j(true, { all: true });
+          applyNeo4jTopology(full);
+        }
       }
     } catch (error) {
-      console.error('加载业务核心图失败:', error);
-      alert('无法加载业务核心图：本机缺少 public/topology_data_core.json，且演示数据 public/topology_demo.json 也缺失');
+      const { message, hint, code } = describeApiError(error);
+      console.error('Neo4j 连接失败:', code, error);
+      const goLocal = window.confirm(
+        `加载 Neo4j 数据失败（${code}）：\n${message}\n\n` +
+          (hint ? `${hint}\n\n` : '') +
+          '是否改为加载本地业务核心图 / 合成演示数据？\n' +
+          '（Neo4j 未就绪时，Louvain / WCC 会自动降级为浏览器本地图算法）'
+      );
+      if (goLocal) {
+        await handleLoadCoreGraph();
+      }
     } finally {
       setLoading(false);
     }
-  }, [handleImportData]);
+  }, [applyNeo4jTopology, handleLoadCoreGraph]);
 
 
   const refreshGdsData = useCallback(async () => {
@@ -615,26 +764,46 @@ export default function Home() {
   }, [gdsAlgorithm, gdsData, hasGdsAlgorithmResults, refreshGdsData]);
 
   const handleQueryPath = useCallback(async (source: string, target: string) => {
+    // Neo4j 不可用时用本地 BFS 兜底（与邻居展开的降级策略保持一致）
+    const applyLocal = (): boolean => {
+      if (!originalData) return false;
+      const local = findPathLocally(originalData.nodes, originalData.links, source, target, 10);
+      if (!local.found) return false;
+      setPathNodeIds(local.nodeIds);
+      setPathEdges(local.edges);
+      return true;
+    };
+
     try {
       const res = await fetch('/api/analysis/path', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ source, target, maxHops: 10 }),
       });
-      const data = await res.json();
-      if (data.found) {
-        setPathNodeIds(data.nodeIds || data.nodes.map((n: any) => n.id));
+      const data = await res.json().catch(() => null);
+
+      if (res.ok && data?.found) {
+        setPathNodeIds(data.nodeIds || (data.nodes ?? []).map((n: { id: string }) => n.id));
         setPathEdges(data.edges || []);
-      } else {
+        return;
+      }
+      if (res.ok) {
+        // Neo4j 明确回答「无路径」
         setPathNodeIds([]);
         setPathEdges([]);
-        alert(data.message || '清除路径失败');
+        alert(data?.message || `${source} 与 ${target} 之间没有可达路径`);
+        return;
       }
+      console.warn('Neo4j 路径查询不可用，改用本地 BFS：', data?.code ?? res.status);
     } catch (err) {
       console.error('Path query failed:', err);
-      alert('路径查询失败');
     }
-  }, []);
+
+    if (applyLocal()) return;
+    setPathNodeIds([]);
+    setPathEdges([]);
+    alert(`未找到 ${source} → ${target} 的可达路径（Neo4j 不可用时使用本地拓扑计算）`);
+  }, [originalData]);
 
   const handleClearPath = useCallback(() => {
     setPathNodeIds([]);

@@ -72,15 +72,16 @@
   --font-mono:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     'Liberation Mono', 'Courier New', monospace;
+
   /* Light theme */
   --background: #F8F9FA;
   --foreground: #1E293B;
-  --card: #FFFFFF;
+  --card: #FFF;
   --card-foreground: #1E293B;
-  --popover: #FFFFFF;
+  --popover: #FFF;
   --popover-foreground: #1E293B;
   --primary: #0EA5E9;
-  --primary-foreground: #FFFFFF;
+  --primary-foreground: #FFF;
   --secondary: #E2E8F0;
   --secondary-foreground: #1E293B;
   --muted: #F1F5F9;
@@ -98,34 +99,34 @@
   --chart-3: #F59E0B;
   --chart-4: #E11D48;
   --chart-5: #64748B;
-  --sidebar: #FFFFFF;
+  --sidebar: #FFF;
   --sidebar-foreground: #1E293B;
   --sidebar-primary: #0EA5E9;
-  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-primary-foreground: #FFF;
   --sidebar-accent: #E0F2FE;
   --sidebar-accent-foreground: #0C4A6E;
   --sidebar-border: #E2E8F0;
   --sidebar-ring: #0EA5E9;
-  --panel-bg: rgba(255, 255, 255, 0.92);
-  --panel-bg-strong: #FFFFFF;
-  --header-bg: rgba(255, 255, 255, 0.94);
-  --toolbar-bg: rgba(255, 255, 255, 0.92);
+  --panel-bg: rgb(255 255 255 / 92%);
+  --panel-bg-strong: #FFF;
+  --header-bg: rgb(255 255 255 / 94%);
+  --toolbar-bg: rgb(255 255 255 / 92%);
   --toolbar-btn: #64748B;
-  --tooltip-bg: rgba(15, 23, 42, 0.94);
+  --tooltip-bg: rgb(15 23 42 / 94%);
   --tooltip-color: #E2E8F0;
-  --tooltip-border: rgba(148, 163, 184, 0.32);
-  --shadow-panel: 0 4px 24px rgba(30, 64, 120, 0.10), 0 1px 4px rgba(30, 64, 120, 0.06);
-  --shadow-elevated: 0 6px 32px rgba(30, 64, 120, 0.12), 0 1px 2px rgba(30, 64, 120, 0.08);
-  --shadow-header: 0 1px 20px rgba(30, 64, 120, 0.10);
-  --shadow-toolbar: 0 1px 20px rgba(30, 64, 120, 0.08);
-  --shadow-tooltip: 0 12px 40px rgba(15, 23, 42, 0.28), 0 2px 8px rgba(15, 23, 42, 0.12);
+  --tooltip-border: rgb(148 163 184 / 32%);
+  --shadow-panel: 0 4px 24px rgb(30 64 120 / 10%), 0 1px 4px rgb(30 64 120 / 6%);
+  --shadow-elevated: 0 6px 32px rgb(30 64 120 / 12%), 0 1px 2px rgb(30 64 120 / 8%);
+  --shadow-header: 0 1px 20px rgb(30 64 120 / 10%);
+  --shadow-toolbar: 0 1px 20px rgb(30 64 120 / 8%);
+  --shadow-tooltip: 0 12px 40px rgb(15 23 42 / 28%), 0 2px 8px rgb(15 23 42 / 12%);
   --topology-bg: #F8F9FA;
-  --topology-grid: rgba(100, 116, 139, 0.10);
-  --topology-glow-1: rgba(14, 165, 233, 0.10);
-  --topology-glow-2: rgba(148, 163, 184, 0.14);
-  --topology-glow-3: rgba(225, 29, 72, 0.02);
-  --topology-edge: rgba(100, 116, 139, 0.55);
-  --topology-edge-cross: rgba(217, 119, 6, 0.55);
+  --topology-grid: rgb(100 116 139 / 10%);
+  --topology-glow-1: rgb(14 165 233 / 10%);
+  --topology-glow-2: rgb(148 163 184 / 14%);
+  --topology-glow-3: rgb(225 29 72 / 2%);
+  --topology-edge: rgb(100 116 139 / 55%);
+  --topology-edge-cross: rgb(217 119 6 / 55%);
   --topology-label: #334155;
 }
 
@@ -146,8 +147,8 @@
   --accent: #131a2e;
   --accent-foreground: #e0e6f0;
   --destructive: #ff4d6a;
-  --border: rgba(120, 140, 180, 0.08);
-  --input: rgba(120, 140, 180, 0.10);
+  --border: rgb(120 140 180 / 8%);
+  --input: rgb(120 140 180 / 10%);
   --ring: #00e5c7;
   --warning: #f0a030;
   --success: #22d67a;
@@ -162,28 +163,28 @@
   --sidebar-primary-foreground: #050810;
   --sidebar-accent: #131a2e;
   --sidebar-accent-foreground: #e0e6f0;
-  --sidebar-border: rgba(120, 140, 180, 0.08);
+  --sidebar-border: rgb(120 140 180 / 8%);
   --sidebar-ring: #00e5c7;
-  --panel-bg: rgba(12, 17, 32, 0.88);
+  --panel-bg: rgb(12 17 32 / 88%);
   --panel-bg-strong: #131a2e;
-  --header-bg: rgba(10, 15, 26, 0.94);
-  --toolbar-bg: rgba(15, 23, 42, 0.92);
+  --header-bg: rgb(10 15 26 / 94%);
+  --toolbar-bg: rgb(15 23 42 / 92%);
   --toolbar-btn: #5a6680;
-  --tooltip-bg: rgba(12, 17, 32, 0.9);
+  --tooltip-bg: rgb(12 17 32 / 90%);
   --tooltip-color: #e0e6f0;
-  --tooltip-border: rgba(120, 140, 180, 0.12);
-  --shadow-panel: 0 4px 24px rgba(0, 0, 0, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2);
-  --shadow-elevated: 0 6px 32px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-header: 0 1px 20px rgba(0, 0, 0, 0.3);
-  --shadow-toolbar: 0 1px 20px rgba(0, 0, 0, 0.3);
-  --shadow-tooltip: 0 12px 40px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.2);
+  --tooltip-border: rgb(120 140 180 / 12%);
+  --shadow-panel: 0 4px 24px rgb(0 0 0 / 30%), 0 1px 4px rgb(0 0 0 / 20%);
+  --shadow-elevated: 0 6px 32px rgb(0 0 0 / 35%), 0 1px 2px rgb(0 0 0 / 20%);
+  --shadow-header: 0 1px 20px rgb(0 0 0 / 30%);
+  --shadow-toolbar: 0 1px 20px rgb(0 0 0 / 30%);
+  --shadow-tooltip: 0 12px 40px rgb(0 0 0 / 50%), 0 2px 8px rgb(0 0 0 / 20%);
   --topology-bg: #050810;
-  --topology-grid: rgba(120, 140, 180, 0.03);
-  --topology-glow-1: rgba(0, 229, 199, 0.08);
-  --topology-glow-2: rgba(42, 51, 84, 0.2);
-  --topology-glow-3: rgba(255, 77, 106, 0.02);
-  --topology-edge: rgba(90, 102, 128, 0.25);
-  --topology-edge-cross: rgba(240, 160, 48, 0.5);
+  --topology-grid: rgb(120 140 180 / 3%);
+  --topology-glow-1: rgb(0 229 199 / 8%);
+  --topology-glow-2: rgb(42 51 84 / 20%);
+  --topology-glow-3: rgb(255 77 106 / 2%);
+  --topology-edge: rgb(90 102 128 / 25%);
+  --topology-edge-cross: rgb(240 160 48 / 50%);
   --topology-label: oklch(0.7 0.01 250);
 }
 
@@ -193,6 +194,7 @@
   }
   html, body {
     @apply font-sans;
+
     background-color: var(--background);
     color: var(--foreground);
     font-variant-numeric: tabular-nums;
@@ -205,6 +207,7 @@
     min-height: 100vh;
     overflow-x: hidden;
   }
+
   /* 顶部微光 — 收敛为一条很淡的顶部光带，不再大面积照亮画布 */
   body::before {
     content: '';
@@ -218,6 +221,7 @@
     background:
       radial-gradient(ellipse at 50% 0%, var(--topology-glow-1) 0%, transparent 60%);
   }
+
   /* 微噪点纹理覆盖（降到不可察觉） */
   body::after {
     content: '';
@@ -232,14 +236,15 @@
 }
 
 /* =========================================== */
+
 /* VOID COMMAND Utility Classes                */
+
 /* =========================================== */
 
 /* 玻璃态面板（图上浮层收敛：低模糊 + 高不透明度，避免图被"脏化"） */
 .glass-panel {
   background: var(--panel-bg);
   backdrop-filter: blur(8px) saturate(140%);
-  -webkit-backdrop-filter: blur(8px) saturate(140%);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-panel);
 }
@@ -266,9 +271,9 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(0, 229, 199, 0.04) 20%,
-    rgba(0, 229, 199, 0.28) 50%,
-    rgba(0, 229, 199, 0.04) 80%,
+    rgb(0 229 199 / 4%) 20%,
+    rgb(0 229 199 / 28%) 50%,
+    rgb(0 229 199 / 4%) 80%,
     transparent 100%
   );
   opacity: 0.5;
@@ -301,7 +306,7 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(120, 140, 180, 0.2);
+  background: rgb(120 140 180 / 20%);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
@@ -309,7 +314,9 @@
 }
 
 /* =========================================== */
+
 /* Topology Backgrounds                        */
+
 /* =========================================== */
 
 /* 基础网格背景 */
@@ -334,7 +341,9 @@
 }
 
 /* =========================================== */
+
 /* Anomaly & Glow Animations                   */
+
 /* =========================================== */
 
 /* 异常脉冲环 — 珊瑚红色调 */
@@ -368,7 +377,7 @@
   }
   100% {
     opacity: 0;
-    stroke-width: 0px;
+    stroke-width: 0;
   }
 }
 
@@ -387,7 +396,7 @@
 
 /* 兼容旧 anomaly-pulse 类 — 新珊瑚红色 */
 .anomaly-pulse {
-  filter: drop-shadow(0 0 4px rgba(255, 77, 106, 0.6));
+  filter: drop-shadow(0 0 4px rgb(255 77 106 / 60%));
 }
 
 /* 节点发光效果 — 电光青绿 */
@@ -409,7 +418,9 @@
 }
 
 /* =========================================== */
+
 /* Tooltip — 玻璃态升级                        */
+
 /* =========================================== */
 
 .topology-tooltip {
@@ -418,7 +429,6 @@
   z-index: 50;
   background: var(--tooltip-bg);
   backdrop-filter: blur(10px) saturate(160%);
-  -webkit-backdrop-filter: blur(10px) saturate(160%);
   border: 1px solid var(--tooltip-border);
   border-radius: 8px;
   padding: 12px 16px;
@@ -431,7 +441,9 @@
 }
 
 /* =========================================== */
+
 /* Sidebar                                     */
+
 /* =========================================== */
 
 .sidebar-section {
@@ -440,7 +452,9 @@
 }
 
 /* =========================================== */
+
 /* Stat Card 兼容（旧类名）                    */
+
 /* =========================================== */
 
 .stat-card {
@@ -463,11 +477,13 @@
 }
 
 /* =========================================== */
+
 /* Welcome Screen Decorative Elements          */
+
 /* =========================================== */
 
 @keyframes float-slow {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  0%, 100% { transform: translateY(0) rotate(0deg); }
   50% { transform: translateY(-12px) rotate(1deg); }
 }
 .float-slow {
@@ -475,7 +491,7 @@
 }
 
 @keyframes float-medium {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  0%, 100% { transform: translateY(0) rotate(0deg); }
   50% { transform: translateY(-8px) rotate(-1deg); }
 }
 .float-medium {
@@ -515,8 +531,11 @@
     0 0 24px color-mix(in srgb, var(--warning) 35%, transparent),
     0 0 48px color-mix(in srgb, var(--warning) 15%, transparent);
 }
+
 /* =========================================== */
+
 /* Floating Action Bar                         */
+
 /* =========================================== */
 
 .floating-bar {
@@ -527,32 +546,22 @@
 .fab-btn {
   background: var(--panel-bg);
   backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
   border: 1px solid var(--border);
   color: var(--foreground);
   box-shadow: var(--shadow-panel);
   transition: all 0.25s ease;
 }
 
-.fab-btn:hover {
-  border-color: color-mix(in srgb, var(--primary) 40%, transparent);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-  transform: translateY(-1px);
-}
-
-.fab-btn:hover .lucide {
-  color: var(--primary);
-}
-
 /* =========================================== */
+
 /* New Layout — Header + Icon Toolbar + Canvas */
+
 /* =========================================== */
 
 /* Top header bar — frosted glass (low blur) */
 .app-header {
   background: var(--header-bg);
   backdrop-filter: blur(10px) saturate(150%);
-  -webkit-backdrop-filter: blur(10px) saturate(150%);
   border-bottom: 1px solid var(--border);
   box-shadow: var(--shadow-header);
 }
@@ -561,7 +570,6 @@
 .icon-toolbar {
   background: var(--toolbar-bg);
   backdrop-filter: blur(10px) saturate(140%);
-  -webkit-backdrop-filter: blur(10px) saturate(140%);
   border-right: 1px solid var(--border);
 }
 
@@ -602,7 +610,7 @@
   height: 20px;
   border-radius: 0 3px 3px 0;
   background: var(--primary);
-  box-shadow: 0 0 8px rgba(0, 229, 199, 0.6);
+  box-shadow: 0 0 8px rgb(0 229 199 / 60%);
 }
 
 /* Empty state breathing animation */
@@ -663,12 +671,14 @@
 .sheet-drawer-glass {
   background: var(--panel-bg-strong) !important;
   backdrop-filter: blur(12px) saturate(150%);
-  -webkit-backdrop-filter: blur(12px) saturate(150%);
   border-color: var(--border) !important;
+  overscroll-behavior: contain;
 }
 
 /* =========================================== */
+
 /* Inspector Slide Animation                   */
+
 /* =========================================== */
 
 @keyframes inspector-slide-in {
@@ -717,6 +727,16 @@
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+.fab-btn:hover {
+  border-color: color-mix(in srgb, var(--primary) 40%, transparent);
+  box-shadow: 0 2px 12px rgb(0 0 0 / 30%);
+  transform: translateY(-1px);
+}
+
+.fab-btn:hover .lucide {
+  color: var(--primary);
+}
+
 :root[data-theme='dark'] {
   color-scheme: dark;
 }
@@ -737,10 +757,6 @@ h1,
 h2,
 h3 {
   scroll-margin-top: 2rem;
-}
-
-.sheet-drawer-glass {
-  overscroll-behavior: contain;
 }
 
 g.node-group:focus {

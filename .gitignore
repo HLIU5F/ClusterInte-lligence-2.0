@@ -217,3 +217,10 @@ docs/*简历*
 # 不应入库的备份与虚拟环境
 src/**/*.bak.*
 scripts/.venv/
+
+# 根目录下的真实拓扑数据副本（含真实内网 IP）—— 与 public/ 下同名文件同等对待，严禁入库
+/topology_for_frontend*.json
+/topology_data*.json
+/security_zones_export*.csv
+/资产全景_*.csv
+/连接关系表*.csv

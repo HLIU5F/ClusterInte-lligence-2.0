@@ -4,6 +4,10 @@
 
 ClusterInte-lligence 2.0 是一个面向网络安全与运维团队的**交互式拓扑可视化与分析工具**。项目以 Neo4j 图数据库为数据底座，结合社区发现（Louvain/WCC）、异常检测（Isolation Forest）等算法，自动对集群网络流量进行安全域划分、枢纽识别与风险评分，并通过 Next.js 前端提供实时探索能力。
 
+> 💡 **Neo4j 是可选依赖**：图数据库不可用时，前端仍可加载本地 / 演示数据，
+> 社区发现、WCC、PageRank 会自动降级为浏览器本地实现。部署细节见
+> [`docs/云服务器部署与Neo4j接入.md`](docs/云服务器部署与Neo4j接入.md)。
+
 ---
 
 ## 🎬 演示视频
@@ -100,8 +104,9 @@ cd ClusterInte-lligence-2.0
 # 2. 安装依赖（仅允许 pnpm）
 pnpm install
 
-# 3. 配置环境变量
-cp .env.example .env.local  # 如无 .env.example 请手动创建
+# 3. 配置环境变量（模板已随仓库提供）
+cp .env.example .env.local
+# 暂时不接 Neo4j 也没关系：只需要确认 PYTHON_BIN / NEXT_PUBLIC_MONITOR_IPS
 
 # 4. 导入数据到 Neo4j（按需选择脚本）
 node scripts/import_purified_to_neo4j.js
@@ -117,6 +122,17 @@ pnpm start
 ```
 
 服务默认监听 `http://localhost:5000`。
+
+### 部署自检
+
+```bash
+curl -s localhost:5000/api/health | python3 -m json.tool
+# 带上 ?deep=1 额外统计库里的 IP / 关系数量
+```
+
+`status: ok` = 应用正常且 Neo4j 可查询；`status: degraded` = 应用正常但图数据库未就绪。
+`degraded` **不是故障**：此时仍可用「加载业务核心图」读本地 / 演示数据，
+Louvain / WCC 会自动降级为本地图算法，最短路径会自动降级为本地 BFS。
 
 ---
 
@@ -140,9 +156,9 @@ pnpm start
 | 命令 | 说明 |
 |------|------|
 | `pnpm dev` | 启动 Next.js 开发服务器 |
-| `pnpm build` | 执行生产构建（调用 `scripts/build.sh`） |
-| `pnpm start` | 启动生产服务（调用 `scripts/start.sh`） |
-| `pnpm validate` | 并行执行 TypeScript 检查 + ESLint + Stylelint |
+| `pnpm build` | 生产构建（`next build`）；平台部署走 `bash scripts/build.sh`（额外用 tsup 打包自定义 server） |
+| `pnpm start` | `next start`，默认 3000；**生产部署请用 `bash scripts/start.sh` 或 pm2**（默认 5000） |
+| `pnpm validate` | 并行执行 TypeScript 检查 + ESLint + Stylelint（当前全绿） |
 | `pnpm lint` | ESLint 代码检查 |
 | `pnpm lint:style` | CSS / Tailwind 样式检查 |
 
@@ -176,6 +192,38 @@ pnpm start
         ↓
   安全域 · 异常评分 · 枢纽识别 · 基线告警
 ```
+
+---
+
+## 📊 数据集怎么选
+
+`public/` 下的静态数据集结构差异极大，**选错会出现「加载成功但分析不出东西」**。下表为实测结论：
+
+| 文件 | 节点 / 边 | 结构实况 | 适合做什么 |
+|------|-----------|----------|------------|
+| `topology_data_core.json` | 212 / 211 | **星型**：1 个采集 hub 连 211 个叶子（叶子度数全为 1），`zone_label` 为空 | 快速演示、验证聚类/导出流水线 |
+| `topology_demo.json` | 210 / 237 | 合成数据（RFC 5737 网段） | 公开演示；无真实数据时的兜底 |
+| **`topology_for_frontend_new2.0.json`** | 3358 / **23741** | **新基线关系图**：平均度 14.14、6 个连通分量、模块度 **Q=0.67**，含 6 类安全域 + `asset_value` + 270 个预计算社区 | ✅✅ **首选**：社区发现 / 跨域攻击链 / 资产价值排序 |
+| `topology_for_frontend.json` | 3739 / **8893** | **主机间访问关系**，平均度 4.76，边带 ports/bytes，`zone_label` 齐全 | ✅ **社区发现 / 枢纽识别 / 异常检测** |
+| `topology_data_security_enhanced.json` | 3736 / 211 | 星型核心 + 3524 个孤立节点（平均度 0.11，3525 个连通分量） | 资产台账、端口/子网统计 |
+| `topology_data_security.json` | 3736 / 211 | 同上 | 资产台账 |
+| `topology_data_purified.json` | 3736 / 211 | 同上 | 资产台账 |
+
+> ⚠️ 上表**只有 `topology_demo.json` 进了 git**，其余是真实网络数据（已被 `.gitignore` 排除）。
+> 服务器上需先 `bash scripts/server_migrate.sh prepare` 回填，否则下拉框选中会报 HTTP 404 并回退到演示数据。
+
+**为什么「业务核心图」做不了图分析**：它是采集节点 ↔ 被采集节点的星型流量 ——
+WCC 只有 1 个连通分量、Louvain 只能分出 1~2 个社区、PageRank 必然把 hub 排第一、跨域边没有意义。
+真正有拓扑结构的是 `topology_for_frontend.json`。前端「数据源 → 静态数据集」下拉框可切换。
+
+---
+
+## 📚 文档
+
+| 文档 | 内容 |
+|------|------|
+| [`docs/云服务器部署与Neo4j接入.md`](docs/云服务器部署与Neo4j接入.md) | 低内存服务器部署、pm2、Neo4j / GDS 接入、错误码与故障对照 |
+| [`docs/项目说明文档.md`](docs/项目说明文档.md) | 架构、数据模型、算法细节、API 清单 |
 
 ---
 

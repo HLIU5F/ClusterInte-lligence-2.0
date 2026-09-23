@@ -11,7 +11,13 @@
  */
 
 import { NextResponse } from 'next/server';
+import { neo4jErrorResponse } from '@/lib/apiErrors';
 import { runCypher } from '@/lib/neo4j';
+
+/** 默认返回的 IP 节点上限：实测本库 3738 节点全量交给 D3 力导向会卡死浏览器 */
+const DEFAULT_IP_LIMIT = 2000;
+/** 硬上限，避免 ?limit=999999 之类的请求把服务打挂 */
+const MAX_IP_LIMIT = 20000;
 
 interface IpRecord {
   id: string;
@@ -21,6 +27,9 @@ interface IpRecord {
   zone_id: string | null;
   zone_color: string | null;
   zone_label: string | null;
+  ip_zone_id: string | null;
+  ip_zone_color: string | null;
+  ip_zone_label: string | null;
   degree: number;
   in_degree: number;
   out_degree: number;
@@ -37,6 +46,8 @@ interface IpRecord {
   // Neo4j 里 IP 节点存的是列表：ports: number[]（如 [443, 36000]）、protocols: string[]（如 ["tcp"]）
   ports: number[];
   protocols: string[];
+  // 数据自带的服务角色（client/server/hybrid…），端口推导不出时作为兜底
+  role_guess: string | null;
 }
 
 interface LinkRecord {
@@ -172,6 +183,14 @@ export async function GET(request: Request) {
     const includeAll = url.searchParams.get('all') === '1';
     const connectedFilter = includeAll ? '' : 'WHERE exists((ip)-[:CONNECTS_TO]-())';
 
+    // 节点上限保护（?all=1 关闭限制；?limit=N 自定义 1..20000）。
+    // 目的：不让一次渲染数千节点卡死浏览器。
+    const rawLimit = Number(url.searchParams.get('limit'));
+    const requestedLimit =
+      Number.isFinite(rawLimit) && rawLimit > 0
+        ? Math.min(Math.floor(rawLimit), MAX_IP_LIMIT)
+        : DEFAULT_IP_LIMIT;
+
     // 1) 节点 + 它们的 Subnet + Zone（一次 JOIN 取齐）
     // Run the three topology queries in parallel instead of serially.
     const [ipRecords, linkRecords, zoneRecords] = await Promise.all([
@@ -180,6 +199,8 @@ export async function GET(request: Request) {
         ${connectedFilter}
         OPTIONAL MATCH (ip)-[:BELONGS_TO]->(sn:Subnet)
         OPTIONAL MATCH (sn)-[:IN_ZONE]->(z:Zone)
+        // IP 自身挂的域（数据作者按 IP 标注，最准确）
+        OPTIONAL MATCH (ip)-[:IN_ZONE]->(iz:Zone)
         OPTIONAL MATCH (ip)-[:BELONGS_TO_GROUP]->(bg:BusinessGroup)
         OPTIONAL MATCH (ip)-[:RUNS_ON]->(os:OS)
         OPTIONAL MATCH (ip)-[:RUNS_APP]->(app:Application)
@@ -192,6 +213,9 @@ export async function GET(request: Request) {
           z.id            AS zone_id,
           z.color         AS zone_color,
           z.label         AS zone_label,
+          iz.id           AS ip_zone_id,
+          iz.color        AS ip_zone_color,
+          iz.label        AS ip_zone_label,
           coalesce(ip.degree, 0)        AS degree,
           coalesce(ip.in_degree, 0)     AS in_degree,
           coalesce(ip.out_degree, 0)    AS out_degree,
@@ -203,6 +227,7 @@ export async function GET(request: Request) {
           head(collect(DISTINCT os.name)) AS os_name,
           head(collect(DISTINCT app.name)) AS application,
           ip.owner                      AS owner,
+          ip.role_guess                 AS role_guess,
           head(collect(DISTINCT env.name)) AS environment,
           coalesce(ip.cmdb_tags, [])    AS cmdb_tags,
           coalesce(ip.ports, [])        AS ports,
@@ -379,9 +404,11 @@ export async function GET(request: Request) {
         id: r.id,
         community: r.community,
         subnet_24: r.subnet_24 ?? r.subnet_cidr ?? '0.0.0.0/0',
-        zone_id: r.zone_id ?? '-1',
-        zone_color: r.zone_color ?? '#64748b',
-        zone_label: r.zone_label ?? 'Unassigned',
+        // 优先用 IP 自带的域（数据作者标注的安全域，最准确），
+        // 其次才是「子网多数票」得到的域 —— 否则同一子网里的 DB 主机会被算进 App 域。
+        zone_id: r.ip_zone_id ?? r.zone_id ?? '-1',
+        zone_color: r.ip_zone_color ?? r.zone_color ?? '#64748b',
+        zone_label: r.ip_zone_label ?? r.zone_label ?? 'Unassigned',
         degree: st.deg || Number(r.degree) || 0,
         in_degree: st.inD,
         out_degree: st.outD,
@@ -403,14 +430,31 @@ export async function GET(request: Request) {
         cmdb_tags: Array.isArray(r.cmdb_tags) ? r.cmdb_tags : [],
         ports: toNumberList(r.ports),
         protocols: toStringList(r.protocols),
-        // 角色：主导端口 → 服务角色（不再回退成 service_type/unknown）
-        role_guess: st.role,
+        // 角色：优先用端口推导；推不出（unknown）时回退到数据自带的 role_guess，
+        // 否则像 new2.0 这种「端口只在边上」的数据集会把角色整列丢成 unknown。
+        role_guess: st.role !== 'unknown' ? st.role : (r.role_guess || 'unknown'),
       };
     });
 
+    // ---- 节点上限保护 ----
+    // 默认只保留连通度最高的一部分；截断时同时过滤边，
+    // 否则会出现指向被裁掉节点的悬空边，D3 渲染会出错。
+    // 需要全量：?all=1；自定义：?limit=N。
+    const totalIps = nodes.length;
+    const limitValue = includeAll ? totalIps : requestedLimit;
+    const truncated = totalIps > limitValue;
+    const keptNodes = truncated
+      ? [...nodes].sort((a, b) => Number(b.degree) - Number(a.degree)).slice(0, limitValue)
+      : nodes;
+
+    const keptIds = new Set(keptNodes.map(n => n.id));
+    const keptLinks = truncated
+      ? linkRecords.filter(l => keptIds.has(l.src) && keptIds.has(l.dst))
+      : linkRecords;
+
     // 给每条边附上 "是否跨 zone"（前端直接用，不用再算）
-    const ipZone = new Map(nodes.map(n => [n.id, n.zone_id]));
-    const links = linkRecords.map(l => ({
+    const ipZone = new Map(keptNodes.map(n => [n.id, n.zone_id]));
+    const links = keptLinks.map(l => ({
       source: l.src,
       target: l.dst,
       weight: Number(l.weight) || 1,
@@ -424,22 +468,19 @@ export async function GET(request: Request) {
       metadata: {
         generated_at: new Date().toISOString(),
         source: 'neo4j',
-        total_nodes: nodes.length,
+        total_nodes: keptNodes.length,
         total_links: links.length,
-        communities: new Set(nodes.map(n => n.community)).size,
+        communities: new Set(keptNodes.map(n => n.community)).size,
+        // 截断溯源：前端据此提示「只加载了前 N 个」
+        truncated,
+        total_ips_in_db: totalIps,
+        node_limit: includeAll ? null : requestedLimit,
       },
-      nodes,
+      nodes: keptNodes,
       links,
       zones: zoneRecords,
     });
   } catch (err) {
-    console.error('[api/topology/neo4j] error:', err);
-    return NextResponse.json(
-      {
-        error: 'Failed to load from Neo4j',
-        detail: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 }
-    );
+    return neo4jErrorResponse('api/topology/neo4j', err);
   }
 }
