@@ -269,6 +269,27 @@ export function TopologyGraph({
     selectedMerge.append('feMergeNode').attr('in', 'coloredBlur');
     selectedMerge.append('feMergeNode').attr('in', 'SourceGraphic');
 
+    // Search highlight glow filter (red aperture, #ff0000)
+    const searchGlowFilter = defs.append('filter')
+      .attr('id', 'search-glow')
+      .attr('x', '-150%')
+      .attr('y', '-150%')
+      .attr('width', '400%')
+      .attr('height', '400%');
+    searchGlowFilter.append('feGaussianBlur')
+      .attr('in', 'SourceGraphic')
+      .attr('stdDeviation', '8')
+      .attr('result', 'blur');
+    searchGlowFilter.append('feColorMatrix')
+      .attr('in', 'blur')
+      .attr('type', 'matrix')
+      .attr('values', '0 0 0 0 1  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0')
+      .attr('result', 'redBlur');
+    const searchMerge = searchGlowFilter.append('feMerge');
+    searchMerge.append('feMergeNode').attr('in', 'redBlur');
+    searchMerge.append('feMergeNode').attr('in', 'redBlur');
+    searchMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
     defs.append('marker')
       .attr('id', 'arrowhead')
       .attr('viewBox', '0 -5 10 10')
@@ -290,19 +311,12 @@ export function TopologyGraph({
     // Degree scale for node size - adaptive for large graphs
     const degreeExtent = d3.extent(nodes, d => d.degree) as [number, number];
     const isLargeGraph = nodes.length > 1000;
-    // 星型中心节点：服务端角色优先，同角色时按度数最大选取
+    // 星型中心节点（度数最大）用最鲜艳的主青色突出
     const HUB_COLOR = '#00e5c7';
-    const SERVER_ROLES = new Set(['web_server','database','cache','message_queue',
-      'dns_server','ldap_server','file_server','data_platform','mail_server',
-      'rpc_service','admin_server','bastion_host','monitoring']);
-    const hubNodeId = nodes.reduce<SimNode | null>((best, n) => {
-      const nIsServer = SERVER_ROLES.has(n.role_guess);
-      const bIsServer = best ? SERVER_ROLES.has(best.role_guess) : false;
-      if (best == null) return n;
-      if (nIsServer && !bIsServer) return n;
-      if (!nIsServer && bIsServer) return best;
-      return (n.degree ?? 0) > (best.degree ?? 0) ? n : best;
-    }, null)?.id;
+    const hubNodeId = nodes.reduce<SimNode | null>(
+      (best, n) => (best == null || (n.degree ?? 0) > (best.degree ?? 0) ? n : best),
+      null
+    )?.id;
     const nodeSizeScale = d3.scaleLinear()
       .domain(degreeExtent[0] === degreeExtent[1] ? [0, degreeExtent[1]] : degreeExtent)
       .range(isLargeGraph ? [2, 8] : [4, 16]);
@@ -770,7 +784,7 @@ export function TopologyGraph({
     });
   }, [highlightedCommunity]);
 
-  // Handle search highlight
+  // Handle search highlight with animated red pulsing aperture rings
   useEffect(() => {
     if (!searchNodeId) return;
     const svg = d3.select(svgRef.current);
@@ -780,7 +794,6 @@ export function TopologyGraph({
     if (!targetNode.empty()) {
       const nodeData = targetNode.datum();
       if (nodeData && nodeData.x != null && nodeData.y != null) {
-        const container = svg.select('.topology-container');
         const currentTransform = d3.zoomTransform(svgRef.current!);
         const scale = Math.max(currentTransform.k, 1.5);
 
@@ -792,11 +805,95 @@ export function TopologyGraph({
             .translate(-nodeData.x, -nodeData.y)
         );
 
-        targetNode.classed('blink-node', true);
-        setTimeout(() => targetNode.classed('blink-node', false), 3000);
+        // Compute node radius for ring sizing
+        const degreeExtent = d3.extent(nodes, d => d.degree) as [number, number];
+        const isLargeGraph = nodes.length > 500;
+        const rScale = d3.scaleLinear()
+          .domain(degreeExtent[0] === degreeExtent[1] ? [0, degreeExtent[1]] : degreeExtent)
+          .range(isLargeGraph ? [2, 8] : [4, 16]);
+        const r = rScale(nodeData.degree);
+
+        // Apply red glow filter
+        targetNode.select('circle').attr('filter', 'url(#search-glow)');
+
+        // Pulsing red glow background
+        const glowBg = targetNode.append('circle')
+          .attr('class', 'search-ring')
+          .attr('r', r + 10)
+          .attr('fill', '#ff0000')
+          .attr('opacity', 0.15)
+          .attr('filter', 'url(#search-glow)');
+        glowBg.append('animate')
+          .attr('attributeName', 'opacity')
+          .attr('values', '0.1;0.3;0.1')
+          .attr('dur', '1s')
+          .attr('repeatCount', '3');
+        glowBg.append('animate')
+          .attr('attributeName', 'r')
+          .attr('values', `${r + 8};${r + 16};${r + 8}`)
+          .attr('dur', '1s')
+          .attr('repeatCount', '3');
+
+        // Expanding ring 1 (fast pulse)
+        const ring1 = targetNode.append('circle')
+          .attr('class', 'search-ring')
+          .attr('r', r + 2)
+          .attr('fill', 'none')
+          .attr('stroke', '#ff0000')
+          .attr('stroke-width', 3)
+          .attr('opacity', 0);
+        ring1.append('animate')
+          .attr('attributeName', 'r')
+          .attr('values', `${r + 2};${r + 28}`)
+          .attr('dur', '1s')
+          .attr('repeatCount', '3');
+        ring1.append('animate')
+          .attr('attributeName', 'stroke-width')
+          .attr('values', '3;0.3')
+          .attr('dur', '1s')
+          .attr('repeatCount', '3');
+        ring1.append('animate')
+          .attr('attributeName', 'opacity')
+          .attr('values', '0.9;0')
+          .attr('dur', '1s')
+          .attr('repeatCount', '3');
+
+        // Expanding ring 2 (delayed 0.5s for staggered effect)
+        const ring2 = targetNode.append('circle')
+          .attr('class', 'search-ring')
+          .attr('r', r + 2)
+          .attr('fill', 'none')
+          .attr('stroke', '#ff0000')
+          .attr('stroke-width', 2.5)
+          .attr('opacity', 0);
+        ring2.append('animate')
+          .attr('attributeName', 'r')
+          .attr('values', `${r + 2};${r + 24}`)
+          .attr('dur', '1s')
+          .attr('begin', '0.5s')
+          .attr('repeatCount', '3');
+        ring2.append('animate')
+          .attr('attributeName', 'stroke-width')
+          .attr('values', '2.5;0.2')
+          .attr('dur', '1s')
+          .attr('begin', '0.5s')
+          .attr('repeatCount', '3');
+        ring2.append('animate')
+          .attr('attributeName', 'opacity')
+          .attr('values', '0.7;0')
+          .attr('dur', '1s')
+          .attr('begin', '0.5s')
+          .attr('repeatCount', '3');
+
+        // Remove all search rings and glow after 3 seconds
+        setTimeout(() => {
+          targetNode.selectAll('.search-ring').remove();
+          targetNode.select('circle').attr('filter', null);
+        }, 3000);
       }
     }
   }, [searchNodeId, dimensions]);
+
 
   // Handle selected node highlight
   useEffect(() => {
