@@ -22,6 +22,8 @@ interface InspectorPanelProps {
   onNodeSelect: (node: TopologyNode | null) => void;
   onToggleFocus: (communityId: number | null) => void;
   onEnrichComplete?: (ip: string, result: any) => void;
+  /** 在图上定位节点（复用搜索光圈 + 未渲染节点补显） */
+  onLocateNode?: (nodeId: string) => void;
   gdsAlgorithm?: 'louvain' | 'wcc' | 'original';
   gdsData?: { nodes: any[]; zones: any[]; hubNodes: any[] } | null;
 }
@@ -36,6 +38,7 @@ export function InspectorPanel({
   onToggleFocus,
   gdsAlgorithm = 'original',
   gdsData = null,
+  onLocateNode,
 }: InspectorPanelProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState<InspectorTab>('detail');
@@ -119,7 +122,9 @@ export function InspectorPanel({
         ))}
       </div>
 
-      <ScrollArea className="flex-1">
+      {/* flex-1 + min-h-0：缺了 min-h-0，ScrollArea 会被内容撑到超过面板高度，
+          下半部分既滚不动也点不到（历史 bug） */}
+      <ScrollArea className="flex-1 min-h-0">
         {/* ===== Detail Tab ===== */}
         {activeTab === 'detail' && (
           <div className="p-3">
@@ -179,12 +184,13 @@ export function InspectorPanel({
 
         {/* ===== Reachability Tab（横向可达性） ===== */}
         {activeTab === 'reach' && (
-          <div className="p-3">
+          <div className="p-3 pb-6">
             <ReachabilityPanel
               selectedNodeId={selectedNode?.id || null}
               selectedNode={selectedNode}
               data={data}
               onNodeSelect={onNodeSelect}
+              onLocate={onLocateNode}
             />
           </div>
         )}

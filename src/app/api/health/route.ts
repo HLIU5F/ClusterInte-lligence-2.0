@@ -18,6 +18,7 @@ import path from 'path';
 import { probeNeo4j, runCypher } from '@/lib/neo4j';
 import { LOCAL_FALLBACK_HINT } from '@/lib/apiErrors';
 import { missingNeo4jSettings, readNeo4jConfig } from '@/lib/neo4jConfig';
+import { readBuildStamp } from '@/lib/buildStamp';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -36,16 +37,32 @@ export async function GET(request: Request) {
 
   const neo4j = await probeNeo4j();
 
-  let counts: { ips: number; links: number } | null = null;
+  let counts: {
+    ips: number;
+    links: number;
+    /** 有 anomaly_score 属性的 IP 数 —— 0 表示这批数据没带异常标注 */
+    anomaly_labeled: number;
+    /** is_anomaly=true 的 IP 数 —— 前端红色光圈就是由它决定的 */
+    anomaly_flagged: number;
+  } | null = null;
   if (deep && neo4j.ok) {
     try {
       const ipRows = await runCypher<{ n: number }>('MATCH (n:IP) RETURN count(n) AS n');
       const linkRows = await runCypher<{ n: number }>(
         'MATCH ()-[r:CONNECTS_TO]->() RETURN count(r) AS n'
       );
+      // 这两行是「满屏红色光圈」的判定依据：
+      // labeled 就应该等于 ips；flagged 应等于数据文件里 is_anomaly 的个数（new2.0 为 0）。
+      const anomalyRows = await runCypher<{ labeled: number; flagged: number }>(
+        `MATCH (n:IP)
+         RETURN count(CASE WHEN n.anomaly_score IS NOT NULL THEN 1 END) AS labeled,
+                count(CASE WHEN n.is_anomaly = true THEN 1 END) AS flagged`
+      );
       counts = {
         ips: Number(ipRows[0]?.n ?? 0),
         links: Number(linkRows[0]?.n ?? 0),
+        anomaly_labeled: Number(anomalyRows[0]?.labeled ?? 0),
+        anomaly_flagged: Number(anomalyRows[0]?.flagged ?? 0),
       };
     } catch {
       counts = null;
@@ -60,6 +77,9 @@ export async function GET(request: Request) {
   return NextResponse.json({
     status: neo4j.ok ? 'ok' : 'degraded',
     checked_at: new Date().toISOString(),
+    // 版本自检：这四个字段是「线上到底跑没跑新代码」的唯一权威答案，
+    // 不要再靠 grep 源码或几百字节的 route.js loader 去推断。
+    build: readBuildStamp(),
     app: {
       node: process.version,
       env: process.env.COZE_PROJECT_ENV || 'development',

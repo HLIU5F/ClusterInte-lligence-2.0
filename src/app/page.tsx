@@ -71,6 +71,12 @@ const DEFAULT_BASELINE_RULES: BaselineRule[] = [
 /** 画布最多渲染多少节点（聚类/统计仍用全量）。实测 D3 力导向在数百节点以上开始明显卡顿。 */
 const RENDER_NODE_CAP = 300;
 
+/**
+ * 搜索命中节点的直连邻居最多补显多少个。
+ * 搜到度数上千的枢纽时不加这个上限，一次会往画布里塞进上千个节点直接卡死。
+ */
+const MAX_FORCED_NEIGHBORS = 60;
+
 function buildGdsRunInfo(algorithm: 'louvain' | 'wcc', runResult: any): GdsRunInfo {
   const info = algorithm === 'louvain' ? runResult?.louvain : runResult?.wcc;
   if (algorithm === 'louvain') {
@@ -256,6 +262,8 @@ export default function Home() {
   const [highlightedCommunity, setHighlightedCommunity] = useState<number | null>(null);
   const [focusedCommunity, setFocusedCommunity] = useState<number | null>(null);
   const [searchNodeId, setSearchNodeId] = useState<string | null>(null);
+  /** 每次搜索自增：同一个节点重复搜索时也要能重新打光圈 */
+  const [searchSeq, setSearchSeq] = useState(0);
   const [baselineRules, setBaselineRules] = useState<BaselineRule[]>(DEFAULT_BASELINE_RULES);
   const [whitelist, setWhitelist] = useState<WhitelistRule[]>([]);
   const [resetKey, setResetKey] = useState(0);
@@ -416,10 +424,30 @@ export default function Home() {
     }
   }, [handleImportData]);
 
+  /**
+   * 搜索定位一个节点。
+   *
+   * 不再 3.5s 后清空 searchNodeId：命中节点会被「补显」进渲染集（见 renderData 的
+   * RENDER_NODE_CAP 分支），一清空它就会从画布上消失，看起来像搜索失败。
+   * 光圈动画本身 3 秒结束，不会在画布上留下残留。
+   */
   const handleSearchNode = useCallback((id: string) => {
-    setSearchNodeId(id);
+    const q = id.trim();
+    if (!q) return;
+    setSearchNodeId(q);
+    setSearchSeq(s => s + 1);
     setFocusedCommunity(null);
-    setTimeout(() => setSearchNodeId(null), 3500);
+  }, []);
+
+  /**
+   * 只做「定位 + 打光圈」，不动安全域聚焦状态。
+   * 供检查器里的可达性列表使用：点一条目标只想知道它在图上哪，别顺手把聚焦/搜索条件也清了。
+   */
+  const handleLocateNode = useCallback((id: string) => {
+    const q = id.trim();
+    if (!q) return;
+    setSearchNodeId(q);
+    setSearchSeq(s => s + 1);
   }, []);
 
   const handleResetView = useCallback(() => {
@@ -427,6 +455,7 @@ export default function Home() {
     setSelectedNode(null);
     setHighlightedCommunity(null);
     setFocusedCommunity(null);
+    setSearchNodeId(null);
   }, []);
 
   const handleToggleFocus = useCallback((communityId: number | null) => {
@@ -525,6 +554,23 @@ export default function Home() {
     if (connectedNodes.length === 0) {
       alert('Neo4j 中暂无有连接关系的拓扑数据');
       return false;
+    }
+
+    // 版本 / 异常来源自检：这两个数字能一次性区分
+    //   ① 线上跑的是不是新代码   ② 库里有没有自带异常标注
+    // 都正常时画布上不该有红色光圈（数据 is_anomaly 全 false ⇒ 前端一个红点都不画）。
+    const srcCounts = neo4jData.metadata?.anomaly_source_counts;
+    console.info(
+      `[拓扑] code_version=${neo4jData.metadata?.code_version ?? '未知'} ` +
+        `build_id=${neo4jData.metadata?.build_id ?? '未知'} ` +
+        `异常来源=${srcCounts ? `stored ${srcCounts.stored} / heuristic ${srcCounts.heuristic}` : '未知'}`
+    );
+    if (srcCounts && srcCounts.heuristic > 0) {
+      console.warn(
+        `[拓扑] 有 ${srcCounts.heuristic} 个节点在库里没有 anomaly_score / is_anomaly，` +
+          `已按服务端启发式打分，画布上会出现红色光圈。` +
+          `请确认导入脚本是 scripts/import_topology_json_to_neo4j.py，且导的是自带标注的数据集。`
+      );
     }
     const topologyData: TopologyData = {
       nodes: connectedNodes.map(n => ({
@@ -977,16 +1023,42 @@ export default function Home() {
     // 画布渲染上限：全量数据仍用于聚类 / 统计 / 面板 / 导出（安全域划分不受影响），
     // 只在**渲染时**收敛到最大的前 RENDER_NODE_CAP 个 —— 优先异常节点（必须可见），
     // 其次按度数（枢纽 + 繁忙主机）。
+    // 搜索命中的节点及其直连邻居**永远补显**：否则搜到第 300 名以外的节点，画布上什么都看不到。
     // 注意：必须同步过滤边，否则会留下指向未渲染节点的悬空边。
+    const forceIds = new Set<string>();
+    if (searchNodeId) {
+      const hits = clusteringAppliedData.nodes.filter(
+        n => n.id === searchNodeId || n.id.includes(searchNodeId)
+      );
+      const hitIds = new Set(hits.map(n => n.id));
+      hitIds.forEach(id => forceIds.add(id));
+      // 邻居按边权降序取前 MAX_FORCED_NEIGHBORS 个，避免搜到枢纽节点时一次拉进上千个
+      const nbrWeight = new Map<string, number>();
+      for (const l of clusteringAppliedData.links) {
+        const s = typeof l.source === 'string' ? l.source : (l.source as any)?.id;
+        const t = typeof l.target === 'string' ? l.target : (l.target as any)?.id;
+        if (!s || !t) continue;
+        if (hitIds.has(s) && !hitIds.has(t)) nbrWeight.set(t, (nbrWeight.get(t) ?? 0) + (l.weight ?? 1));
+        else if (hitIds.has(t) && !hitIds.has(s)) nbrWeight.set(s, (nbrWeight.get(s) ?? 0) + (l.weight ?? 1));
+      }
+      [...nbrWeight.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, MAX_FORCED_NEIGHBORS)
+        .forEach(([id]) => forceIds.add(id));
+    }
+
     if (clusteringAppliedData.nodes.length > RENDER_NODE_CAP) {
       const isAnomalyNode = (n: TopologyNode) =>
         n.is_anomaly || n.anomaly_level === 'Critical' || n.anomaly_level === 'High' || (n.anomaly_score ?? 0) >= 0.45;
-      const anomalyNodes = clusteringAppliedData.nodes.filter(isAnomalyNode);
-      const rest = clusteringAppliedData.nodes
+      const forced = forceIds.size > 0 ? clusteringAppliedData.nodes.filter(n => forceIds.has(n.id)) : [];
+      const remain = forceIds.size > 0 ? clusteringAppliedData.nodes.filter(n => !forceIds.has(n.id)) : clusteringAppliedData.nodes;
+      const anomalyNodes = remain.filter(isAnomalyNode);
+      const rest = remain
         .filter(n => !isAnomalyNode(n))
         .sort((a, b) => (b.degree ?? 0) - (a.degree ?? 0));
-      const budget = Math.max(RENDER_NODE_CAP - anomalyNodes.length, 0);
-      const renderNodes = [...anomalyNodes, ...rest.slice(0, budget)];
+      const base = [...forced, ...anomalyNodes];
+      const budget = Math.max(RENDER_NODE_CAP - base.length, 0);
+      const renderNodes = [...base, ...rest.slice(0, budget)];
       const keep = new Set(renderNodes.map(n => n.id));
       const renderLinks = clusteringAppliedData.links.filter(l => {
         const srcId = typeof l.source === 'string' ? l.source : (l.source as any)?.id;
@@ -996,7 +1068,7 @@ export default function Home() {
       return { ...clusteringAppliedData, nodes: renderNodes, links: renderLinks };
     }
     return clusteringAppliedData;
-  }, [clusteringAppliedData, focusedCommunity]);
+  }, [clusteringAppliedData, focusedCommunity, searchNodeId]);
 
   const handleHeaderSearch = useCallback(() => {
     if (headerSearchQuery.trim()) handleSearchNode(headerSearchQuery.trim());
@@ -1133,6 +1205,7 @@ export default function Home() {
                 selectedNode={selectedNode}
                 highlightedCommunity={highlightedCommunity}
                 searchNodeId={searchNodeId}
+                searchSeq={searchSeq}
                 showLabels={showLabels}
                 onNodeSelect={handleNodeSelect}
                 highlightPathNodeIds={pathNodeIds}
@@ -1214,6 +1287,7 @@ export default function Home() {
               data={clusteringAppliedData}
               focusedCommunity={focusedCommunity}
               onNodeSelect={(node) => handleNodeSelect(node)}
+              onLocateNode={(nodeId) => handleLocateNode(nodeId)}
               onToggleFocus={handleToggleFocus}
               gdsAlgorithm={gdsAlgorithm}
               gdsData={gdsData}

@@ -408,14 +408,8 @@
   animation: node-glow 3s ease-in-out infinite;
 }
 
-/* 搜索高亮闪烁 */
-@keyframes blink-node {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-.blink-node {
-  animation: blink-node 0.5s ease-in-out 6;
-}
+/* 搜索高亮：光圈由 topology-graph 用 d3 动态绘制（circle.search-halo），
+   曾经用 opacity 闪烁的 .blink-node 已经废弃 —— 用户要的是「红色光圈」，不是整体闪。 */
 
 /* =========================================== */
 

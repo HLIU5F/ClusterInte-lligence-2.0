@@ -5,14 +5,23 @@
 //
 // 优先走服务端 /api/analysis/reachable（Neo4j 全量图上的有界 BFS，跨域可达也准确）；
 // 库里连不上时回退到浏览器本地 BFS（只用已加载的边，结果会受限，界面会标注）。
+//
+// 运维向改动（2026-10）：
+//   1. 参数一改就自动重算，不用再手点「重新分析」——旧版点了没反馈，很容易以为没生效
+//   2. 点条目 = 在图上高亮并飞过去（复用搜索光圈）；「设起点」单独一个靶心按钮，避免点一下就把分析对象换掉
+//   3. 新增「只看跨域」筛选、一键复制 IP、结果导出 CSV（贴工单/报告）
+//   4. 列表不再自己套一层滚动，交给面板统一滚动，避免出现「外层滚不动、内层滚一下就到底」
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import type { TopologyData, TopologyNode } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ROLE_LABELS } from '@/lib/types';
-import { Radar, Loader2, AlertCircle, ArrowRight, Crosshair, ShieldAlert } from 'lucide-react';
+import {
+  Radar, Loader2, AlertCircle, ArrowRight, Crosshair, ShieldAlert,
+  Copy, Check, Download, Filter, Target,
+} from 'lucide-react';
 
 interface ReachTarget {
   id: string;
@@ -42,6 +51,8 @@ interface ReachabilityPanelProps {
   selectedNode?: TopologyNode | null;
   data: TopologyData | null;
   onNodeSelect?: (node: TopologyNode) => void;
+  /** 在图上定位某个节点（复用搜索光圈 + 未渲染节点补显） */
+  onLocate?: (nodeId: string) => void;
 }
 
 /** 本地回退：在已加载的边上做 BFS（结果受限于画布数据） */
@@ -88,7 +99,7 @@ function computeLocally(
       return {
         id,
         hops: h,
-        assetValue: 0,
+        assetValue: Number(n?.asset_value ?? 0),
         zoneId: n?.zone_id ?? null,
         zoneLabel: n?.zone_label ?? null,
         role: n?.role_guess ?? null,
@@ -96,7 +107,8 @@ function computeLocally(
         isCrossDomain: srcZone != null && (n?.zone_id ?? null) !== srcZone,
       };
     })
-    .sort((a, b) => b.degree - a.degree)
+    .filter(t => t.assetValue >= minAssetValue)
+    .sort((a, b) => b.assetValue - a.assetValue || b.degree - a.degree)
     .slice(0, topN);
 
   return {
@@ -104,69 +116,158 @@ function computeLocally(
     sourceZone: srcZone,
     reached: reachedNodes.length,
     byHop,
-    highValueReached: reachedNodes.length, // 本地无 asset_value，全部计入
+    highValueReached: reachedNodes.filter(([id]) => Number(nodeById.get(id)?.asset_value ?? 0) >= minAssetValue).length,
     targets,
     computedBy: 'local',
   };
 }
 
-export function ReachabilityPanel({ selectedNodeId, selectedNode, data, onNodeSelect }: ReachabilityPanelProps) {
+export function ReachabilityPanel({ selectedNodeId, selectedNode, data, onNodeSelect, onLocate }: ReachabilityPanelProps) {
   const [maxHops, setMaxHops] = useState(2);
   const [minAssetValue, setMinAssetValue] = useState(60);
   const [topN, setTopN] = useState(20);
+  const [crossOnly, setCrossOnly] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ReachResult | null>(null);
+  const [elapsedMs, setElapsedMs] = useState<number | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
-  const sourceZoneLabel = useMemo(() => {
-    if (!selectedNode) return null;
-    return selectedNode.zone_label || selectedNode.zone_id || null;
-  }, [selectedNode]);
+  /** 分析起点。和画布选中分开：列表里点一条目标不该把分析对象换掉。 */
+  const [sourceId, setSourceId] = useState<string | null>(selectedNodeId);
+  const skipSyncRef = useRef(false);
+  const reqSeq = useRef(0);
+
+  useEffect(() => {
+    // 图上点节点 → 起点跟随；列表里点条目导致的选中变化由 skipSyncRef 拦住
+    if (skipSyncRef.current) {
+      skipSyncRef.current = false;
+      return;
+    }
+    setSourceId(selectedNodeId);
+  }, [selectedNodeId]);
+
+  const sourceNode = useMemo(() => {
+    if (!sourceId) return null;
+    if (selectedNode?.id === sourceId) return selectedNode;
+    return data?.nodes.find(n => n.id === sourceId) ?? null;
+  }, [sourceId, selectedNode, data]);
+
+  const sourceZoneLabel = sourceNode ? (sourceNode.zone_label || sourceNode.zone_id || null) : null;
 
   const run = useCallback(async () => {
-    if (!selectedNodeId) {
+    if (!sourceId) {
       setResult(null);
       return;
     }
+    const seq = ++reqSeq.current;
     setLoading(true);
+    const startedAt = performance.now();
     try {
       const res = await fetch('/api/analysis/reachable', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source: selectedNodeId, maxHops, topN, minAssetValue }),
+        body: JSON.stringify({ source: sourceId, maxHops, topN, minAssetValue }),
       });
+      if (seq !== reqSeq.current) return;
       const body = (await res.json().catch(() => null)) as ReachResult | null;
       if (res.ok && body?.success) {
         setResult({ ...body, computedBy: 'neo4j' });
+        setElapsedMs(Math.round(performance.now() - startedAt));
         return;
       }
       // 服务端不可用（Neo4j 未连接等）→ 本地回退
       if (data) {
         setResult({
-          ...computeLocally(data, selectedNodeId, maxHops, topN, minAssetValue),
+          ...computeLocally(data, sourceId, maxHops, topN, minAssetValue),
           error: body?.error ? `服务端不可用（${body.error}），已回退到本地计算` : undefined,
         });
+        setElapsedMs(Math.round(performance.now() - startedAt));
       } else {
         setResult({ success: false, error: body?.error || `分析失败（HTTP ${res.status}）` });
       }
     } catch (err) {
+      if (seq !== reqSeq.current) return;
       if (data) {
         setResult({
-          ...computeLocally(data, selectedNodeId, maxHops, topN, minAssetValue),
+          ...computeLocally(data, sourceId, maxHops, topN, minAssetValue),
           error: `服务端不可用（${err instanceof Error ? err.message : '网络错误'}），已回退到本地计算`,
         });
+        setElapsedMs(Math.round(performance.now() - startedAt));
       } else {
         setResult({ success: false, error: err instanceof Error ? err.message : '请求失败' });
       }
     } finally {
-      setLoading(false);
+      if (seq === reqSeq.current) setLoading(false);
     }
-  }, [selectedNodeId, maxHops, topN, minAssetValue, data]);
+  }, [sourceId, maxHops, topN, minAssetValue, data]);
 
+  // 参数一改自动重算：旧版必须手点按钮，改完没反馈很容易以为坏了
   useEffect(() => {
     run();
   }, [run]);
 
-  const crossCount = result?.targets?.filter(t => t.isCrossDomain).length ?? 0;
+  const allTargets = result?.targets ?? [];
+  const targets = crossOnly ? allTargets.filter(t => t.isCrossDomain) : allTargets;
+  const crossCount = allTargets.filter(t => t.isCrossDomain).length;
+
+  const handleRowClick = (t: ReachTarget) => {
+    const node = data?.nodes.find(n => n.id === t.id) ?? null;
+    if (node) {
+      skipSyncRef.current = true;
+      onNodeSelect?.(node);
+      onLocate?.(t.id);
+      setNotice(null);
+    } else {
+      // 目标来自 Neo4j 全量图，当前画布没加载这个节点：至少把它定位/补显出来
+      onLocate?.(t.id);
+      setNotice(`${t.id} 不在当前加载的图数据里，已尝试在图上定位`);
+    }
+  };
+
+  const copyIp = async (id: string) => {
+    try {
+      await navigator.clipboard.writeText(id);
+      setCopiedId(id);
+      window.setTimeout(() => setCopiedId(prev => (prev === id ? null : prev)), 1500);
+    } catch {
+      setNotice('浏览器拒绝了剪贴板访问，请手动选中复制');
+    }
+  };
+
+  const exportCsv = () => {
+    if (!sourceId || targets.length === 0) return;
+    const rows: string[][] = [
+      ['起点', '目标IP', '跳数', '资产价值', '安全域', '角色', '度数', '是否跨域'],
+      ...targets.map(t => [
+        sourceId,
+        t.id,
+        String(t.hops),
+        t.assetValue.toFixed(1),
+        t.zoneLabel || t.zoneId || '',
+        t.role ? (ROLE_LABELS[t.role] || t.role) : '',
+        String(t.degree),
+        t.isCrossDomain ? '跨域' : '同域',
+      ]),
+    ];
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\r\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `可达性_${sourceId}_${maxHops}跳_${crossOnly ? '跨域' : '全部'}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const segBtn = (active: boolean) =>
+    `flex-1 py-1 rounded text-[11px] font-mono transition-colors ${
+      active
+        ? 'bg-primary/15 text-primary border border-primary/40'
+        : 'bg-secondary/40 text-muted-foreground border border-border/60 hover:text-foreground'
+    }`;
 
   return (
     <div className="space-y-3">
@@ -176,25 +277,30 @@ export function ReachabilityPanel({ selectedNodeId, selectedNode, data, onNodeSe
           <Radar className="w-4 h-4 text-muted-foreground" />
           <span className="text-sm font-medium text-foreground">横向可达性</span>
         </div>
-        {result?.computedBy && (
-          <Badge variant="outline" className="text-[10px] px-1 py-0">
-            {result.computedBy === 'neo4j' ? 'Neo4j 全量图' : '本地回退'}
-          </Badge>
-        )}
+        <div className="flex items-center gap-1">
+          {elapsedMs != null && !loading && (
+            <span className="text-[10px] text-muted-foreground/70 font-mono tabular-nums">{elapsedMs} ms</span>
+          )}
+          {result?.computedBy && (
+            <Badge variant="outline" className="text-[10px] px-1 py-0">
+              {result.computedBy === 'neo4j' ? 'Neo4j 全量图' : '本地回退'}
+            </Badge>
+          )}
+        </div>
       </div>
 
-      {!selectedNodeId && (
+      {!sourceId && (
         <div className="text-xs text-muted-foreground text-center py-4 border border-dashed border-border/50 rounded-md">
           选中一个节点后，分析它能摸到哪些高价值资产
         </div>
       )}
 
-      {selectedNodeId && (
+      {sourceId && (
         <>
           <div className="rounded-md bg-secondary/40 border border-border/60 px-3 py-2 space-y-1">
             <div className="flex items-center justify-between">
               <span className="text-[11px] text-muted-foreground">起点</span>
-              <span className="text-xs font-mono font-medium text-foreground">{selectedNodeId}</span>
+              <span className="text-xs font-mono font-medium text-foreground">{sourceId}</span>
             </div>
             {sourceZoneLabel && (
               <div className="flex items-center justify-between">
@@ -202,10 +308,10 @@ export function ReachabilityPanel({ selectedNodeId, selectedNode, data, onNodeSe
                 <span className="text-[11px] text-foreground">{sourceZoneLabel}</span>
               </div>
             )}
-            {selectedNode?.asset_value != null && (
+            {sourceNode?.asset_value != null && (
               <div className="flex items-center justify-between">
                 <span className="text-[11px] text-muted-foreground">资产价值</span>
-                <span className="text-[11px] font-mono text-foreground">{Number(selectedNode.asset_value).toFixed(1)}</span>
+                <span className="text-[11px] font-mono text-foreground">{Number(sourceNode.asset_value).toFixed(1)}</span>
               </div>
             )}
           </div>
@@ -216,15 +322,7 @@ export function ReachabilityPanel({ selectedNodeId, selectedNode, data, onNodeSe
               <span className="text-[11px] text-muted-foreground w-14 shrink-0">跳数</span>
               <div className="flex gap-1 flex-1">
                 {[1, 2, 3].map(h => (
-                  <button
-                    key={h}
-                    onClick={() => setMaxHops(h)}
-                    className={`flex-1 py-1 rounded text-[11px] font-mono transition-colors ${
-                      maxHops === h
-                        ? 'bg-primary/15 text-primary border border-primary/40'
-                        : 'bg-secondary/40 text-muted-foreground border border-border/60 hover:text-foreground'
-                    }`}
-                  >
+                  <button key={h} onClick={() => setMaxHops(h)} className={segBtn(maxHops === h)}>
                     {h} 跳
                   </button>
                 ))}
@@ -234,15 +332,7 @@ export function ReachabilityPanel({ selectedNodeId, selectedNode, data, onNodeSe
               <span className="text-[11px] text-muted-foreground w-14 shrink-0">价值≥</span>
               <div className="flex gap-1 flex-1">
                 {[0, 50, 60, 65].map(v => (
-                  <button
-                    key={v}
-                    onClick={() => setMinAssetValue(v)}
-                    className={`flex-1 py-1 rounded text-[11px] font-mono transition-colors ${
-                      minAssetValue === v
-                        ? 'bg-primary/15 text-primary border border-primary/40'
-                        : 'bg-secondary/40 text-muted-foreground border border-border/60 hover:text-foreground'
-                    }`}
-                  >
+                  <button key={v} onClick={() => setMinAssetValue(v)} className={segBtn(minAssetValue === v)}>
                     {v === 0 ? '不限' : v}
                   </button>
                 ))}
@@ -252,24 +342,39 @@ export function ReachabilityPanel({ selectedNodeId, selectedNode, data, onNodeSe
               <span className="text-[11px] text-muted-foreground w-14 shrink-0">显示</span>
               <div className="flex gap-1 flex-1">
                 {[10, 20, 50].map(v => (
-                  <button
-                    key={v}
-                    onClick={() => setTopN(v)}
-                    className={`flex-1 py-1 rounded text-[11px] font-mono transition-colors ${
-                      topN === v
-                        ? 'bg-primary/15 text-primary border border-primary/40'
-                        : 'bg-secondary/40 text-muted-foreground border border-border/60 hover:text-foreground'
-                    }`}
-                  >
+                  <button key={v} onClick={() => setTopN(v)} className={segBtn(topN === v)}>
                     Top {v}
                   </button>
                 ))}
               </div>
             </div>
-            <Button size="sm" className="w-full h-8 text-xs" onClick={run} disabled={loading}>
-              {loading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Crosshair className="w-3 h-3 mr-1" />}
-              {loading ? '分析中…' : '重新分析'}
-            </Button>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] text-muted-foreground w-14 shrink-0">筛选</span>
+              <div className="flex gap-1 flex-1">
+                <button onClick={() => setCrossOnly(false)} className={segBtn(!crossOnly)}>全部</button>
+                <button onClick={() => setCrossOnly(true)} className={segBtn(crossOnly)}>
+                  <span className="inline-flex items-center gap-1">
+                    <Filter className="w-2.5 h-2.5" />只看跨域
+                  </span>
+                </button>
+              </div>
+            </div>
+            <div className="flex gap-1">
+              <Button size="sm" className="flex-1 h-8 text-xs" onClick={run} disabled={loading}>
+                {loading ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Crosshair className="w-3 h-3 mr-1" />}
+                {loading ? '分析中…' : '重新分析'}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 px-2 text-xs"
+                onClick={exportCsv}
+                disabled={targets.length === 0}
+                title="把当前列表导出为 CSV（贴工单/报告用）"
+              >
+                <Download className="w-3 h-3" />
+              </Button>
+            </div>
           </div>
 
           <Separator />
@@ -279,6 +384,13 @@ export function ReachabilityPanel({ selectedNodeId, selectedNode, data, onNodeSe
             <div className="flex items-start gap-1.5 px-2 py-1.5 rounded-md bg-amber-500/10 border border-amber-500/20">
               <AlertCircle className="w-3 h-3 text-amber-400 shrink-0 mt-0.5" />
               <span className="text-[10px] text-amber-300">{result.error}</span>
+            </div>
+          )}
+
+          {notice && (
+            <div className="flex items-start gap-1.5 px-2 py-1.5 rounded-md bg-secondary/40 border border-border/60">
+              <AlertCircle className="w-3 h-3 text-muted-foreground shrink-0 mt-0.5" />
+              <span className="text-[10px] text-muted-foreground">{notice}</span>
             </div>
           )}
 
@@ -311,50 +423,86 @@ export function ReachabilityPanel({ selectedNodeId, selectedNode, data, onNodeSe
 
               {/* 高价值目标列表 */}
               <div>
-                <div className="text-[11px] text-muted-foreground font-medium mb-1.5 flex items-center gap-1">
-                  <ShieldAlert className="w-3 h-3" />
-                  可达的高价值资产（按价值降序）
+                <div className="text-[11px] text-muted-foreground font-medium mb-1.5 flex items-center justify-between gap-1">
+                  <span className="flex items-center gap-1">
+                    <ShieldAlert className="w-3 h-3" />
+                    可达的高价值资产（按价值降序）
+                  </span>
+                  <span className="font-mono tabular-nums text-muted-foreground/70">
+                    {targets.length}/{allTargets.length}
+                  </span>
                 </div>
-                {(!result.targets || result.targets.length === 0) ? (
+                {targets.length === 0 ? (
                   <div className="text-[11px] text-muted-foreground text-center py-3">
-                    该范围内没有达到价值门槛的资产
+                    {crossOnly
+                      ? '当前范围内没有跨域可达资产（可放宽跳数或降低价值门槛）'
+                      : '该范围内没有达到价值门槛的资产'}
                   </div>
                 ) : (
-                  <div className="space-y-1 max-h-[280px] overflow-y-auto pr-1 scrollbar-thin">
-                    {result.targets.map(t => {
-                      const node = data?.nodes.find(n => n.id === t.id);
-                      return (
-                        <div
-                          key={t.id}
-                          className={`text-[11px] p-1.5 rounded font-mono cursor-pointer transition-colors ${
-                            t.isCrossDomain
-                              ? 'bg-destructive/10 border border-destructive/25 hover:bg-destructive/15'
-                              : 'bg-secondary/30 hover:bg-secondary/50'
-                          }`}
-                          onClick={() => node && onNodeSelect?.(node)}
-                          title={t.isCrossDomain ? '跨安全域可达' : '同安全域'}
-                        >
-                          <div className="flex items-center gap-1">
-                            <span className={`tabular-nums shrink-0 ${t.assetValue >= 65 ? 'text-amber-400' : 'text-muted-foreground'}`}>
-                              {t.assetValue.toFixed(1)}
-                            </span>
-                            <span className="text-foreground truncate flex-1">{t.id}</span>
-                            <span className="text-muted-foreground shrink-0">{t.hops}跳</span>
-                            {t.isCrossDomain && <ArrowRight className="w-2.5 h-2.5 text-destructive shrink-0" />}
-                          </div>
-                          <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
-                            {t.zoneLabel || t.zoneId || '未分区'} · {t.role ? (ROLE_LABELS[t.role] || t.role) : '未知角色'} · 度 {t.degree}
-                          </div>
+                  <div className="space-y-1">
+                    {targets.map(t => (
+                      <div
+                        key={t.id}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => handleRowClick(t)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleRowClick(t);
+                          }
+                        }}
+                        className={`group text-[11px] p-1.5 rounded font-mono cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/50 ${
+                          t.isCrossDomain
+                            ? 'bg-destructive/10 border border-destructive/25 hover:bg-destructive/15'
+                            : 'bg-secondary/30 border border-transparent hover:bg-secondary/50'
+                        }`}
+                        title={`${t.isCrossDomain ? '跨安全域可达' : '同安全域'} · 点击在图上定位`}
+                      >
+                        <div className="flex items-center gap-1">
+                          <span className={`tabular-nums shrink-0 ${t.assetValue >= 65 ? 'text-amber-400' : 'text-muted-foreground'}`}>
+                            {t.assetValue.toFixed(1)}
+                          </span>
+                          <span className="text-foreground truncate flex-1">{t.id}</span>
+                          <span className="text-muted-foreground shrink-0">{t.hops}跳</span>
+                          {t.isCrossDomain && <ArrowRight className="w-2.5 h-2.5 text-destructive shrink-0" />}
+                          <button
+                            type="button"
+                            aria-label={`把 ${t.id} 设为分析起点`}
+                            title="以该节点为新起点重新分析"
+                            className="shrink-0 p-0.5 rounded text-muted-foreground/50 hover:text-primary opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+                            onClick={e => {
+                              e.stopPropagation();
+                              setSourceId(t.id);
+                            }}
+                          >
+                            <Target className="w-2.5 h-2.5" />
+                          </button>
+                          <button
+                            type="button"
+                            aria-label={`复制 ${t.id}`}
+                            title="复制 IP"
+                            className="shrink-0 p-0.5 rounded text-muted-foreground/50 hover:text-primary opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+                            onClick={e => {
+                              e.stopPropagation();
+                              copyIp(t.id);
+                            }}
+                          >
+                            {copiedId === t.id ? <Check className="w-2.5 h-2.5 text-emerald-400" /> : <Copy className="w-2.5 h-2.5" />}
+                          </button>
                         </div>
-                      );
-                    })}
+                        <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
+                          {t.zoneLabel || t.zoneId || '未分区'} · {t.role ? (ROLE_LABELS[t.role] || t.role) : '未知角色'} · 度 {t.degree}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
 
               <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
-                跨域可达（红色）表示从起点可以不经过额外跳板就摸到别的安全域资产 —— 排查横向移动时优先看这些。
-                点击条目可在图上选中该节点。
+                跨域可达（红色）表示从起点不经过额外汇聚设备就能摸到别的安全域资产 —— 排查横向移动优先看这些。
+                点条目在图上定位并打光圈；行尾靶心可把该节点设成新起点。
               </p>
             </>
           )}

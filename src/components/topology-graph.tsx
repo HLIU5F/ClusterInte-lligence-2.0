@@ -13,6 +13,8 @@ interface TopologyGraphProps {
   selectedNode: TopologyNode | null;
   highlightedCommunity: number | null;
   searchNodeId: string | null;
+  /** 每次搜索自增；同一个节点重复搜索也要能重新打光圈 */
+  searchSeq?: number;
   showLabels: boolean;
   onNodeSelect: (node: TopologyNode | null) => void;
   highlightPathNodeIds?: string[];
@@ -27,6 +29,9 @@ interface TopologyGraphProps {
 type SimNode = TopologyNode & d3.SimulationNodeDatum & { isExpanded?: boolean; distance?: number };
 type SimLink = { source: SimNode; target: SimNode; weight: number; bytes: number };
 
+/** 搜索定位光圈的颜色（与异常节点的 #ff4d6a 区分开，更正红） */
+const SEARCH_HALO_COLOR = '#ff2d55';
+
 export function TopologyGraph({
   data,
   edgeThreshold,
@@ -34,6 +39,7 @@ export function TopologyGraph({
   selectedNode,
   highlightedCommunity,
   searchNodeId,
+  searchSeq = 0,
   showLabels,
   onNodeSelect,
   layoutPreset,
@@ -770,33 +776,108 @@ export function TopologyGraph({
     });
   }, [highlightedCommunity]);
 
-  // Handle search highlight
+  // Handle search highlight —— 定位到节点并打 3 秒红色光圈（脉冲 3 次）
+  // 搜索命中的节点可能原本不在渲染集里（画布只画前 RENDER_NODE_CAP 个），
+  // 由 page.tsx 补显进 data；这里是等它真的进了 DOM 之后再动画。
   useEffect(() => {
     if (!searchNodeId) return;
-    const svg = d3.select(svgRef.current);
-    const targetNode = svg.selectAll<SVGGElement, SimNode>('.node-group')
-      .filter(d => d.id.includes(searchNodeId));
+    const svgEl = svgRef.current;
+    if (!svgEl) return;
+    const svg = d3.select(svgEl);
 
-    if (!targetNode.empty()) {
-      const nodeData = targetNode.datum();
-      if (nodeData && nodeData.x != null && nodeData.y != null) {
-        const container = svg.select('.topology-container');
-        const currentTransform = d3.zoomTransform(svgRef.current!);
-        const scale = Math.max(currentTransform.k, 1.5);
+    let disposed = false;
+    let findTimer: number | undefined;
+    let resetTimer: number | undefined;
+    let tries = 0;
 
-        svg.transition().duration(750).call(
-          d3.zoom<SVGSVGElement, unknown>().transform as never,
-          d3.zoomIdentity
-            .translate(dimensions.width / 2, dimensions.height / 2)
-            .scale(scale)
-            .translate(-nodeData.x, -nodeData.y)
-        );
+    const drawHalo = (hit: d3.Selection<SVGGElement, SimNode, SVGGElement, unknown>) => {
+      const nodeData = hit.datum();
+      // 半径直接读 DOM：节点尺寸是渲染期按度数算的局部刻度，这里不重复推导
+      const r = Number(hit.select<SVGCircleElement>('circle.node-circle').attr('r')) || 6;
+      const cx = nodeData.x ?? 0;
+      const cy = nodeData.y ?? 0;
 
-        targetNode.classed('blink-node', true);
-        setTimeout(() => targetNode.classed('blink-node', false), 3000);
+      // 1) 相机飞到节点上（等力导向稍微稳一点再飞，避免飞完节点又漂走）
+      const currentTransform = d3.zoomTransform(svgEl);
+      const scale = Math.max(currentTransform.k, 1.8);
+      svg.interrupt().transition().duration(700).call(
+        d3.zoom<SVGSVGElement, unknown>().transform as never,
+        d3.zoomIdentity
+          .translate(dimensions.width / 2, dimensions.height / 2)
+          .scale(scale)
+          .translate(-cx, -cy)
+      );
+
+      // 2) 红色光圈：3 次脉冲，合计约 3 秒
+      hit.selectAll('circle.search-halo').remove();
+      const halo = hit.insert('circle', ':first-child')
+        .attr('class', 'search-halo')
+        .attr('r', r + 6)
+        .attr('fill', 'none')
+        .attr('stroke', SEARCH_HALO_COLOR)
+        .attr('stroke-width', 3)
+        .attr('opacity', 0)
+        .attr('pointer-events', 'none');
+
+      const pulse = (i: number) => {
+        if (disposed) return;
+        halo.interrupt()
+          .attr('r', r + 5)
+          .attr('stroke-width', 3.2)
+          .attr('opacity', 1);
+        halo.transition().duration(940)
+          .attr('r', r + 38)
+          .attr('stroke-width', 0.6)
+          .attr('opacity', 0)
+          .on('end', () => {
+            if (disposed) return;
+            if (i < 2) pulse(i + 1);
+            else halo.remove();
+          });
+      };
+      pulse(0);
+
+      // 3) 节点本体临时描红加粗，小节点在缩略视图里也能一眼看到
+      const core = hit.select<SVGCircleElement>('circle.node-circle');
+      if (!core.empty()) {
+        core.attr('stroke', SEARCH_HALO_COLOR).attr('stroke-width', 3);
+        resetTimer = window.setTimeout(() => {
+          if (disposed) return;
+          core.attr('stroke', (d: any) => {
+            const n = d as SimNode;
+            if (n.is_anomaly && !n.is_whitelisted) return '#ff4d6a';
+            if (n.isFocusedDomain === false) return 'rgba(0,0,0,0.3)';
+            return 'rgba(0,0,0,0.6)';
+          }).attr('stroke-width', (d: any) => {
+            const n = d as SimNode;
+            if (n.is_anomaly && !n.is_whitelisted) return 2.5;
+            if (n.isFocusedDomain === false) return 0.5;
+            return 1;
+          });
+        }, 3000);
       }
-    }
-  }, [searchNodeId, dimensions]);
+    };
+
+    const attempt = () => {
+      if (disposed) return;
+      const hit = svg.selectAll<SVGGElement, SimNode>('.node-group')
+        .filter(d => d.id === searchNodeId || d.id.includes(searchNodeId));
+      if (!hit.empty()) {
+        drawHalo(hit);
+        return;
+      }
+      // 补显的节点可能晚一两帧才进 DOM，最多等 3 秒
+      if (tries++ < 30) findTimer = window.setTimeout(attempt, 100);
+    };
+    findTimer = window.setTimeout(attempt, 120);
+
+    return () => {
+      disposed = true;
+      if (findTimer) window.clearTimeout(findTimer);
+      if (resetTimer) window.clearTimeout(resetTimer);
+      svg.selectAll('circle.search-halo').remove();
+    };
+  }, [searchNodeId, searchSeq, dimensions]);
 
   // Handle selected node highlight
   useEffect(() => {

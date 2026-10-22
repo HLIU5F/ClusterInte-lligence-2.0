@@ -22,6 +22,16 @@ export interface Neo4jTopologyResponse {
     total_anomalies_in_db?: number;
     /** 截断后实际带回的异常节点数 —— 截断会优先保住异常 */
     anomalies_included?: number;
+    /** 代码签名（服务端自报）—— 判断线上是不是新代码，看这个而不是看源码 */
+    code_version?: string;
+    anomaly_source_version?: string;
+    /** 服务端 .next/BUILD_ID */
+    build_id?: string | null;
+    /**
+     * 异常标注来源统计。heuristic > 0 表示库里缺 anomaly_score / is_anomaly，
+     * 服务端只能启发式打分 —— 这就是「满屏红色光圈」的根因。
+     */
+    anomaly_source_counts?: { stored: number; heuristic: number };
   };
   nodes: Array<{
     id: string;
@@ -36,6 +46,8 @@ export interface Neo4jTopologyResponse {
     anomaly_score: number;
     is_anomaly: boolean;
     anomaly_level: 'Critical' | 'High' | 'Medium' | 'Low' | 'None';
+    /** 异常分是数据自带的（stored）还是服务端启发式猜的（heuristic） */
+    anomaly_source?: 'stored' | 'heuristic';
     is_hub: boolean;
     is_critical?: boolean;
     service_type: string | null;

@@ -13,6 +13,7 @@
 import { NextResponse } from 'next/server';
 import { neo4jErrorResponse } from '@/lib/apiErrors';
 import { runCypher } from '@/lib/neo4j';
+import { readBuildStamp } from '@/lib/buildStamp';
 
 /**
  * 默认节点上限：0 = 不限制，把全量交给前端。
@@ -534,6 +535,19 @@ export async function GET(request: Request) {
       is_cross_domain: (ipZone.get(l.src) ?? '') !== (ipZone.get(l.dst) ?? ''),
     }));
 
+    // 异常标注来源统计：stored = 用数据自带标注，heuristic = 库里没字段只能猜。
+    // heuristic > 0 就是「满屏红色光圈」的根因（老数据的库 / 老代码都会走到这里），
+    // 让它直接在接口里现形，比在前端数红点可靠。
+    const anomalySourceCounts = keptNodes.reduce(
+      (acc, n) => {
+        if (n.anomaly_source === 'stored') acc.stored += 1;
+        else acc.heuristic += 1;
+        return acc;
+      },
+      { stored: 0, heuristic: 0 }
+    );
+    const stamp = readBuildStamp();
+
     return NextResponse.json({
       metadata: {
         generated_at: new Date().toISOString(),
@@ -548,6 +562,11 @@ export async function GET(request: Request) {
         // 异常保全：截断后实际带回的异常数 / 全库异常总数
         total_anomalies_in_db: totalAnomaliesInDb,
         anomalies_included: keptNodes.filter(n => n.is_anomaly).length,
+        // 版本自检 + 异常来源审计（判断「线上是不是新代码」「库里有没有标注」）
+        code_version: stamp.code_version,
+        anomaly_source_version: stamp.anomaly_source_version,
+        build_id: stamp.build_id,
+        anomaly_source_counts: anomalySourceCounts,
       },
       nodes: keptNodes,
       links,
