@@ -8,6 +8,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import { neo4jErrorResponse } from '@/lib/apiErrors';
 import { runCypher } from '@/lib/neo4j';
 
 interface GDSNodeRecord {
@@ -87,11 +88,7 @@ export async function GET() {
       zones,
       hubNodes: hubNodesFormatted,
     });
-  } catch (error: any) {
-    console.error('GDS topology API error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch GDS topology data' },
-      { status: 500 }
-    );
+  } catch (error) {
+    return neo4jErrorResponse('api/topology/gds', error);
   }
 }

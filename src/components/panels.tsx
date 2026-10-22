@@ -561,6 +561,7 @@ interface DataSourcePanelProps {
 }
 
 export function DataSourcePanel({ onImportData, onLoadFromNeo4j, onLoadCoreGraph, loading, data }: DataSourcePanelProps) {
+
   const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -893,7 +894,7 @@ export function AlgorithmPanel({
                       当前使用「通信锚点域（方案2）」策略，共 {clusteringResult.zoneCount} 个安全域。
                     </div>
                     <div className="font-mono text-muted-foreground">
-                      (源IP, 目的IP, 固定目的端口) 三元组锚点：域 = 服务类别 × 服务子网 × 调用方子网；接入主机间流量后自动细分"谁调用我的哪个服务"。
+                      (源IP, 目的IP, 固定目的端口) 三元组锚点：域 = 服务类别 × 服务子网 × 调用方子网；接入主机间流量后自动细分“谁调用我的哪个服务”。
                     </div>
                   </>
                 ) : clusteringStrategy === 'policy_domain' && clusteringResult ? (

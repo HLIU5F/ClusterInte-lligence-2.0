@@ -217,3 +217,13 @@ docs/*简历*
 # 不应入库的备份与虚拟环境
 src/**/*.bak.*
 scripts/.venv/
+
+# Build cache and backups
+.next.bak*/
+*.bak
+*.bak.*
+oom
+package.json.bak*
+tsconfig.json.bak*
+next.config.ts.bak
+server_migrate.sh.bak

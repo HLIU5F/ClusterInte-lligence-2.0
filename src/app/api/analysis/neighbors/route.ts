@@ -2,6 +2,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import neo4j, { Driver } from 'neo4j-driver';
+import { neo4jErrorResponse } from '@/lib/apiErrors';
+import { Neo4jError, readNeo4jConfig } from '@/lib/neo4jConfig';
 
 let driver: Driver | null = null;
 
@@ -19,22 +21,28 @@ function toNum(value: any): number {
 
 function getDriver(): Driver {
   if (!driver) {
-    const password = process.env.NEO4J_PASSWORD;
-    if (!password) {
-      throw new Error('缺少 NEO4J_PASSWORD：请在项目根目录 .env.local 中配置 Neo4j 密码');
+    const cfg = readNeo4jConfig();
+    if (!cfg.password) {
+      throw new Neo4jError(
+        'NEO4J_NOT_CONFIGURED',
+        '缺少 NEO4J_PASSWORD：请在项目根目录 .env.local 中配置 Neo4j 密码',
+        '云服务器上可先执行 bash scripts/server_migrate.sh prepare 生成 .env.local 模板'
+      );
     }
-    driver = neo4j.driver(
-      process.env.NEO4J_URI || 'bolt://localhost:7687',
-      neo4j.auth.basic(process.env.NEO4J_USER || 'neo4j', password)
-    );
+    driver = neo4j.driver(cfg.boltUri, neo4j.auth.basic(cfg.user, cfg.password), {
+      connectionTimeout: cfg.timeoutMs,
+    });
   }
   return driver;
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { nodeId, hops = 2, includePaths = true } = body;
+    const body = await req.json().catch(() => null);
+    if (!body || typeof body !== 'object') {
+      return NextResponse.json({ error: '请求体必须是合法 JSON' }, { status: 400 });
+    }
+    const { nodeId, hops = 2 } = body as { nodeId?: string; hops?: number };
 
     if (!nodeId) {
       return NextResponse.json(
@@ -43,9 +51,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const safeHops = Math.min(Math.max(parseInt(hops) || 2, 1), 5);
+    const safeHops = Math.min(Math.max(Number(hops) || 2, 1), 5);
     const d = getDriver();
-    const session = d.session({ database: process.env.NEO4J_DATABASE || 'neo4j' });
+    const session = d.session({ database: readNeo4jConfig().database });
 
     try {
       // 获取N跳内所有邻居节点及其最短距离
@@ -146,11 +154,7 @@ export async function POST(req: NextRequest) {
     } finally {
       await session.close();
     }
-  } catch (error: any) {
-    console.error('Neighbors expansion error:', error);
-    return NextResponse.json(
-      { error: error.message || '邻居扩展查询失败' },
-      { status: 500 }
-    );
+  } catch (error) {
+    return neo4jErrorResponse('api/analysis/neighbors', error);
   }
 }

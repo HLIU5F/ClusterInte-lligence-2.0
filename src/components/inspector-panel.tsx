@@ -7,12 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { EnrichPanel } from '@/components/enrich-panel';
+import { ReachabilityPanel } from '@/components/reachability-panel';
 import { getNodeCmdbTags } from '@/lib/cmdbTags';
 import {
   Activity, AlertTriangle, Link2, ArrowRight,
   PanelRightClose, PanelRightOpen, ChevronRight,
-  Server, Zap, Info, Network, X,
+  Server, Radar, Info, Network, X,
 } from 'lucide-react';
 
 interface InspectorPanelProps {
@@ -26,7 +26,7 @@ interface InspectorPanelProps {
   gdsData?: { nodes: any[]; zones: any[]; hubNodes: any[] } | null;
 }
 
-type InspectorTab = 'detail' | 'enrich' | 'connections';
+type InspectorTab = 'detail' | 'reach' | 'connections';
 
 export function InspectorPanel({
   selectedNode,
@@ -34,7 +34,6 @@ export function InspectorPanel({
   focusedCommunity,
   onNodeSelect,
   onToggleFocus,
-  onEnrichComplete,
   gdsAlgorithm = 'original',
   gdsData = null,
 }: InspectorPanelProps) {
@@ -102,7 +101,7 @@ export function InspectorPanel({
       <div className="flex border-b border-border">
         {[
           { key: 'detail' as const, label: '详情', icon: Activity },
-          { key: 'enrich' as const, label: '富化', icon: Zap },
+          { key: 'reach' as const, label: '可达性', icon: Radar },
           { key: 'connections' as const, label: '连接', icon: Link2 },
         ].map(tab => (
           <button
@@ -178,13 +177,14 @@ export function InspectorPanel({
           </div>
         )}
 
-        {/* ===== Enrich Tab ===== */}
-        {activeTab === 'enrich' && (
+        {/* ===== Reachability Tab（横向可达性） ===== */}
+        {activeTab === 'reach' && (
           <div className="p-3">
-            <EnrichPanel
+            <ReachabilityPanel
               selectedNodeId={selectedNode?.id || null}
               selectedNode={selectedNode}
-              onEnrichComplete={onEnrichComplete}
+              data={data}
+              onNodeSelect={onNodeSelect}
             />
           </div>
         )}
@@ -335,113 +335,135 @@ function DetailRow({ label, value, highlight, tone }: { label: string; value: st
 }
 
 // ============ Node Connections (for selected node) ============
+/**
+ * 选中节点的连接明细。
+ *
+ * 不只是罗列边：每条连接都带出**对端的安全域、资产价值、角色**，并标出**跨域**。
+ * 排序按「资产价值 → 连接度」，把最该先看的对端排在前面 ——
+ * 排查横向移动时，"这台被拿下后能直接摸到哪个高价值资产" 比"有多少条边"重要得多。
+ */
 function NodeConnections({ node, data, onNodeSelect }: {
   node: TopologyNode;
   data: TopologyData;
   onNodeSelect: (node: TopologyNode) => void;
 }) {
-  const connections = useMemo(() => {
-    const result: Array<{ link: TopologyLink; peerId: string; peerNode: TopologyNode | undefined; direction: 'out' | 'in' }> = [];
-    data.links.forEach(l => {
-      const srcId = typeof l.source === 'string' ? l.source : l.source.id;
-      const tgtId = typeof l.target === 'string' ? l.target : l.target.id;
-      if (srcId === node.id) {
-        const peerNode = data.nodes.find(n => n.id === tgtId);
-        result.push({ link: l, peerId: tgtId, peerNode, direction: 'out' });
-      } else if (tgtId === node.id) {
-        const peerNode = data.nodes.find(n => n.id === srcId);
-        result.push({ link: l, peerId: srcId, peerNode, direction: 'in' });
-      }
-    });
-    return result;
+  const { outConns, inConns } = useMemo(() => {
+    const byId = new Map(data.nodes.map(n => [n.id, n]));
+    const out: Array<{ link: TopologyLink; peer?: TopologyNode }> = [];
+    const inn: Array<{ link: TopologyLink; peer?: TopologyNode }> = [];
+    for (const l of data.links) {
+      const srcId = typeof l.source === 'string' ? l.source : (l.source as { id: string }).id;
+      const tgtId = typeof l.target === 'string' ? l.target : (l.target as { id: string }).id;
+      if (srcId === node.id) out.push({ link: l, peer: byId.get(tgtId) });
+      else if (tgtId === node.id) inn.push({ link: l, peer: byId.get(srcId) });
+    }
+    const rank = (c: { peer?: TopologyNode }) =>
+      (c.peer?.asset_value ?? 0) * 1000 + (c.peer?.degree ?? 0);
+    out.sort((a, b) => rank(b) - rank(a));
+    inn.sort((a, b) => rank(b) - rank(a));
+    return { outConns: out, inConns: inn };
   }, [node, data]);
 
-  const outConnections = connections.filter(c => c.direction === 'out');
-  const inConnections = connections.filter(c => c.direction === 'in');
+  const selfZone = node.zone_id ?? node.security_domain ?? null;
+  const zoneOf = (n?: TopologyNode) => n?.zone_id ?? n?.security_domain ?? null;
+  const crossOut = outConns.filter(c => zoneOf(c.peer) !== selfZone).length;
+  const crossIn = inConns.filter(c => zoneOf(c.peer) !== selfZone).length;
+
+  const renderRow = (conn: { link: TopologyLink; peer?: TopologyNode }, dir: 'out' | 'in') => {
+    const ports = ((conn.link as unknown as { ports?: number[] }).ports) ?? [];
+    const peer = conn.peer;
+    const cross = zoneOf(peer) !== selfZone;
+    const value = peer?.asset_value ?? null;
+    return (
+      <div
+        key={`${dir}-${conn.link.source as string}-${conn.link.target as string}`}
+        className={`text-[10px] p-1.5 rounded cursor-pointer transition-colors ${
+          cross ? 'bg-destructive/10 border border-destructive/25 hover:bg-destructive/15' : 'bg-secondary/30 hover:bg-secondary/50'
+        }`}
+        onClick={() => peer && onNodeSelect(peer)}
+        title={cross ? '跨安全域连接' : '同安全域'}
+      >
+        <div className="flex items-center gap-1">
+          <span className="text-foreground truncate">{dir === 'out' ? node.id : (peer?.id ?? '?')}</span>
+          <ArrowRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
+          <span className="text-foreground truncate">{dir === 'out' ? (peer?.id ?? '?') : node.id}</span>
+          {value != null && value > 0 && (
+            <span className={`ml-auto font-mono tabular-nums shrink-0 ${value >= 65 ? 'text-amber-400' : 'text-muted-foreground'}`}>
+              {Number(value).toFixed(1)}
+            </span>
+          )}
+        </div>
+        <div className="text-[10px] text-muted-foreground mt-0.5 truncate">
+          {peer?.zone_label || zoneOf(peer) || '未分区'}
+          {' · '}
+          {peer?.role_guess ? (ROLE_LABELS[peer.role_guess] || peer.role_guess) : '未知角色'}
+          {peer?.degree != null ? ` · 度 ${peer.degree}` : ''}
+        </div>
+        {ports.length > 0 && (
+          <div className="text-[10px] text-muted-foreground/80 mt-0.5 font-mono">
+            端口 {ports.slice(0, 6).join(', ')}{ports.length > 6 ? ` +${ports.length - 6}` : ''}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2 mb-1">
-        <div
-          className="w-2.5 h-2.5 rounded-full"
-          style={{ backgroundColor: communityColor(node.community) }}
-        />
-        <span className="text-xs font-mono font-semibold">{node.id}</span>
-        <Badge variant="secondary" className="text-[11px]">{connections.length} 连接</Badge>
+      {/* 本节点概览 */}
+      <div className="rounded-md bg-secondary/40 border border-border/60 px-3 py-2 space-y-1">
+        <div className="flex items-center gap-2">
+          <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: communityColor(node.community) }} />
+          <span className="text-xs font-mono font-semibold truncate">{node.id}</span>
+          <Badge variant="secondary" className="text-[11px] ml-auto shrink-0">
+            {outConns.length + inConns.length} 连接
+          </Badge>
+        </div>
+        <div className="text-[11px] text-muted-foreground truncate">
+          {node.zone_label || selfZone || '未分区'}
+          {' · '}
+          {node.role_guess ? (ROLE_LABELS[node.role_guess] || node.role_guess) : '未知角色'}
+          {node.asset_value != null && ` · 资产价值 ${Number(node.asset_value).toFixed(1)}`}
+        </div>
       </div>
 
-      <div className="flex gap-2 text-[11px]">
+      <div className="flex flex-wrap gap-2 text-[11px]">
         <span className="px-2 py-1 rounded bg-secondary/40 text-muted-foreground">
-          出向 {outConnections.length}
+          出向 {outConns.length}{crossOut > 0 && <span className="text-destructive">（跨域 {crossOut}）</span>}
         </span>
         <span className="px-2 py-1 rounded bg-secondary/40 text-muted-foreground">
-          入向 {inConnections.length}
+          入向 {inConns.length}{crossIn > 0 && <span className="text-destructive">（跨域 {crossIn}）</span>}
         </span>
       </div>
 
-      {outConnections.length > 0 && (
+      {outConns.length > 0 && (
         <div>
           <div className="text-[11px] text-muted-foreground font-medium mb-1.5 flex items-center gap-1">
-            <div className="w-3 h-0.5 bg-muted-foreground/60 rounded"></div>
-            出向连接
+            <div className="w-3 h-0.5 bg-muted-foreground/60 rounded" />
+            出向连接（它在访问谁）
           </div>
-          <div className="space-y-1 max-h-[200px] overflow-y-auto pr-1 scrollbar-thin">
-            {outConnections.map((conn, idx) => {
-              const ports = (conn.link as any).ports || [];
-              return (
-                <div
-                  key={idx}
-                  className="text-[10px] p-1.5 rounded bg-secondary/30 font-mono cursor-pointer hover:bg-secondary/50"
-                  onClick={() => conn.peerNode && onNodeSelect(conn.peerNode)}
-                >
-                  <div className="flex items-center gap-1">
-                    <span className="text-foreground truncate">{node.id}</span>
-                    <ArrowRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                    <span className="text-foreground truncate">{conn.peerId}</span>
-                  </div>
-                  {ports.length > 0 && (
-                    <div className="text-[11px] text-muted-foreground mt-0.5">
-                      端口 {ports.slice(0, 5).join(', ')}{ports.length > 5 ? '...' : ''}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+          <div className="space-y-1 max-h-[240px] overflow-y-auto pr-1 scrollbar-thin">
+            {outConns.map(c => renderRow(c, 'out'))}
           </div>
         </div>
       )}
 
-      {inConnections.length > 0 && (
+      {inConns.length > 0 && (
         <div>
           <div className="text-[11px] text-muted-foreground font-medium mb-1.5 flex items-center gap-1">
-            <div className="w-3 h-0.5 bg-muted-foreground/60 rounded"></div>
-            入向连接
+            <div className="w-3 h-0.5 bg-muted-foreground/60 rounded" />
+            入向连接（谁在访问它）
           </div>
-          <div className="space-y-1 max-h-[200px] overflow-y-auto pr-1 scrollbar-thin">
-            {inConnections.map((conn, idx) => {
-              const ports = (conn.link as any).ports || [];
-              return (
-                <div
-                  key={idx}
-                  className="text-[11px] p-1.5 rounded bg-secondary/30 font-mono cursor-pointer hover:bg-secondary/50"
-                  onClick={() => conn.peerNode && onNodeSelect(conn.peerNode)}
-                >
-                  <div className="flex items-center gap-1">
-                    <span className="text-foreground truncate">{conn.peerId}</span>
-                    <ArrowRight className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-                    <span className="text-foreground truncate">{node.id}</span>
-                  </div>
-                  {ports.length > 0 && (
-                    <div className="text-[11px] text-muted-foreground mt-0.5">
-                      端口 {ports.slice(0, 5).join(', ')}{ports.length > 5 ? '...' : ''}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+          <div className="space-y-1 max-h-[240px] overflow-y-auto pr-1 scrollbar-thin">
+            {inConns.map(c => renderRow(c, 'in'))}
           </div>
         </div>
       )}
+
+      <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
+        按「对端资产价值 → 连接度」排序；<span className="text-destructive">红色</span>为跨安全域连接。
+        点击条目可在图上选中对端节点。
+      </p>
     </div>
   );
 }

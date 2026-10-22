@@ -11,7 +11,18 @@
  */
 
 import { NextResponse } from 'next/server';
+import { neo4jErrorResponse } from '@/lib/apiErrors';
 import { runCypher } from '@/lib/neo4j';
+
+/**
+ * 默认节点上限：0 = 不限制，把全量交给前端。
+ * 由前端在**渲染时**只画最大的前 N 个节点；聚类 / 统计 / 导出仍基于全量，
+ * 否则安全域数量会随截断一起缩水（实测全量 1692 域 → 截到 300 只剩 187 域）。
+ * 需要服务端截断时显式传 ?limit=N。
+ */
+const DEFAULT_IP_LIMIT = 0;
+/** 硬上限，避免 ?limit=999999 之类的请求把服务打挂 */
+const MAX_IP_LIMIT = 20000;
 
 interface IpRecord {
   id: string;
@@ -21,10 +32,13 @@ interface IpRecord {
   zone_id: string | null;
   zone_color: string | null;
   zone_label: string | null;
+  ip_zone_id: string | null;
+  ip_zone_color: string | null;
+  ip_zone_label: string | null;
   degree: number;
   in_degree: number;
   out_degree: number;
-  anomaly_score: number;
+  anomaly_score: number | null;
   is_hub: boolean;
   service_type: string | null;
   geo_country: string | null;
@@ -37,6 +51,19 @@ interface IpRecord {
   // Neo4j 里 IP 节点存的是列表：ports: number[]（如 [443, 36000]）、protocols: string[]（如 ["tcp"]）
   ports: number[];
   protocols: string[];
+  // 数据自带的服务角色（client/server/hybrid…），端口推导不出时作为兜底
+  role_guess: string | null;
+  // 数据自带的异常标注 —— 权威事实，优先于启发式重算（anomaly_score 见上方声明）
+  has_anomaly_score: boolean | null;
+  // 库里预先算好的通信锚点域（方案2）
+  flow_zone_id: string | null;
+  flow_zone_label: string | null;
+  flow_direction: string | null;
+  flow_callers: string | null;
+  flow_peers: string | null;
+  is_anomaly: boolean | null;
+  anomaly_level: string | null;
+  asset_value: number | null;
 }
 
 interface LinkRecord {
@@ -172,6 +199,14 @@ export async function GET(request: Request) {
     const includeAll = url.searchParams.get('all') === '1';
     const connectedFilter = includeAll ? '' : 'WHERE exists((ip)-[:CONNECTS_TO]-())';
 
+    // 节点上限保护（?all=1 关闭限制；?limit=N 自定义 1..20000）。
+    // 目的：不让一次渲染数千节点卡死浏览器。
+    const rawLimit = Number(url.searchParams.get('limit'));
+    const requestedLimit =
+      Number.isFinite(rawLimit) && rawLimit > 0
+        ? Math.min(Math.floor(rawLimit), MAX_IP_LIMIT)
+        : DEFAULT_IP_LIMIT;
+
     // 1) 节点 + 它们的 Subnet + Zone（一次 JOIN 取齐）
     // Run the three topology queries in parallel instead of serially.
     const [ipRecords, linkRecords, zoneRecords] = await Promise.all([
@@ -180,6 +215,10 @@ export async function GET(request: Request) {
         ${connectedFilter}
         OPTIONAL MATCH (ip)-[:BELONGS_TO]->(sn:Subnet)
         OPTIONAL MATCH (sn)-[:IN_ZONE]->(z:Zone)
+        // IP 自身挂的域（数据作者按 IP 标注，最准确）
+        OPTIONAL MATCH (ip)-[:IN_ZONE]->(iz:Zone)
+        // 通信锚点域（方案2，由 scripts/compute_flow_zones.py 预先算好）
+        OPTIONAL MATCH (ip)-[:IN_FLOW_ZONE]->(fz:FlowZone)
         OPTIONAL MATCH (ip)-[:BELONGS_TO_GROUP]->(bg:BusinessGroup)
         OPTIONAL MATCH (ip)-[:RUNS_ON]->(os:OS)
         OPTIONAL MATCH (ip)-[:RUNS_APP]->(app:Application)
@@ -192,6 +231,9 @@ export async function GET(request: Request) {
           z.id            AS zone_id,
           z.color         AS zone_color,
           z.label         AS zone_label,
+          iz.id           AS ip_zone_id,
+          iz.color        AS ip_zone_color,
+          iz.label        AS ip_zone_label,
           coalesce(ip.degree, 0)        AS degree,
           coalesce(ip.in_degree, 0)     AS in_degree,
           coalesce(ip.out_degree, 0)    AS out_degree,
@@ -203,6 +245,16 @@ export async function GET(request: Request) {
           head(collect(DISTINCT os.name)) AS os_name,
           head(collect(DISTINCT app.name)) AS application,
           ip.owner                      AS owner,
+          ip.role_guess                 AS role_guess,
+          ip.is_anomaly                 AS is_anomaly,
+          ip.anomaly_level              AS anomaly_level,
+          ip.anomaly_score IS NOT NULL  AS has_anomaly_score,
+          ip.asset_value                AS asset_value,
+          fz.id                         AS flow_zone_id,
+          coalesce(fz.label, ip.flow_zone_label) AS flow_zone_label,
+          coalesce(fz.direction, ip.flow_direction) AS flow_direction,
+          ip.flow_callers               AS flow_callers,
+          ip.flow_peers                 AS flow_peers,
           head(collect(DISTINCT env.name)) AS environment,
           coalesce(ip.cmdb_tags, [])    AS cmdb_tags,
           coalesce(ip.ports, [])        AS ports,
@@ -278,6 +330,21 @@ export async function GET(request: Request) {
       if (KNOWN_COLLECTOR_IPS.has(r.id) || isCollectorLike(deg, ipRecords.length)) collectorIds.add(r.id);
     }
 
+    // 全图平均度 / 平均端口数：启发式风险分用它做**相对**阈值。
+    // 旧代码把 deg>=8/15、端口>=6 写死，那是为 avgDeg≈4.8 的老数据调的，
+    // 换到 avgDeg≈14 的新数据上几乎全员命中，于是满屏红色光圈。
+    let totalDegAll = 0;
+    let totalPortsAll = 0;
+    for (const r of ipRecords) {
+      totalDegAll += (inDeg.get(r.id) || 0) + (outDeg.get(r.id) || 0);
+      const pc = new Set<number>();
+      for (const q of toNumberList(r.ports)) pc.add(q);
+      for (const q of linkPorts.get(r.id) || []) pc.add(q);
+      totalPortsAll += pc.size;
+    }
+    const avgDeg = ipRecords.length > 0 ? totalDegAll / ipRecords.length : 0;
+    const avgPortCount = ipRecords.length > 0 ? totalPortsAll / ipRecords.length : 0;
+
     // 每个节点的派生统计：角色（组合端口规则）+ 风险分（连续因子）+ 入出度
     const nodeStats = new Map<string, {
       inD: number; outD: number; deg: number; totalW: number;
@@ -298,8 +365,12 @@ export async function GET(request: Request) {
       const role = deriveRole(portCount, r.id);
       const isCritical = CRITICAL_ROLES.has(role);
 
-      let aScore = 0.15;
-      if (!collectorIds.has(r.id)) {
+      // ---- 异常分来源优先级 ----
+      // 数据自带的异常标注是权威事实，必须优先采用；只有数据**没有**该字段时才跑启发式。
+      // 否则会出现「同一份数据：本地 JSON 导入一个都不亮、从库加载满屏红色」的矛盾。
+      const storedAnomaly = r.has_anomaly_score === true ? Number(r.anomaly_score ?? 0) : null;
+      let aScore = storedAnomaly ?? 0.15;
+      if (storedAnomaly === null && !collectorIds.has(r.id)) {
         if (domPort && MONITOR_DOMINANT_PORTS.has(domPort)) {
           aScore = 0.05; // 监控资产不标异常
         } else {
@@ -322,8 +393,11 @@ export async function GET(request: Request) {
               aScore = Math.max(aScore, 0.1);
               if (nbrSubnetCount >= 3) aScore = Math.max(aScore, 0.18);
             } else {
-              // A. 暴露面：6 端口起跳 +0.18，每多 1 端口 +0.05，上限 +0.4
-              aScore += Math.min(0.4, Math.max(0, portCount.size - 5) * 0.05 + (portCount.size >= 6 ? 0.18 : 0));
+              // A. 暴露面：以「全图平均端口数」为基准起跳，而不是写死 6 个端口
+              const portThreshold = Math.max(6, avgPortCount * 1.5);
+              if (portCount.size >= portThreshold) {
+                aScore += Math.min(0.4, (portCount.size - 5) * 0.05 + 0.18);
+              }
               // B. 数据库端口暴露（非关键资产）：1 类 +0.15，≥2 类 +0.25
               const dbHits = DB_PORTS.filter(p => portCount.has(p)).length;
               if (dbHits >= 2) aScore += 0.25;
@@ -351,18 +425,18 @@ export async function GET(request: Request) {
                 else if (lowCnt >= 3 && nEdges >= 4) aScore += 0.08;
                 // H. 跨子网边占比：广泛跨域通信（横向扩散特征，需高连接数才触发）
                 const crossShare = (crossSubnetEdges.get(r.id) || 0) / nEdges;
-                if (deg >= 8 && crossShare >= 0.8) aScore += 0.12;
+                if (deg >= avgDeg * 1.5 && crossShare >= 0.8) aScore += 0.12;
               }
-              // G. 节点度（连接数）：多目标通信规模（主机间流量接入后更有区分度）
-              if (deg >= 15) aScore += 0.15;
-              else if (deg >= 8) aScore += 0.08;
+              // G. 节点度：相对全图平均度，而不是写死 8/15
+              if (deg >= avgDeg * 3) aScore += 0.15;
+              else if (deg >= avgDeg * 1.5) aScore += 0.08;
             }
           }
         }
-      } else {
+      } else if (storedAnomaly === null) {
         aScore = 0.05; // 采集/汇聚 hub 不标异常
       }
-      aScore = Math.min(aScore, 0.95);
+      aScore = storedAnomaly === null ? Math.min(aScore, 0.95) : Math.max(0, Math.min(aScore, 1));
       nodeStats.set(r.id, {
         inD, outD, deg, totalW, role,
         anomaly: aScore,
@@ -379,18 +453,30 @@ export async function GET(request: Request) {
         id: r.id,
         community: r.community,
         subnet_24: r.subnet_24 ?? r.subnet_cidr ?? '0.0.0.0/0',
-        zone_id: r.zone_id ?? '-1',
-        zone_color: r.zone_color ?? '#64748b',
-        zone_label: r.zone_label ?? 'Unassigned',
+        // 优先用 IP 自带的域（数据作者标注的安全域，最准确），
+        // 其次才是「子网多数票」得到的域 —— 否则同一子网里的 DB 主机会被算进 App 域。
+        zone_id: r.ip_zone_id ?? r.zone_id ?? '-1',
+        zone_color: r.ip_zone_color ?? r.zone_color ?? '#64748b',
+        zone_label: r.ip_zone_label ?? r.zone_label ?? 'Unassigned',
         degree: st.deg || Number(r.degree) || 0,
         in_degree: st.inD,
         out_degree: st.outD,
         anomaly_score: anomalyScore,
-        is_anomaly: anomalyScore >= 0.6,
+        // 有自带标注时以标注为准（本地导入走的就是这个字段），否则按分数阈值判
+        is_anomaly: r.is_anomaly ?? anomalyScore >= 0.6,
         anomaly_level:
-          anomalyScore >= 0.75 ? 'Critical' :
-          anomalyScore >= 0.60 ? 'High' :
-          anomalyScore >= 0.45 ? 'Medium' : 'Low',
+          (r.anomaly_level as 'Critical' | 'High' | 'Medium' | 'Low' | 'None' | null) ??
+          (anomalyScore >= 0.75 ? 'Critical' :
+            anomalyScore >= 0.60 ? 'High' :
+            anomalyScore >= 0.45 ? 'Medium' : 'Low'),
+        anomaly_source: r.has_anomaly_score === true ? 'stored' : 'heuristic',
+        asset_value: r.asset_value == null ? null : Number(r.asset_value),
+        // 库里算好的通信锚点域（方案2）：有则前端直接采用，不再重算
+        flow_zone_id: r.flow_zone_id,
+        flow_zone_label: r.flow_zone_label,
+        flow_direction: r.flow_direction,
+        flow_callers: r.flow_callers,
+        flow_peers: r.flow_peers,
         is_hub: st.isHub,
         is_critical: st.isCritical,
         service_type: r.service_type,
@@ -403,14 +489,42 @@ export async function GET(request: Request) {
         cmdb_tags: Array.isArray(r.cmdb_tags) ? r.cmdb_tags : [],
         ports: toNumberList(r.ports),
         protocols: toStringList(r.protocols),
-        // 角色：主导端口 → 服务角色（不再回退成 service_type/unknown）
-        role_guess: st.role,
+        // 角色：优先用端口推导；推不出（unknown）时回退到数据自带的 role_guess，
+        // 否则像 new2.0 这种「端口只在边上」的数据集会把角色整列丢成 unknown。
+        role_guess: st.role !== 'unknown' ? st.role : (r.role_guess || 'unknown'),
       };
     });
 
+    // ---- 节点上限保护 ----
+    // 一次渲染数千节点会卡死浏览器，所以默认只保留一小部分。
+    // 选取优先级：① 异常节点（必须保住，否则风险被截断隐藏）
+    //              ② 枢纽 / hub ③ 资产价值 ④ 连接度。
+    // 截断时同步过滤边，否则会出现指向被裁掉节点的悬空边，D3 渲染会出错。
+    // 全量：?all=1；自定义：?limit=N。
+    const totalIps = nodes.length;
+    const totalAnomaliesInDb = nodes.filter(n => n.is_anomaly).length;
+    const limitValue = includeAll || requestedLimit <= 0 ? totalIps : requestedLimit;
+    const truncated = totalIps > limitValue;
+    const rankOf = (n: { is_anomaly: boolean; is_hub: boolean; is_critical: boolean }) =>
+      (n.is_anomaly ? 4 : 0) + (n.is_hub ? 2 : 0) + (n.is_critical ? 1 : 0);
+    const keptNodes = truncated
+      ? [...nodes]
+          .sort((a, b) =>
+            rankOf(b) - rankOf(a) ||
+            Number(b.asset_value ?? 0) - Number(a.asset_value ?? 0) ||
+            Number(b.degree) - Number(a.degree)
+          )
+          .slice(0, limitValue)
+      : nodes;
+
+    const keptIds = new Set(keptNodes.map(n => n.id));
+    const keptLinks = truncated
+      ? linkRecords.filter(l => keptIds.has(l.src) && keptIds.has(l.dst))
+      : linkRecords;
+
     // 给每条边附上 "是否跨 zone"（前端直接用，不用再算）
-    const ipZone = new Map(nodes.map(n => [n.id, n.zone_id]));
-    const links = linkRecords.map(l => ({
+    const ipZone = new Map(keptNodes.map(n => [n.id, n.zone_id]));
+    const links = keptLinks.map(l => ({
       source: l.src,
       target: l.dst,
       weight: Number(l.weight) || 1,
@@ -424,22 +538,22 @@ export async function GET(request: Request) {
       metadata: {
         generated_at: new Date().toISOString(),
         source: 'neo4j',
-        total_nodes: nodes.length,
+        total_nodes: keptNodes.length,
         total_links: links.length,
-        communities: new Set(nodes.map(n => n.community)).size,
+        communities: new Set(keptNodes.map(n => n.community)).size,
+        // 截断溯源：前端据此提示「只加载了前 N 个」
+        truncated,
+        total_ips_in_db: totalIps,
+        node_limit: includeAll || requestedLimit <= 0 ? null : requestedLimit,
+        // 异常保全：截断后实际带回的异常数 / 全库异常总数
+        total_anomalies_in_db: totalAnomaliesInDb,
+        anomalies_included: keptNodes.filter(n => n.is_anomaly).length,
       },
-      nodes,
+      nodes: keptNodes,
       links,
       zones: zoneRecords,
     });
   } catch (err) {
-    console.error('[api/topology/neo4j] error:', err);
-    return NextResponse.json(
-      {
-        error: 'Failed to load from Neo4j',
-        detail: err instanceof Error ? err.message : String(err),
-      },
-      { status: 500 }
-    );
+    return neo4jErrorResponse('api/topology/neo4j', err);
   }
 }

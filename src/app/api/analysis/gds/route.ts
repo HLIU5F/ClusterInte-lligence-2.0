@@ -1,4 +1,4 @@
-﻿/**
+/**
  * GDS 动态分区端点
  *
  * POST /api/analysis/gds
@@ -14,6 +14,7 @@
  *   { graph: {nodeCount,relationshipCount}, results: {...}, persisted: true|false }
  */
 import { NextResponse } from 'next/server';
+import { neo4jErrorResponse } from '@/lib/apiErrors';
 import { runCypher } from '@/lib/neo4j';
 
 type Algo = 'louvain' | 'wcc' | 'pagerank' | 'all' | 'physical_zone';
@@ -382,12 +383,8 @@ export async function POST(request: Request) {
     await dropGraph();
 
     return NextResponse.json({ success: true, ...results });
-  } catch (e: any) {
-    console.error('[/api/analysis/gds] error:', e);
-    return NextResponse.json(
-      { success: false, error: e.message || String(e) },
-      { status: 500 }
-    );
+  } catch (e) {
+    return neo4jErrorResponse('api/analysis/gds:POST', e, { success: false });
   }
 }
 
@@ -431,10 +428,7 @@ export async function GET() {
         ip_count: Number(z.ip_count),
       })),
     });
-  } catch (e: any) {
-    return NextResponse.json(
-      { success: false, error: e.message || String(e) },
-      { status: 500 }
-    );
+  } catch (e) {
+    return neo4jErrorResponse('api/analysis/gds:GET', e, { success: false });
   }
 }
